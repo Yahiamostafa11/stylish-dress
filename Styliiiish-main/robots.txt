@@ -1,0 +1,11 @@
+User-agent: Google-InspectionTool
+Disallow:
+
+User-agent: Googlebot
+Disallow:
+
+User-agent: *
+Disallow: /wp-admin/
+Allow: /wp-admin/admin-ajax.php
+
+Sitemap: https://styliiiish.com/sitemap_index.xml

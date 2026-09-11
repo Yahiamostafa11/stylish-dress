@@ -1,0 +1,243 @@
+  
+  /* ========================
+   Delivery Policy – Layout
+========================= */
+  
+  .policy-wrapper {
+    background: #f7f8fb;
+    padding: 60px 15px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .policy-container {
+    max-width: 900px;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 30px 24px 40px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+    border: 1px solid #e5e7eb;
+  }
+
+  .policy-container h1 {
+    font-size: 28px;
+    margin-bottom: 10px;
+    color: #111827;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .policy-intro {
+    margin-bottom: 30px;
+    color: #4b5563;
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  .policy-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .policy-block {
+    padding: 18px 18px 20px;
+    border-radius: 12px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+  }
+
+  .policy-block h2 {
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: #111827;
+    font-weight: 600;
+  }
+
+  .policy-block p {
+    margin-bottom: 10px;
+    color: #4b5563;
+    line-height: 1.6;
+    font-size: 14px;
+  }
+
+  .policy-block ul,
+  .policy-block ol {
+    margin: 0 0 10px 18px;
+    padding: 0;
+    color: #4b5563;
+    line-height: 1.6;
+    font-size: 14px;
+  }
+
+  .policy-block li {
+    margin-bottom: 5px;
+  }
+
+  .policy-contact li {
+    list-style: none;
+    margin-left: 0;
+  }
+
+  .policy-block a {
+    color: #0f766e;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .policy-block a:hover {
+    text-decoration: underline;
+  }
+
+  /* Responsive */
+  @media (min-width: 768px) {
+    .policy-container {
+      padding: 40px 40px 48px;
+    }
+
+    .policy-container h1 {
+      font-size: 32px;
+    }
+
+    .policy-block {
+      padding: 22px 22px 24px;
+    }
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+    
+  /* ========================
+  Legal Pages Wrapper – Layout
+========================= */
+  
+  /* ===== Legal Pages Wrapper ===== */
+.legal-wrapper {
+    background: #f6f7f9;
+    padding: 40px 15px;
+}
+
+/* ===== Card ===== */
+.legal-card {
+    background: #ffffff;
+    max-width: 880px;
+    margin: auto;
+    padding: 50px 40px;
+    border-radius: 14px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.07);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: #1f2933;
+}
+
+/* ===== Headings ===== */
+.legal-card h1 {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    letter-spacing: -0.5px;
+}
+
+.legal-card h2 {
+    font-size: 20px;
+    margin-top: 35px;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+/* ===== Text ===== */
+.legal-card p {
+    font-size: 16px;
+    line-height: 1.75;
+    margin-bottom: 15px;
+    color: #4a4a4a;
+}
+
+.legal-card .intro {
+    font-size: 17px;
+    color: #333;
+}
+
+/* ===== Lists ===== */
+.legal-card ul {
+    padding-left: 22px;
+    margin-bottom: 20px;
+}
+
+.legal-card li {
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+/* ===== Contact Box ===== */
+.contact-box {
+    margin-top: 40px;
+    padding: 20px 25px;
+    border-left: 4px solid #111;
+    background: #fafafa;
+    border-radius: 8px;
+}
+
+.contact-box a {
+    display: inline-block;
+    font-weight: 600;
+    color: #000;
+    text-decoration: none;
+    margin-top: 8px;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .legal-card {
+        padding: 30px 22px;
+    }
+
+    .legal-card h1 {
+        font-size: 28px;
+    }
+
+    .legal-card h2 {
+        font-size: 18px;
+    }
+
+    .legal-card p,
+    .legal-card li {
+        font-size: 15px;
+    }
+}
+
+  
+  
+   /* ========================
+  Legal Pages Wrapper – Layout
+========================= */
+  
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  

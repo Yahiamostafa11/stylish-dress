@@ -1,0 +1,726 @@
+/* ===========================
+   PRODUCT BUILDER SYSTEM
+=========================== */
+
+:root{
+    --p-main:#4f46e5;
+    --p-bg:#f8fafc;
+    --p-card:#ffffff;
+    --p-border:#e2e8f0;
+    --p-text:#0f172a;
+    --p-muted:#64748b;
+    --p-radius:16px;
+    --p-shadow:0 15px 40px rgba(0,0,0,.12);
+}
+
+
+/* Overlay */
+
+.wf-ui-modal{
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,.6);
+    display:none;
+    z-index:99999;
+}
+
+
+/* Modal Box */
+
+.wf-ui-modal-box{
+   display: flex;
+   flex-direction: column;
+
+   height: 90vh;
+   max-height: 95vh;
+
+   background: var(--p-bg);
+   width: 95%;
+   max-width: 1100px;
+   margin: 4vh auto;
+
+   border-radius: var(--p-radius);
+   box-shadow: var(--p-shadow);
+
+   padding: 0; /* مهم */
+   overflow: hidden;
+}
+
+/* Keep Add/Edit Product modal large even if generic modal styles load later */
+#addProductModal.wf-ui-modal{
+   overflow-y: auto;
+}
+
+#addProductModal .wf-ui-modal-box{
+   width: 95%;
+   max-width: 1200px;
+   height: 90vh;
+   max-height: 95vh;
+   margin: 3vh auto;
+   padding: 0;
+   display: flex;
+   flex-direction: column;
+}
+
+/* Mobile */
+
+@media(max-width:900px){
+
+    .product-builder{
+        grid-template-columns:1fr;
+    }
+
+    .wf-ui-modal-box{
+        height:auto;
+    }
+
+   #addProductModal .wf-ui-modal-box{
+      width: 96%;
+      max-width: 96%;
+      margin: 2vh auto;
+      height: auto;
+      max-height: none;
+   }
+}
+
+/* Layout */
+
+.product-builder{
+   display: grid;
+   grid-template-columns: 380px 1fr;
+   grid-template-rows: 1fr;
+   gap: 24px;
+   padding: 24px;
+   height: 100%;
+   overflow: hidden;
+}
+
+
+/* ===========================
+   LIVE PREVIEW CARD
+=========================== */
+
+.product-preview{
+
+   background: #fff;
+   border-radius: 16px;
+   padding: 16px;
+   box-shadow: 0 8px 24px rgba(0,0,0,.08);
+   position: sticky;
+   top: 20px;
+}
+
+
+/* Image */
+
+.preview-image{
+
+   width:100%;
+   aspect-ratio:1/1;
+   background:#f5f5f5;
+   border-radius:12px;
+   display:flex;
+   align-items:center;
+   justify-content:center;
+   overflow:hidden;
+}
+
+.preview-image img{
+   width:100%;
+   height:100%;
+   object-fit:cover;
+}
+
+.preview-gallery{
+   margin-top:10px;
+   display:grid;
+   grid-template-columns:repeat(auto-fill,minmax(52px,1fr));
+   gap:8px;
+}
+
+.preview-gallery .preview-thumb{
+   width:100%;
+   aspect-ratio:1/1;
+   object-fit:cover;
+   border-radius:8px;
+   border:2px solid transparent;
+   cursor:pointer;
+   transition:.15s ease;
+   background:#f1f5f9;
+}
+
+.preview-gallery .preview-thumb:hover{
+   transform:translateY(-1px);
+   border-color:#c7d2fe;
+}
+
+.preview-gallery .preview-thumb.is-active{
+   border-color:#4f46e5;
+   box-shadow:0 0 0 2px rgba(79,70,229,.12);
+}
+
+
+/* Title */
+
+.preview-title{
+    font-size:20px;
+    font-weight:700;
+    color:var(--p-text);
+}
+
+
+
+/* Desc */
+
+.preview-desc{
+    font-size:14px;
+    color:var(--p-muted);
+    line-height:1.6;
+}
+
+
+/* Category */
+
+.preview-cats span{
+    background:#eef2ff;
+    color:#4338ca;
+    padding:4px 10px;
+    border-radius:50px;
+    font-size:12px;
+    margin-right:6px;
+}
+
+
+/* ===========================
+   FORM PANEL
+=========================== */
+
+.builder-form{
+   height: 100%;
+   overflow-y: auto;
+   padding: 22px 22px 90px 22px;
+   /* bottom = مساحة للأزرار */
+}
+
+
+/* Field */
+
+.wf-field{
+   margin-bottom:18px;
+}
+
+.wf-field label{
+   font-size:13px;
+   font-weight:600;
+   margin-bottom:6px;
+   display:block;
+   color:#444;
+}
+
+.wf-field input,
+.wf-field textarea,
+.wf-field select{
+   width:100%;
+   padding:10px 12px;
+   border-radius:8px;
+   border:1px solid #ddd;
+   font-size:14px;
+   transition:.2s;
+}
+
+.wf-field input:focus,
+.wf-field textarea:focus,
+.wf-field select:focus{
+   border-color:#4f46e5;
+   outline:none;
+   box-shadow:0 0 0 2px rgba(79,70,229,.15);
+}
+
+
+
+/* Upload */
+
+.wf-upload{
+    border:2px dashed #c7d2fe;
+    padding:20px;
+    text-align:center;
+    border-radius:14px;
+    cursor:pointer;
+    background:#f8fafc;
+}
+
+
+/* Buttons */
+
+.builder-actions{
+   position: relative;
+   bottom: 0;
+
+   background: #fff;
+   border-top: 1px solid #eee;
+
+   padding: 12px 22px;
+
+   display: flex;
+   gap: 10px;
+
+   z-index: 100;
+}
+
+
+.styliiiish-upload-btn{
+   width:100%;
+   border:2px dashed #ccc;
+   padding:16px;
+   border-radius:10px;
+   background:#fafafa;
+}
+
+
+.wf-ui-btn{
+    flex:1;
+    padding:10px;
+    border-radius:10px;
+    border:none;
+    background:var(--p-main);
+    color:#fff;
+    cursor:pointer;
+}
+
+.wf-ui-btn.outline{
+    background:#fff;
+    border:1px solid var(--p-border);
+    color:var(--p-text);
+}
+
+
+/* ===========================
+   PRODUCT CARD EXTRAS
+=========================== */
+
+.preview-meta{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+
+.preview-badge{
+    background:#22c55e;
+    color:#fff;
+    font-size:11px;
+    padding:3px 8px;
+    border-radius:50px;
+}
+
+
+.preview-rating{
+    font-size:13px;
+    color:#f59e0b;
+}
+
+
+.preview-buy-btn{
+    margin-top:10px;
+    padding:10px;
+    width:100%;
+    background:#0f172a;
+    color:#fff;
+    border:none;
+    border-radius:10px;
+    font-size:14px;
+    cursor:pointer;
+}
+
+
+/* ===========================
+   ATTRIBUTES UI
+=========================== */
+/* ATTR BOX */
+.attr-box{
+   padding:10px;
+   background:#fafafa;
+   border:1px solid #ddd;
+   border-radius:8px;
+}
+
+/* GROUP */
+.attr-group{
+   margin-bottom:15px;
+}
+
+.attr-group:last-child{
+   margin-bottom:0;
+}
+
+/* TITLE */
+.attr-title{
+   font-size:14px;
+   font-weight:600;
+   margin-bottom:6px;
+   color:#333;
+}
+
+/* OPTIONS */
+.attr-list{
+   display:flex;
+   flex-wrap:wrap;
+   gap:6px;
+}
+
+/* ITEM */
+.attr-item{
+   cursor:pointer;
+}
+
+.attr-item input{
+   display:none;
+}
+
+.attr-item span{
+   display:inline-block;
+   padding:5px 12px;
+   border:1px solid #ccc;
+   border-radius:6px;
+   font-size:13px;
+   background:#fff;
+   transition:.15s;
+}
+
+/* HOVER */
+.attr-item:hover span{
+   background:#f0f0f0;
+}
+
+/* ACTIVE */
+.attr-item input:checked + span{
+   background:#2271b1;
+   border-color:#2271b1;
+   color:#fff;
+}
+
+
+#prevCats span,
+#prevAttrs span{
+   display:inline-block;
+   background:#eee;
+   padding:4px 8px;
+   border-radius:12px;
+   margin:2px;
+   font-size:12px;
+}
+
+
+.preview-attrs span{
+   background:#f1f5f9;
+   padding:3px 8px;
+   border-radius:6px;
+   font-size:11px;
+   margin:2px;
+   display:inline-block;
+}
+
+
+
+/* ===========================
+   PRICE UI (CLEAN)
+=========================== */
+
+.price-row{
+    display:flex;
+    gap:12px;
+}
+
+.price-row input{
+    flex:1;
+}
+
+.price-hint{
+    font-size:11px;
+    color:#64748b;
+}
+
+/* Preview Price */
+
+.preview-price{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    margin:10px 0;
+    font-size:18px;
+    color:var(--p-main);
+    font-weight:600;
+}
+
+/* Regular */
+
+#prevRegular{
+    font-size:18px;
+    font-weight:700;
+    color:#0f172a;
+}
+
+#prevRegular.discount{
+    text-decoration:line-through;
+    color:#94a3b8;
+    font-size:14px;
+}
+
+/* Sale */
+
+#prevSale{
+    font-size:22px;
+    font-weight:700;
+    color:#e63946;
+    margin-left:8px;
+    transition:.2s ease;
+}
+
+/* Discount Badge */
+
+#prevDiscount{
+    background:#e63946;
+    color:#fff;
+    font-size:12px;
+    padding:2px 6px;
+    border-radius:4px;
+    margin-left:8px;
+}
+
+
+
+/* Hide file input safely (NOT display:none) */
+
+.wf-hidden-file{
+  position: fixed;
+  left: -9999px;
+  top: -9999px;
+  opacity: 0;
+}
+
+
+#wfImageModal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  z-index:99999;
+  display:none;
+}
+
+#wfImageModal .wf-images-box{
+  background:#fff;
+  width:90%;
+  max-width:800px;
+  margin:5% auto;
+  padding:20px;
+  border-radius:12px;
+}
+
+
+/* خلي SweetAlert دايمًا فوق أي مودال */
+.swal2-container {
+    z-index: 999999 !important;
+}
+
+
+.preview-attr{
+   background:#eee;
+   padding:4px 8px;
+   border-radius:6px;
+   margin:2px;
+   display:inline-block;
+   font-size:13px;
+}
+
+/* ==================================================
+   FINAL SCOPED OVERRIDES (ensure visibility/apply)
+   ================================================== */
+#addProductModal.wf-ui-modal{
+   position: fixed;
+   inset: 0;
+   display: none;
+   z-index: 99999;
+   background: rgba(15,23,42,.6);
+   overflow-y: auto;
+}
+
+#addProductModal .wf-ui-modal-box{
+   background: var(--p-bg);
+   width: 95%;
+   max-width: 1200px;
+   min-height: 620px;
+   height: 90vh;
+   max-height: 95vh;
+   margin: 3vh auto;
+   border-radius: var(--p-radius);
+   box-shadow: var(--p-shadow);
+   overflow: hidden;
+   display: flex;
+   flex-direction: column;
+}
+
+#addProductModal .product-builder{
+   display: grid;
+   grid-template-columns: 380px 1fr;
+   gap: 24px;
+   padding: 24px;
+   height: 100%;
+   overflow: hidden;
+}
+
+#addProductModal .builder-form{
+   height: 100%;
+   overflow-y: auto;
+   padding: 22px 22px 90px 22px;
+}
+
+#addProductModal .builder-actions{
+   position: relative;
+   bottom: 0;
+   display: flex;
+   gap: 10px;
+   background: #fff;
+   border-top: 1px solid #eee;
+   padding: 12px 22px;
+   z-index: 100;
+}
+
+#addProductModal .wf-field input,
+#addProductModal .wf-field textarea,
+#addProductModal .wf-field select{
+   width: 100%;
+   box-sizing: border-box;
+}
+
+
+
+
+
+/* ===========================
+   MOBILE FINAL FIX
+=========================== */
+
+@media (max-width:768px){
+
+/* Overlay scroll */
+.wf-ui-modal{
+   overflow-y:auto;
+}
+
+/* Full modal */
+.wf-ui-modal-box{
+   width:100%;
+   height:auto;
+   min-height:100vh;
+   margin:0;
+   border-radius:0;
+   padding:12px;
+   display:block;
+}
+
+/* Layout → normal flow */
+.product-builder{
+   display:block;
+   padding:10px;
+   max-height:none;
+   overflow:visible;
+}
+
+/* Preview normal */
+.product-preview{
+   position:relative;
+   margin-bottom:15px;
+}
+
+/* Form scrolls */
+.builder-form{
+   max-height:none;
+   overflow:visible;
+   padding-bottom:120px;
+}
+
+/* Fixed buttons */
+.builder-actions{
+   position:fixed;
+   bottom:0;
+   left:0;
+   width:100%;
+   background:#fff;
+   padding:10px;
+   z-index:9999;
+   box-shadow:0 -2px 10px rgba(0,0,0,.1);
+}
+
+#addProductModal .wf-ui-modal-box{
+   width: 100%;
+   max-width: 100%;
+   margin: 0;
+   min-height: 100vh;
+   height: auto;
+   max-height: none;
+   border-radius: 0;
+}
+
+#addProductModal .product-builder{
+   display: block;
+   padding: 10px;
+   max-height: none;
+   overflow: visible;
+}
+
+#addProductModal .builder-form{
+   max-height: none;
+   overflow: visible;
+   padding-bottom: 120px;
+}
+
+#addProductModal .builder-actions{
+   position: fixed;
+   left: 0;
+   right: 0;
+   bottom: 0;
+   width: 100%;
+}
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,170 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"Project-Id-Version: WebsiteFlexi Owner Dashboard & Marketplace\n"
+"POT-Creation-Date: 2026-01-06 22:48+0200\n"
+"PO-Revision-Date: 2026-01-06 22:48+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.2\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-Flags-xgettext: --add-comments=translators:\n"
+"X-Poedit-WPHeader: owner-dashboard.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+
+#: includes/vendor-workflow.php:83
+msgid "Your Store"
+msgstr ""
+
+#: includes/vendor-workflow.php:84
+msgid "My Products"
+msgstr ""
+
+#: includes/vendor-workflow.php:85
+msgid "Wallet"
+msgstr ""
+
+#: includes/vendor-workflow.php:86
+msgid "Withdraw Earnings"
+msgstr ""
+
+#: includes/vendor-workflow.php:87
+msgid "Application Under Review"
+msgstr ""
+
+#: includes/vendor-workflow.php:88
+msgid "Store Suspended"
+msgstr ""
+
+#: includes/vendor-workflow.php:89
+msgid "Register as Vendor"
+msgstr ""
+
+#: includes/vendor-workflow.php:188
+msgid "Your vendor application is under review. You will be contacted soon."
+msgstr ""
+
+#: includes/vendor-workflow.php:192
+msgid "Your store has been temporarily suspended. Please contact support."
+msgstr ""
+
+#: includes/vendor-workflow.php:212
+msgid "You cannot apply again."
+msgstr ""
+
+#: includes/vendor-workflow.php:217
+msgid "Register as a Vendor"
+msgstr ""
+
+#: includes/vendor-workflow.php:218
+msgid ""
+"Please fill in the following details carefully. Your application will be "
+"reviewed before approval."
+msgstr ""
+
+#: includes/vendor-workflow.php:228
+msgid "Basic Information"
+msgstr ""
+
+#: includes/vendor-workflow.php:231
+msgid "Store Name"
+msgstr ""
+
+#: includes/vendor-workflow.php:236
+msgid "Phone Number (Call)"
+msgstr ""
+
+#: includes/vendor-workflow.php:241
+msgid "WhatsApp Number"
+msgstr ""
+
+#: includes/vendor-workflow.php:246
+msgid "Current Address"
+msgstr ""
+
+#: includes/vendor-workflow.php:250
+msgid "Business Type"
+msgstr ""
+
+#: includes/vendor-workflow.php:254
+msgid "Select Business Type"
+msgstr ""
+
+#: includes/vendor-workflow.php:255
+msgid "Home"
+msgstr ""
+
+#: includes/vendor-workflow.php:256
+msgid "Shop"
+msgstr ""
+
+#: includes/vendor-workflow.php:257
+msgid "Company"
+msgstr ""
+
+#: includes/vendor-workflow.php:258
+msgid "Office"
+msgstr ""
+
+#: includes/vendor-workflow.php:263
+msgid "This address will be used as the pickup location for shipping orders."
+msgstr ""
+
+#: includes/vendor-workflow.php:267
+msgid "Business Documents"
+msgstr ""
+
+#: includes/vendor-workflow.php:270
+msgid "Commercial Register"
+msgstr ""
+
+#: includes/vendor-workflow.php:275
+msgid "Tax Card"
+msgstr ""
+
+#: includes/vendor-workflow.php:280
+msgid "Business Address"
+msgstr ""
+
+#: includes/vendor-workflow.php:285
+msgid "Identity Verification"
+msgstr ""
+
+#: includes/vendor-workflow.php:288
+msgid "ID Card (Front)"
+msgstr ""
+
+#: includes/vendor-workflow.php:293
+msgid "ID Card (Back)"
+msgstr ""
+
+#: includes/vendor-workflow.php:298
+msgid "Latest Electricity or Gas Bill"
+msgstr ""
+
+#: includes/vendor-workflow.php:303
+msgid "Submit Vendor Application"
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "WebsiteFlexi Owner Dashboard & Marketplace"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid ""
+"WebsiteFlexi Dashboard & Marketplace — Owner control, managers, dashboard "
+"access and customer dress marketplace."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "WebsiteFlexi"
+msgstr ""

@@ -1,0 +1,81 @@
+# ---------------------------------------------------------------------------
+# Repo-root ignores for the stylish-dress repository.
+#
+# Styliiiish-main/.gitignore already covers WordPress core, uploads, secrets and
+# vendor folders relative to itself. This file covers the repo root, and repeats
+# the few patterns whose leaking would be unrecoverable — a belt-and-braces layer
+# in case the inner .gitignore is ever moved, renamed or edited.
+# ---------------------------------------------------------------------------
+
+# --- The raw download. 631 MB, and GitHub rejects any single file over 100 MB.
+Styliiiish-main.zip
+*.zip
+*.tar
+*.tar.gz
+*.rar
+*.7z
+
+# --- Secrets. Must never enter history; history is forever.
+**/wp-config.php
+**/laravel_home/.env
+**/.env
+**/.env.*
+!**/.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Laravel's cached config. After `php artisan config:cache` this file contains the
+# fully-resolved config — DB password and APP_KEY in plaintext. Unrecoverable if pushed.
+**/laravel_home/bootstrap/cache/*.php
+
+# --- Customer and vendor PII.
+# uploads/ holds product media AND vendor KYC identity documents.
+# styliiiish-kyc/ is the private KYC store created by includes/kyc-storage.php:
+# national IDs, utility bills, commercial registers, tax cards. Never commit it.
+**/wp-content/uploads/
+**/uploads/styliiiish-kyc/
+**/jpcrm-storage/
+
+# --- Database dumps and local databases.
+*.sql
+*.sql.gz
+*.sqlite
+*.sqlite3
+
+# --- Dependencies and build output.
+# NOTE: only Laravel's vendor/ is ignored. WordPress plugin vendor/ folders
+# (WooCommerce's autoloader above all) are required at runtime and MUST stay
+# tracked — a blanket **/vendor/ rule here would ship a broken site.
+Styliiiish-main/laravel_home/vendor/
+**/node_modules/
+**/laravel_home/public/build/
+**/laravel_home/public/hot/
+
+# --- Runtime, caches, logs.
+**/wp-content/cache/
+**/wp-content/litespeed/
+**/wp-content/upgrade/
+**/wp-content/upgrade-temp-backup/
+**/wp-content/uploads/wc-logs/
+**/laravel_home/storage/logs/*.log
+**/laravel_home/storage/framework/cache/*
+**/laravel_home/storage/framework/sessions/*
+**/laravel_home/storage/framework/views/*
+**/litespeed/
+*.log
+
+# --- Leftovers found in the audit. Delete these rather than commit them.
+**/tmp_footer_patch.diff
+**/.htaccess.bk
+**/*(old).php
+**/BackUps/
+
+# --- OS and editor noise.
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+*.swp
+*~

@@ -1,0 +1,213 @@
+                                                                                 
+                                                                                 
+                                                                                 
+                                                                                 
+                                                                                 
+                                                                                 
+                                                                                 
+                                                                                 
+                                                                                 
+                                                                                 
+                                                                                 
+                                                                                 
+                                                                                 
+                                                                                 
+                                                                                 
+                                                                                 
+                                                                                owner-dashboard/
+                                                                                │
+                                                                                    ├── owner-dashboard.php            ← الملف الرئيسي (Plugin Bootstrap)
+                                                                                    │
+                                                                                    ├── admin/
+                                                                                    │   ├── system-settings.php        ← صفحة الإعدادات الرئيسية للإضافة
+                                                                                    │   └── system-settings-view.php   ← واجهة عرض الإعدادات (Tabs UI + Forms)
+                                                                                    │
+                                                                                    ├── includes/
+                                                                                    │   ├── settings-handler.php       ← معالجة الإعدادات (POST + Saving)
+                                                                                    │   ├── helpers.php                ← دوال عامة + Option keys + loaders
+                                                                                    │   └── marketplace.php            ← تفعيل / تعطيل Marketplace + مستقبل التطوير
+                                                                                    │
+                                                                                    ├── modules/
+                                                                                    │       ├── manage-products/       
+                                                                                    │           ├── manage-products.php               
+                                                                                    │           └── manage-products.js           
+                                                                                    │           └── manage-products.css   
+                                                                                    │
+                                                                                    │       ├── shared/       
+                                                                                    │               ├── ajax/               
+                                                                                    │                   └── manage-products-ajax.php           
+                                                                                    │               └── helpers.php            
+                                                                                    │
+                                                                                    │
+                                                                                    ├── assets/
+                                                                                    │   └── css/
+                                                                                    │       └── owner-style.css
+                                                                                    │       └── mobile.css
+                                                                                    │   └── js/
+                                                                                    │       └── owner-dashboard-theme.js
+                                                                                    │       └── owner-core.js
+                                                                                    │   └── images/
+                                                                                    │
+                                                                                    │
+                                                                                    │
+                                                                                    ├── manage-products.php            ← صفحة إدارة المنتجات للـ Owner
+                                                                                    ├── vendor-products.php            ← منتجات العملاء (pending/approved)
+                                                                                    ├── orders.php                     ← صفحة الطلبات
+                                                                                    ├── stats.php                      ← صفحة الإحصائيات
+                                                                                    ├── owner-dashboard.php            ← Shortcode + Frontend UI
+                                                                                    ├── email.php                      ← صفحة إرسال الإيميلات من الداشبورد
+                                                                                    ├── functions.php                  ← AJAX + Inline Editing + Attribute Editor
+                                                                                    │
+                                                                                    ├── owner
+
+
+
+
+
+
+
+
+owner-dashboard/
+│
+├── owner-dashboard.php               ← الملف الرئيسي (Loader + Bootstrap)
+│
+├── admin/
+│   ├── system-settings.php           ← صفحة الإعدادات في WP Admin
+│   └── system-settings-view.php      ← HTML + UI الخاصة بالإعدادات
+│
+├── includes/
+│   ├── settings-handler.php          ← معالجة الإعدادات وحفظها
+│   ├── helpers.php                   ← دوال عامة
+│   └── marketplace.php               ← منطق Marketplace (endpoint + menu)
+│
+├── modules/
+│   ├── manage-products/
+│   │   ├── manage-products.php       ← View (HTML structure) لصفحة إدارة المنتجات
+│   │   ├── manage-products.js        ← JS الخاص بالصفحة فقط
+│   │   └── manage-products.css       ← CSS الخاص بالصفحة فقط
+│   │
+│   └── shared/
+│       ├── ajax/
+│       │   └── manage-products-ajax.php ← كل دوال AJAX الخاصة بالمنتجات
+│       └── helpers.php                ← helpers-images + helpers-attributes (ملفاتك المدموجة)
+│
+├── assets/
+│   ├── css/
+│   │   ├── owner-style.css
+│   │   └── mobile.css
+│   │
+│   ├── js/
+│   │   ├── owner-dashboard-theme.js   ← Dark mode + UI interactions العامة
+│   │   └── owner-core.js              ← Core shared JS (لو عايز)
+│   │
+│   └── images/
+│
+├── pages/
+│   ├── vendor-products.php
+│   ├── orders.php
+│   ├── stats.php
+│   ├── email.php
+│   ├── functions.php                 ← Ajax مشترك + Inline editing + attrs
+│   └── owner-dashboard.php           ← الملف اللي بيعمل Shortcode + رابط UI
+│
+└── owner/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                        owner-dashboard/
+                                                                                        │
+                                                                                        ├── owner-dashboard.php               ← الملف الرئيسي (Loader + Bootstrap)
+                                                                                        │
+                                                                                        ├── admin/
+                                                                                        │   ├── system-settings.php           ← صفحة الإعدادات في WP Admin
+                                                                                        │   └── system-settings-view.php      ← HTML + UI الخاصة بالإعدادات
+                                                                                        │
+                                                                                        ├── includes/
+                                                                                        │   ├── settings-handler.php          ← معالجة الإعدادات وحفظها
+                                                                                        │   ├── helpers.php                   ← دوال عامة
+                                                                                        │   └── marketplace.php               ← منطق Marketplace (endpoint + menu)
+                                                                                        │
+                                                                                        ├── modules/
+                                                                                        │   ├── manage-products/
+                                                                                        │   │   ├── manage-products.php       ← View (HTML structure) لصفحة إدارة المنتجات
+                                                                                        │   │   ├── manage-products.js        ← JS الخاص بالصفحة فقط
+                                                                                        │   │   └── manage-products.css       ← CSS الخاص بالصفحة فقط
+                                                                                        │   │
+                                                                                        │   └── shared/
+                                                                                        │       ├── ajax/
+                                                                                        │       │   └── manage-products-ajax.php ← كل دوال AJAX الخاصة بالمنتجات
+                                                                                        │       └── helpers.php                ← helpers-images + helpers-attributes (ملفاتك المدموجة)
+                                                                                        │
+                                                                                        ├── assets/
+                                                                                        │   ├── css/
+                                                                                        │   │   ├── owner-style.css
+                                                                                        │   │   └── mobile.css
+                                                                                        │   │
+                                                                                        │   ├── js/
+                                                                                        │   │   ├── owner-dashboard-theme.js   ← Dark mode + UI interactions العامة
+                                                                                        │   │   └── owner-core.js              ← Core shared JS (لو عايز)
+                                                                                        │   │
+                                                                                        │   └── images/
+                                                                                        │
+                                                                                        ├── pages/
+                                                                                        │   ├── vendor-products.php
+                                                                                        │   ├── orders.php
+                                                                                        │   ├── stats.php
+                                                                                        │   ├── email.php
+                                                                                        │   ├── functions.php                 ← Ajax مشترك + Inline editing + attrs
+                                                                                        │   └── owner-dashboard.php           ← الملف اللي بيعمل Shortcode + رابط UI
+                                                                                        │
+                                                                                        └── owner/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

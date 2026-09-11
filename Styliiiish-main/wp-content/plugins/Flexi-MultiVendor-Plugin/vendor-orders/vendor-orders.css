@@ -1,0 +1,1373 @@
+/* =====================================================
+   WF SUPPORT SYSTEM – PRO UI / UX (DESKTOP)
+   Author: Mahmoud x ChatGPT 😎
+===================================================== */
+
+/* Reset Smooth */
+*{
+  box-sizing:border-box;
+  -webkit-font-smoothing:antialiased;
+}
+
+
+/* =====================================================
+   MAIN LAYOUT
+===================================================== */
+
+.wf-agent-panel{
+  display:flex;
+  height:650px;
+  background:#fff;
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 8px 30px rgba(0,0,0,.08);
+}
+
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
+
+.wf-ticket-list{
+  width:270px;
+  background:#f9fbff;
+  border-right:1px solid #e3eaf3;
+  display:flex;
+  flex-direction:column;
+}
+
+.wf-ticket-list h4{
+  padding:16px;
+  background:linear-gradient(135deg,#1976d2,#2196f3);
+  color:#fff;
+  font-size:15px;
+  text-align:center;
+  letter-spacing:.4px;
+}
+
+
+/* Ticket */
+
+.wf-ticket-item{
+  position:relative;
+  padding:14px 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:14px;
+  color:#222;
+  border-bottom:1px solid #eef2f7;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.wf-ticket-item:hover{
+  background:#edf4ff;
+  transform:translateX(4px);
+}
+
+.wf-ticket-item.active{
+  background:#e3f2fd;
+  font-weight:600;
+}
+
+.wf-ticket-item.active::before{
+  content:'';
+  position:absolute;
+  left:0;
+  top:0;
+  width:4px;
+  height:100%;
+  background:#1976d2;
+}
+
+
+/* Badge */
+
+.wf-badge{
+  background:#f44336;
+  color:#fff;
+  font-size:11px;
+  padding:3px 8px;
+  border-radius:20px;
+  font-weight:600;
+}
+
+
+/* =====================================================
+   CHAT PANEL
+===================================================== */
+
+.wf-chat-panel{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  background:#fff;
+}
+
+
+/* =====================================================
+   CHAT CARD
+===================================================== */
+
+.wf-chat-card{
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  background:#fff;
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.wf-chat-header{
+  padding:14px 20px;
+  background:linear-gradient(135deg,#1976d2,#2196f3);
+  color:#fff;
+  font-size:15px;
+  font-weight:600;
+  letter-spacing:.3px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+
+/* =====================================================
+   BODY
+===================================================== */
+
+.wf-chat-body,
+.wf-support-messages{
+  flex:1;
+  padding:16px;
+  overflow-y:auto;
+  background:linear-gradient(to bottom,#f3f6fb,#f9fbff);
+  scroll-behavior:smooth;
+}
+
+
+/* Scroll */
+
+.wf-chat-body::-webkit-scrollbar,
+.wf-support-messages::-webkit-scrollbar{
+  width:6px;
+}
+
+.wf-chat-body::-webkit-scrollbar-thumb,
+.wf-support-messages::-webkit-scrollbar-thumb{
+  background:#cfd8dc;
+  border-radius:10px;
+}
+
+
+/* =====================================================
+   MESSAGE BUBBLES
+===================================================== */
+
+.wf-bubble,
+.wf-msg{
+  max-width:72%;
+  padding:10px 14px;
+  border-radius:18px;
+  font-size:14px;
+  line-height:1.5;
+  word-break:break-word;
+  margin-bottom:8px;
+  animation:msgFade .2s ease;
+  box-shadow:0 1px 3px rgba(0,0,0,.06);
+}
+
+
+@keyframes msgFade{
+  from{opacity:0;transform:translateY(4px);}
+  to{opacity:1;}
+}
+
+
+/* Me */
+
+.wf-bubble.me,
+.wf-msg.vendor{
+  background:#1976d2;
+  color:#fff;
+  margin-left:auto;
+  border-bottom-right-radius:6px;
+}
+
+
+/* Other */
+
+.wf-bubble.other,
+.wf-msg.admin{
+  background:#fff;
+  color:#222;
+  margin-right:auto;
+  border:1px solid #e1e7ef;
+  border-bottom-left-radius:6px;
+}
+
+
+/* =====================================================
+   INPUT AREA
+===================================================== */
+
+.wf-chat-input,
+.wf-support-input{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:12px 15px;
+  background:#fafcff;
+  border-top:1px solid #e3eaf3;
+}
+
+
+/* Text */
+
+.wf-chat-input textarea,
+.wf-support-text{
+  flex:1;
+  min-height:42px;
+  max-height:100px;
+  resize:none;
+  padding:10px 14px;
+  border-radius:22px;
+  border:1px solid #d0d7e2;
+  font-size:14px;
+  background:#fff;
+  transition:.2s;
+}
+
+.wf-chat-input textarea:focus,
+.wf-support-text:focus{
+  outline:none;
+  border-color:#1976d2;
+  box-shadow:0 0 0 2px rgba(25,118,210,.12);
+}
+
+
+/* Send Button */
+
+.wf-support-send,
+.wf-chat-input button{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  border:0;
+  background:#1976d2;
+  color:#fff;
+  font-size:17px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:.2s;
+}
+
+.wf-support-send:hover,
+.wf-chat-input button:hover{
+  background:#125ca1;
+  transform:scale(1.06);
+}
+
+.wf-support-send:active,
+.wf-chat-input button:active{
+  transform:scale(.92);
+}
+
+
+/* =====================================================
+   EMPTY STATE
+===================================================== */
+
+.wf-placeholder{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  color:#9aa4b2;
+  font-size:16px;
+}
+
+.wf-placeholder::before{
+  content:'💬';
+  font-size:36px;
+  opacity:.6;
+}
+
+
+/* =====================================================
+   SUPPORT MODAL
+===================================================== */
+
+.wf-support-modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  backdrop-filter:blur(2px);
+  display:none;
+  z-index:999999;
+  animation:fadeBg .25s ease;
+}
+
+@keyframes fadeBg{
+  from{opacity:0}
+  to{opacity:1}
+}
+
+
+/* Box */
+
+.wf-support-box{
+  background:#fff;
+  width:560px;
+  max-width:95vw;
+  height:72vh;
+  max-height:600px;
+  margin:auto;
+  margin-top:6vh;
+  border-radius:18px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  box-shadow:0 25px 50px rgba(0,0,0,.25);
+  animation:scaleBox .25s ease;
+}
+
+@keyframes scaleBox{
+  from{transform:scale(.94);opacity:.7}
+  to{transform:scale(1);opacity:1}
+}
+
+
+/* Fix AJAX chat flex bugs */
+.wf-chat-panel,
+.wf-chat-card,
+.wf-chat-body{
+  min-height:0;
+}
+
+/* After rebuild */
+body.wf-chat-ready .wf-chat-card{
+  opacity:1;
+}
+
+
+
+
+
+
+
+
+
+/* =====================================
+   ROOT SYSTEM
+===================================== */
+:root{
+  --wf-main:#1976d2;
+  --wf-main-dark:#125ca1;
+  --wf-bg:#f4f7fb;
+  --wf-card:#ffffff;
+  --wf-border:#e3e8ef;
+  --wf-text:#1f2937;
+  --wf-muted:#6b7280;
+  --wf-radius:14px;
+  --wf-shadow:0 10px 30px rgba(0,0,0,.18);
+}
+
+/* =====================================
+   MODAL WRAPPER
+===================================== */
+.wf-support-modal{
+  position:fixed;
+
+  top:0;
+  left:0;
+
+  width:100vw;
+  height:100vh;
+
+  min-width:100vw;
+  min-height:100vh;
+
+  z-index:99999999;
+
+  display:none;
+
+  font-family:system-ui,-apple-system,BlinkMacSystemFont;
+}
+
+/* Overlay */
+.wf-support-modal .wf-support-overlay{
+  position:fixed;
+
+  top:0;
+  left:0;
+
+  width:100vw;
+  height:100vh;
+
+  background:rgba(15,23,42,.65);
+
+  backdrop-filter:blur(6px);
+  -webkit-backdrop-filter:blur(6px);
+}
+
+
+/* =====================================
+   MAIN BOX
+===================================== */
+.wf-support-modal .wf-support-box{
+  position:relative;
+  margin:auto;
+  top:50%;
+  transform:translateY(-50%);
+  width:520px;
+  max-width:95vw;
+  height:75vh;
+  max-height:640px;
+
+  background:var(--wf-card);
+  border-radius:var(--wf-radius);
+  overflow:hidden;
+
+  display:flex;
+  flex-direction:column;
+
+  box-shadow:var(--wf-shadow);
+
+  animation:wfModalIn .25s ease;
+}
+
+.wf-support-modal @keyframes wfModalIn{
+  from{opacity:0;transform:translateY(-45%) scale(.96);}
+  to{opacity:1;transform:translateY(-50%) scale(1);}
+}
+
+/* =====================================
+   HEADER CARD
+===================================== */
+.wf-support-modal .wf-support-order-card{
+  display:flex;
+  align-items:center;
+  gap:12px;
+
+  padding:14px 16px;
+
+  background:linear-gradient(180deg,#fff,#f7f9fc);
+
+  border-bottom:1px solid var(--wf-border);
+
+  flex-shrink:0;
+}
+
+/* Product */
+.wf-support-modal .wf-support-product{
+  display:flex;
+  gap:10px;
+  flex:1;
+  min-width:0;
+}
+
+.wf-support-modal .wf-support-thumb{
+  width:52px;
+  height:52px;
+  border-radius:10px;
+  object-fit:cover;
+  border:1px solid var(--wf-border);
+}
+
+/* Info */
+.wf-support-modal .wf-support-product-info{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  min-width:0;
+}
+
+.wf-support-modal .wf-support-title{
+  font-size:14px;
+  font-weight:600;
+  color:var(--wf-text);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.wf-support-modal .wf-support-sub{
+  font-size:12px;
+  color:var(--wf-muted);
+  display:flex;
+  gap:8px;
+}
+
+/* Status */
+.wf-support-modal .wf-support-status{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:4px;
+  font-size:12px;
+}
+
+.wf-support-modal .wf-support-badge{
+  background:var(--wf-main);
+  color:#fff;
+  padding:2px 8px;
+  border-radius:10px;
+  font-size:11px;
+}
+
+.wf-support-modal .wf-support-live{
+  color:#16a34a;
+  font-weight:600;
+}
+
+/* Actions */
+.wf-support-modal .wf-support-actions{
+  margin-left:6px;
+}
+
+.wf-support-modal .wf-support-close{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  background:#f1f5f9;
+  border:0;
+  font-size:20px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:.2s;
+}
+
+.wf-support-modal .wf-support-close:hover{
+  background:#e2e8f0;
+  transform:scale(1.05);
+}
+
+/* =====================================
+   CHAT AREA
+===================================== */
+.wf-support-modal .wf-support-messages{
+  flex:1;
+  padding:14px;
+  background:var(--wf-bg);
+  overflow-y:auto;
+
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+
+  scroll-behavior:smooth;
+}
+
+.wf-support-modal .wf-support-messages::-webkit-scrollbar{
+  width:5px;
+}
+.wf-support-modal .wf-support-messages::-webkit-scrollbar-thumb{
+  background:#cbd5e1;
+  border-radius:10px;
+}
+
+/* =====================================
+   CHAT BUBBLES
+===================================== */
+.wf-support-modal .wf-msg{
+  max-width:75%;
+  padding:9px 13px;
+  border-radius:16px;
+  font-size:14px;
+  line-height:1.45;
+  word-break:break-word;
+
+  animation:wfMsgIn .15s ease;
+}
+
+.wf-support-modal @keyframes wfMsgIn{
+  from{opacity:0;transform:translateY(4px);}
+  to{opacity:1;}
+}
+
+/* Vendor */
+.wf-support-modal .wf-msg.vendor{
+  background:#1976d2;
+  margin-left:auto;
+  border-bottom-right-radius:4px;
+}
+
+/* Admin */
+.wf-support-modal .wf-msg.admin{
+  background:#fff;
+  border:1px solid var(--wf-border);
+  margin-right:auto;
+  border-bottom-left-radius:4px;
+}
+
+/* =====================================
+   INPUT BAR
+===================================== */
+.wf-support-modal .wf-support-input{
+  display:flex;
+  align-items:center;
+  gap:8px;
+
+  padding:10px 12px;
+
+  background:#fff;
+
+  border-top:1px solid var(--wf-border);
+
+  padding-bottom:
+    calc(10px + env(safe-area-inset-bottom));
+}
+
+/* Text */
+.wf-support-modal .wf-support-text{
+  flex:1;
+  height:42px;
+  padding:9px 14px;
+
+  border-radius:22px;
+  border:1px solid #d1d9e6;
+
+  font-size:14px;
+
+  outline:none;
+  transition:.2s;
+}
+
+.wf-support-modal .wf-support-text:focus{
+  border-color:var(--wf-main);
+  box-shadow:0 0 0 2px rgba(25,118,210,.12);
+}
+
+/* Send */
+.wf-support-modal .wf-support-send{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+
+  background:var(--wf-main);
+  color:#fff;
+
+  border:0;
+
+  font-size:18px;
+  cursor:pointer;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  transition:.2s;
+}
+
+.wf-support-modal .wf-support-send:hover{
+  background:var(--wf-main-dark);
+  transform:scale(1.05);
+}
+
+.wf-support-modal .wf-support-send:active{
+  transform:scale(.95);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =====================================================
+   MOBILE SAFE
+===================================================== */
+
+@media(max-width:900px){
+
+  .wf-agent-panel{
+    flex-direction:column;
+    height:auto;
+  }
+
+  .wf-ticket-list{
+    width:100%;
+    max-height:220px;
+    overflow:auto;
+  }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =====================================================
+   WF SUPPORT – MOBILE PRO UI
+===================================================== */
+
+@media(max-width:768px){
+
+
+/* Hide inbox in chat */
+.chat-open{
+  display:none;
+}
+
+
+
+
+
+/* Back */
+
+.wf-chat-back{
+  background:rgba(255,255,255,.2);
+  border:0;
+  color:#fff;
+  padding:6px 10px;
+  border-radius:8px;
+  font-size:14px;
+}
+
+
+
+
+.wf-msg{
+  max-width:82%;
+  font-size:14px;
+  padding:9px 13px;
+  border-radius:16px;
+}
+
+
+.wf-msg.vendor{
+  background:#1976d2;
+  color:#fff;
+  margin-left:auto;
+}
+
+
+.wf-msg.admin{
+  background:#fff;
+  border:1px solid #e1e7ef;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*****************************************************************************
+******************* MOBILE  SUPPORT TEAM TICKET *****************************
+******************************************************************************/
+
+
+
+/* Root */
+
+.wf-agent-panel{
+  position:relative;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  background:#fff;
+}
+
+
+/* =========================
+   INBOX SCREEN
+========================= */
+
+.wf-ticket-list{
+  height:100%;
+  max-height:100%;
+  overflow:auto;
+  background:#f9fbff;
+}
+
+.wf-agent-panel.chat-open .wf-ticket-list{
+  display:none;
+}
+
+
+/* Ticket */
+
+.wf-ticket-item{
+  padding:14px 16px;
+  border-bottom:1px solid #e8edf3;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.wf-ticket-item span{
+  font-weight:600;
+}
+
+.wf-ticket-item.active{
+  background:#e3f2fd;
+}
+
+
+/* =========================
+   CHAT SCREEN
+========================= */
+
+.wf-chat-panel{
+  flex:1;
+  display:none;
+  flex-direction:column;
+  height:100%;
+}
+
+.wf-agent-panel.chat-open .wf-chat-panel{
+  display:flex;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.wf-chat-header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px 14px;
+  background:#1976d2;
+  color:#fff;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+.wf-chat-back{
+  background:rgba(255,255,255,.2);
+  border:0;
+  color:#fff;
+  font-size:18px;
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  cursor:pointer;
+}
+
+.wf-chat-title{
+  display:flex;
+  flex-direction:column;
+  line-height:1.2;
+}
+
+.wf-chat-title span{
+  font-size:12px;
+  opacity:.9;
+}
+
+
+/* =========================
+   BODY
+========================= */
+
+.wf-chat-body{
+  flex:1;
+  padding:12px 10px;
+  background:#f3f6fb;
+  overflow:auto;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+
+/* =========================
+   BUBBLES
+========================= */
+
+.wf-bubble{
+  max-width:80%;
+  padding:10px 14px;
+  border-radius:18px;
+  font-size:14px;
+  line-height:1.4;
+  word-break:break-word;
+}
+
+.wf-bubble.me{
+  background:#1976d2;
+  color:#fff;
+  margin-left:auto;
+  border-bottom-right-radius:6px;
+}
+
+.wf-bubble.other{
+  background:#fff;
+  border:1px solid #dde4ec;
+  margin-right:auto;
+  border-bottom-left-radius:6px;
+}
+
+
+/* =========================
+   INPUT BAR
+========================= */
+
+.wf-chat-input{
+  position:sticky;
+  bottom:0;
+  display:flex;
+  gap:8px;
+  padding:8px 10px;
+  background:#fff;
+  border-top:1px solid #e3e8ef;
+}
+
+.wf-chat-input textarea{
+  flex:1;
+  min-height:42px;
+  padding:10px 14px;
+  border-radius:22px;
+  border:1px solid #d0d7e2;
+  font-size:15px;
+}
+
+.wf-chat-input textarea:focus{
+  outline:none;
+  border-color:#1976d2;
+}
+
+.wf-chat-input button{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  background:#1976d2;
+  color:#fff;
+  border:0;
+  font-size:18px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*****************************************************************************
+******************* MOBILE VENDOR SUPPORT & SUPPORT TEAM TICKET *****************************
+******************************************************************************/
+
+
+
+/* =====================
+   MESSAGES
+===================== */
+/*
+.wf-support-messages{
+  flex:1;
+  padding:12px 10px;
+  background:#f3f6fb;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
+}
+*/
+
+
+
+
+
+/* =====================
+   INPUT BAR
+===================== */
+/*
+.wf-support-text{
+  flex:1;
+  padding:10px 14px;
+  border-radius:22px;
+  border:1px solid #d0d7e2;
+  font-size:15px;
+}
+*/
+
+/*
+.wf-support-send{
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  font-size:18px;
+}
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*****************************************************************************
+******************* MOBILE VENDOR SUPPORT TICKET *****************************
+******************************************************************************/
+
+
+/* =====================================================
+   SUPPORT MODAL
+===================================================== */
+
+.wf-support-modal{
+  background:rgba(15,20,25,.85);
+  backdrop-filter:blur(4px);
+}
+
+
+.wf-support-overlay{
+    
+}
+
+
+
+/* =====================
+   MODAL BOX
+===================== */
+
+.wf-support-box{
+  width:100vw;
+  height:100vh;
+  border-radius:0;
+  max-width:100%;
+  max-height:100%;
+  display:flex;
+  flex-direction:column;
+}
+
+
+
+
+
+/* =====================
+   ORDER HEADER
+===================== */
+
+.wf-support-order-card{
+  position:sticky;
+  top:0;
+  z-index:50;
+  display:flex;
+  align-items:center;
+  padding:12px;
+  background:#fff;
+  border-bottom:1px solid #e6eaf0;
+  box-shadow:0 2px 6px rgba(0,0,0,.06);
+  padding-top:
+    calc(12px + env(safe-area-inset-top));
+}
+
+
+
+/* Product */
+
+.wf-support-product{
+  flex:1;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+}
+
+
+
+.wf-support-thumb{
+  width:44px;
+  height:44px;
+  border-radius:8px;
+  object-fit:cover;
+}
+
+
+
+.wf-support-product-info{
+    
+}
+
+
+
+
+.wf-support-title{
+  font-size:14px;
+  font-weight:600;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+
+
+
+.wf-support-sub{
+  font-size:11px;
+  color:#666;
+}
+
+
+
+
+.wf-support-order-id {
+    
+}
+
+
+
+
+.wf-support-qty{
+    
+}
+
+
+
+
+
+/* Status */
+
+.wf-support-status{
+  align-items:flex-end;
+  gap:3px;
+}
+
+
+
+.wf-support-badge{
+    
+}
+
+
+
+.wf-support-live{
+  font-size:10px;
+  font-weight:600;
+}
+
+
+
+
+.wf-support-actions{
+    
+}
+
+
+
+/* =====================
+   CLOSE
+===================== */
+
+.wf-support-close{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  background:#f1f3f6;
+  font-size:20px;
+}
+
+
+.wf-support-close:active{
+  transform:scale(.9);
+}
+
+
+
+
+
+
+/* =====================
+   INPUT BAR
+===================== */
+
+.wf-support-input{
+  position:sticky;
+  bottom:0;
+
+  display:flex;
+  align-items:center;
+
+  gap:8px;
+  padding:10px;
+
+  background:#fff;
+
+  border-top:1px solid #e2e8f0;
+
+  padding-bottom:
+    calc(10px + env(safe-area-inset-bottom));
+}
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

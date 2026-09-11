@@ -1,0 +1,810 @@
+msgid ""
+msgstr "Project-Id-Version: WebsiteFlexi Owner Dashboard & Marketplace\\\\nPOT-Creation-Date: 2026-01-17 16:10+0200\\\\nPO-Revision-Date: 2026-01-17 16:31+0200\\\\nLast-Translator: \\\\nLanguage-Team: \\\\nLanguage: ar\\\\nMIME-Version: 1.0\\\\nContent-Type: text/plain; charset=UTF-8\\\\nContent-Transfer-Encoding: 8bit\\\\nPlural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\\\\nX-Generator: Poedit 2.2\\\\nX-Poedit-Basepath: ..\\\\nX-Poedit-Flags-xgettext: --add-comments=translators:\\\\nX-Poedit-WPHeader: owner-dashboard.php\\\\nX-Poedit-SourceCharset: UTF-8\\\\nX-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;_nx_noop:3c,1,2;__ngettext_noop:1,2\\\\nX-Poedit-SearchPath-0: .\\\\nX-Poedit-SearchPathExcluded-0: *.js\\\\n"
+
+msgid "WebsiteFlexi Owner Dashboard & Marketplace – Settings"
+msgstr "لوحة تحكم مالك موقع الويب والسوق - الإعدادات"
+
+msgid "Marketplace settings saved successfully."
+msgstr "تم حفظ إعدادات السوق بنجاح."
+
+msgid "Add Product Mode saved successfully."
+msgstr "تم حفظ وضع إضافة المنتج بنجاح."
+
+msgid "Manager added successfully."
+msgstr "تمت إضافة المدير بنجاح."
+
+msgid "Manager removed successfully."
+msgstr "تمت إزالة المدير بنجاح."
+
+msgid "Dashboard user added successfully."
+msgstr "تمت إضافة مستخدم لوحة المعلومات بنجاح."
+
+msgid "Dashboard user removed successfully."
+msgstr "تمت إزالة مستخدم لوحة المعلومات بنجاح."
+
+msgid "Settings saved."
+msgstr "تم حفظ الإعدادات."
+
+msgid "Marketplace"
+msgstr "السوق"
+
+msgid "Add Product"
+msgstr "منتجاتي"
+
+msgid "Managers"
+msgstr "المديرين"
+
+msgid "Dashboard Access"
+msgstr "الوصول إلى لوحة القيادة"
+
+msgid "Vendors"
+msgstr "الباعة"
+
+msgid "Reviews"
+msgstr "التعليقات"
+
+msgid "Reports"
+msgstr "التقارير"
+
+msgid "Vendor Orders"
+msgstr "أوامر البائعين"
+
+msgid "Enable Customer Marketplace"
+msgstr "تمكين سوق العملاء"
+
+msgid "Allow customers to sell & manage their own dresses (Sell Your Dress system)."
+msgstr "السماح للعملاء ببيع وإدارة فساتينهم الخاصة (نظام بيع فستانك)."
+
+msgid "When enabled, logged-in customers will see custom marketplace features (Sell Your Dress / Manage Products) based on your implementation."
+msgstr "عند التمكين، سيرى العملاء الذين قاموا بتسجيل الدخول ميزات السوق المخصصة (بيع ملابسك / إدارة المنتجات) بناءً على التنفيذ الخاص بك."
+
+msgid "My Account Welcome Banner"
+msgstr "شعار الترحيب الخاص بحسابي"
+
+msgid "Enable welcome banner in My Account page"
+msgstr "تمكين شعار الترحيب في صفحة حسابي"
+
+msgid "Save Marketplace Settings"
+msgstr "حفظ إعدادات السوق"
+
+msgid "Add Product Mode"
+msgstr "إضافة وضع المنتج"
+
+msgid "AJAX – Duplicate Template (Recommended)"
+msgstr "AJAX – قالب مكرر (مستحسن)"
+
+msgid "OLD Method – admin_post (Legacy)"
+msgstr "الطريقة القديمة – admin_post (قديم)"
+
+msgid "Choose how a new product is created inside the Owner Dashboard."
+msgstr "اختر كيفية إنشاء منتج جديد داخل لوحة تحكم المالك."
+
+msgid "Save Add Product Settings"
+msgstr "حفظ إضافة إعدادات المنتج"
+
+msgid "Current Managers"
+msgstr "المديرين الحاليين"
+
+msgid "User"
+msgstr "مستخدم"
+
+msgid "Role"
+msgstr "دور"
+
+msgid "ID"
+msgstr "بطاقة تعريف"
+
+msgid "Action"
+msgstr "فعل"
+
+msgid "No managers added."
+msgstr "لم تتم إضافة أي مديرين."
+
+msgid "Remove this manager?"
+msgstr "هل تريد إزالة هذا المدير؟"
+
+msgid "Remove"
+msgstr "يزيل"
+
+msgid "Add Manager"
+msgstr "إضافة مدير"
+
+msgid "Email"
+msgstr "بريد إلكتروني"
+
+msgid "Password"
+msgstr "كلمة المرور"
+
+msgid "Auto-generate if empty"
+msgstr "الإنشاء التلقائي إذا كان فارغًا"
+
+msgid "Owner Dashboard Access"
+msgstr "الوصول إلى لوحة تحكم المالك"
+
+msgid "No dashboard users yet."
+msgstr "لا يوجد مستخدمون للوحة التحكم حتى الآن."
+
+msgid "Remove this user?"
+msgstr "هل ترغب في إزالة هذا المستخدم؟"
+
+msgid "Add Dashboard User"
+msgstr "إضافة مستخدم لوحة المعلومات"
+
+msgid "All Vendors"
+msgstr "جميع البائعين"
+
+msgid "Pending Vendors"
+msgstr "البائعين في انتظار"
+
+msgid "Approved Vendors"
+msgstr "البائعين المعتمدين"
+
+msgid "Suspended Vendors"
+msgstr "الباعة الموقوفون"
+
+msgid "Vendor Details"
+msgstr "تفاصيل البائع"
+
+msgid "Documents"
+msgstr "وثائق"
+
+msgid "Status"
+msgstr "حالة"
+
+msgid "Admin Notes"
+msgstr "ملاحظات المشرف"
+
+msgid "Actions"
+msgstr "الإجراءات"
+
+msgid "Verified"
+msgstr "تم التحقق منه"
+
+msgid "Wallet"
+msgstr "محفظة"
+
+msgid "Orders"
+msgstr "طلبات"
+
+msgid "Reports&amp;Reviews"
+msgstr "التقارير والمراجعات"
+
+msgid "No vendors found."
+msgstr "لم يتم العثور على البائعين."
+
+msgid "Unnamed Store"
+msgstr "متجر بدون اسم"
+
+msgid "ID Front"
+msgstr "واجهة الهوية"
+
+msgid "ID Back"
+msgstr "معرف العودة"
+
+msgid "Utility Bill"
+msgstr "فاتورة المرافق"
+
+msgid "No documents uploaded"
+msgstr "لم يتم تحميل أي مستندات"
+
+msgid "Pending Review"
+msgstr "في انتظار المراجعة"
+
+msgid "View Store"
+msgstr "متجرى"
+
+msgid "Approval note"
+msgstr "مذكرة الموافقة"
+
+msgid "Confirm Approval"
+msgstr "تأكيد الموافقة"
+
+msgid "Approve"
+msgstr "يعتمد"
+
+msgid "Reason for rejection"
+msgstr "سبب الرفض"
+
+msgid "Confirm Rejection"
+msgstr "تأكيد الرفض"
+
+msgid "Reject"
+msgstr "يرفض"
+
+msgid "Reason for converting vendor to customer"
+msgstr "سبب تحويل البائع إلى عميل"
+
+msgid "Confirm Convert to Customer"
+msgstr "تأكيد التحويل إلى العميل"
+
+msgid "Convert to Customer"
+msgstr "تحويل إلى العميل"
+
+msgid "Approved"
+msgstr "موافقة"
+
+msgid "Suspended"
+msgstr "تم تعليق المتجر"
+
+msgid "Reason for suspension"
+msgstr "سبب الإيقاف"
+
+msgid "Confirm Suspension"
+msgstr "تأكيد التعليق"
+
+msgid "Suspend"
+msgstr "تم تعليق المتجر"
+
+msgid "Reason for setting vendor to pending"
+msgstr "سبب تعيين البائع إلى معلق"
+
+msgid "Confirm Set to Pending"
+msgstr "قم بتأكيد التعيين على \\"معلق\\"."
+
+msgid "Set to Pending"
+msgstr "اضبط على معلق"
+
+msgid "Reason for re-activation"
+msgstr "سبب إعادة التنشيط"
+
+msgid "Confirm Re-Activation"
+msgstr "تأكيد إعادة التنشيط"
+
+msgid "Re-Activate"
+msgstr "إعادة التنشيط"
+
+msgid "Reason for setting pending"
+msgstr "سبب الضبط معلق"
+
+msgid "Vendor Reviews"
+msgstr "مراجعات البائعين"
+
+msgid "No vendor reviews found."
+msgstr "لم يتم العثور على مراجعات البائعين."
+
+msgid "Reviewer"
+msgstr "المراجع"
+
+msgid "Vendor"
+msgstr "بائع"
+
+msgid "Rating"
+msgstr "تصنيف"
+
+msgid "Review"
+msgstr "مراجعة"
+
+msgid "Date"
+msgstr "تاريخ"
+
+msgid "Delete this review?"
+msgstr "هل تريد حذف هذه المراجعة؟"
+
+msgid "Delete"
+msgstr "يمسح"
+
+msgid "No reports found."
+msgstr "لم يتم العثور على تقارير."
+
+msgid "Item not found"
+msgstr "لم يتم العثور على العنصر"
+
+msgid "WebsiteFlexi Owner Dashboard & Marketplace"
+msgstr "لوحة تحكم وسوق ويبسايت فليكسى لأصحاب المواقع"
+
+msgid "WebsiteFlexi System Settings"
+msgstr "إعدادات نظام الموقع الإلكتروني"
+
+msgid "You do not have permission to access this page."
+msgstr "ليس لديك إذن للوصول إلى هذه الصفحة."
+
+msgid "Email is required."
+msgstr "البريد الإلكتروني مطلوب."
+
+msgid "Error creating user:"
+msgstr "خطأ في إنشاء المستخدم:"
+
+msgid "Admin note is required."
+msgstr "ملاحظة المشرف مطلوبة."
+
+msgid "Welcome back, Boss! 🔧✨"
+msgstr "مرحبًا بعودتك يا رئيس! "
+
+msgid "Here’s your quick access to manage your website smoothly and keep everything running perfectly."
+msgstr "إليك وصولك السريع لإدارة موقع الويب الخاص بك بسلاسة والحفاظ على تشغيل كل شيء بشكل مثالي."
+
+msgid "🔧 Manage Your Website"
+msgstr "🔧 إدارة موقع الويب الخاص بك"
+
+msgid "Hey lovely! 💖"
+msgstr "يا جميل! "
+
+msgid "Ready to earn money now? You can list your products in just a few smooth steps. We’re here to make it easy for you! ✨"
+msgstr "هل أنت مستعد لكسب المال الآن؟ "
+
+msgid "Add Your Products Now"
+msgstr "أضف منتجاتك الآن"
+
+msgid "Pending Approval"
+msgstr "في انتظار الموافقة"
+
+msgid "Active"
+msgstr "نشيط"
+
+msgid "Rating: %s / 5 (%d reviews)"
+msgstr "التقييم: %s / 5 (%d مراجعة)"
+
+msgid "Order Success Rate"
+msgstr "معدل نجاح الطلب"
+
+msgid "Login required"
+msgstr "تسجيل الدخول مطلوب"
+
+msgid "Security check failed"
+msgstr "فشل فحص الأمان"
+
+msgid "Invalid data"
+msgstr "بيانات غير صالحة"
+
+msgid "You can only review vendors after a completed (final) order."
+msgstr "لا يمكنك مراجعة الموردين إلا بعد اكتمال الطلب (النهائي)."
+
+msgid "You already reviewed this vendor."
+msgstr "لقد قمت بالفعل بمراجعة هذا البائع."
+
+msgid "Failed to save review"
+msgstr "فشل حفظ المراجعة"
+
+msgid "Review submitted"
+msgstr "تم إرسال المراجعة"
+
+msgid "Unauthorized"
+msgstr "غير مصرح به"
+
+msgid "Reply already exists"
+msgstr "الرد موجود بالفعل"
+
+msgid "Review not found"
+msgstr "لم يتم العثور على المراجعة"
+
+msgid "Failed to save reply"
+msgstr "فشل حفظ الرد"
+
+msgid "Reply added successfully"
+msgstr "تمت إضافة الرد بنجاح"
+
+msgid "This product has been temporarily disabled by Aswaq Taj because the store is still under review."
+msgstr "لقد تم تعطيل هذا المنتج مؤقتاً من قبل أسواق تاج لأن المتجر لا يزال قيد المراجعة."
+
+msgid "This product is unavailable because the store has been suspended by Aswaq Taj."
+msgstr "هذا المنتج غير متوفر بسبب إيقاف المتجر من قبل أسواق تاج."
+
+msgid "This store is still pending"
+msgstr "هذا المتجر لا يزال معلقا"
+
+msgid "Pending"
+msgstr "قيد الانتظار"
+
+msgid "This store is suspended"
+msgstr "تم تعليق المتجر"
+
+msgid "Store Profile"
+msgstr "اسم المتجر"
+
+msgid "Please log in."
+msgstr "الرجاء تسجيل الدخول."
+
+msgid "Security check failed."
+msgstr "فشل فحص الأمان."
+
+msgid "Store profile updated successfully."
+msgstr "تم تحديث ملف تعريف المتجر بنجاح."
+
+msgid "Update your store information, logo, and cover. These details will appear on your public vendor page."
+msgstr "قم بتحديث معلومات متجرك وشعاره وغلافه. "
+
+msgid "Store Cover"
+msgstr "اسم المتجر"
+
+msgid "Recommended: wide image (e.g. 1200×400)."
+msgstr "موصى به: صورة واسعة (على سبيل المثال 1200×400)."
+
+msgid "No cover selected"
+msgstr "لم يتم تحديد أي غلاف"
+
+msgid "Choose Cover"
+msgstr "اختر الغلاف"
+
+msgid "Store Logo"
+msgstr "اسم المتجر"
+
+msgid "Recommended: square image (e.g. 400×400)."
+msgstr "موصى به: صورة مربعة (على سبيل المثال، 400×400)."
+
+msgid "No logo"
+msgstr "لا شعار"
+
+msgid "Choose Logo"
+msgstr "اختر الشعار"
+
+msgid "Store Name"
+msgstr "اسم المتجر"
+
+msgid "Store Description"
+msgstr "وصف المتجر"
+
+msgid "WhatsApp Number"
+msgstr "رقم واتساب"
+
+msgid "Example: 201155555555"
+msgstr "مثال: 201155555555"
+
+msgid "Use international format without + sign."
+msgstr "استخدم التنسيق الدولي بدون علامة +."
+
+msgid "Phone Number"
+msgstr "رقم التليفون"
+
+msgid "Example: 01123456789"
+msgstr "مثال: 01123456789"
+
+msgid "Address"
+msgstr "عنوان"
+
+msgid "Save Changes"
+msgstr "حفظ التغييرات"
+
+msgid "Store Orders"
+msgstr "اسم المتجر"
+
+msgid "My Products"
+msgstr "منتجاتي"
+
+msgid "Withdraw Earnings"
+msgstr "سحب الأرباح"
+
+msgid "Application Under Review"
+msgstr "الطلب قيد المراجعة"
+
+msgid "Store Suspended"
+msgstr "تم تعليق المتجر"
+
+msgid "Register as Vendor"
+msgstr "سجل كتاجر"
+
+msgid "Moderate Your Site"
+msgstr "قم بتعديل موقعك"
+
+msgid "Your vendor application is under review. You will be contacted soon."
+msgstr "طلب انضمامك كتاجر قيد المراجعة. سيتم التواصل معك قريباً."
+
+msgid "Your store has been temporarily suspended. Please contact support."
+msgstr "تم تعليق متجرك مؤقتًا. يرجى الاتصال بالدعم."
+
+msgid "You cannot apply again."
+msgstr "لا يمكنك التقديم مرة أخرى."
+
+msgid "Register as a Vendor"
+msgstr "سجل كتاجر"
+
+msgid "Fill in the details below. Your application will be reviewed before approval."
+msgstr "يرجى تعبئة البيانات التالية بعناية. سيتم مراجعة طلبك قبل الموافقة عليه."
+
+msgid "Basic Information"
+msgstr "معلومات أساسية"
+
+msgid "Store details shown to customers after approval."
+msgstr "تفاصيل المتجر تظهر للعملاء بعد الموافقة عليها."
+
+msgid "Phone Number (Call)"
+msgstr "رقم هاتف"
+
+msgid "Current Working Address"
+msgstr "عنوان العمل الحالي"
+
+msgid "Business Type"
+msgstr "نوع النشاط"
+
+msgid "This helps us verify your business and set pickup details."
+msgstr "يساعدنا هذا في التحقق من نشاطك التجاري وتعيين تفاصيل الاستلام."
+
+msgid "Select Business Type"
+msgstr "اختر نوع النشاط"
+
+msgid "Work From Home"
+msgstr "العمل من المنزل"
+
+msgid "I Have a Shop"
+msgstr "لدي متجر"
+
+msgid "I Have a Company"
+msgstr "لدي شركة"
+
+msgid "I Have an Office"
+msgstr "لدي مكتب"
+
+msgid "This working address will be used as the pickup location for shipping orders."
+msgstr "سيتم استخدام عنوان العمل هذا كموقع لاستلام طلبات الشحن."
+
+msgid "Business Documents"
+msgstr "وثائق الأعمال"
+
+msgid "Optional for home businesses. Required for shops/companies/offices."
+msgstr "اختياري للأعمال المنزلية. "
+
+msgid "Commercial Register"
+msgstr "السجل التجاري"
+
+msgid "Choose File"
+msgstr "اختر ملف"
+
+msgid "No file chosen"
+msgstr "لم يتم اختيار أي ملف"
+
+msgid "Tax Card"
+msgstr "بطاقة ضريبية"
+
+msgid "Business Address"
+msgstr "عنوان العمل"
+
+msgid "Identity Verification"
+msgstr "التحقق من الهوية"
+
+msgid "Upload clear images. Make sure all details are readable."
+msgstr "تحميل صور واضحة. "
+
+msgid "ID Card (Front)"
+msgstr "بطاقة الهوية (الوجه الأمامي)"
+
+msgid "ID Card (Back)"
+msgstr "بطاقة الهوية (الظهر)"
+
+msgid "Latest Electricity or Gas Bill"
+msgstr "آخر فاتورة كهرباء أو غاز"
+
+msgid "Submit Vendor Application"
+msgstr "تقديم طلب التاجر"
+
+msgid "By submitting, you confirm the information is correct. We may contact you for verification."
+msgstr "من خلال الإرسال، فإنك تؤكد صحة المعلومات. "
+
+msgid "Home"
+msgstr "الصفحة الرئيسية"
+
+msgid "Vendor not found"
+msgstr "لم يتم العثور على البائع"
+
+msgid "No ratings yet"
+msgstr "لا يوجد تقييمات حتى الآن"
+
+msgid "Products"
+msgstr "منتجاتي"
+
+msgid "WhatsApp"
+msgstr "واتساب"
+
+msgid "Statistics"
+msgstr "إحصائيات"
+
+msgid "Report"
+msgstr "تقرير"
+
+msgid "Previous"
+msgstr "سابق"
+
+msgid "Next"
+msgstr "التالي"
+
+msgid "No products yet."
+msgstr "لا توجد منتجات حتى الآن."
+
+msgid "Please log in to leave a review."
+msgstr "الرجاء تسجيل الدخول لترك التعليق."
+
+msgid "Leave a Review"
+msgstr "ترك التعليق"
+
+msgid "Write your review…"
+msgstr "أكتب رأيك…"
+
+msgid "Submit Review"
+msgstr "إرسال المراجعة"
+
+msgid "Reported"
+msgstr "ذكرت"
+
+msgid "Store Reply"
+msgstr "اسم المتجر"
+
+msgid "Edit"
+msgstr "يحرر"
+
+msgid "Reply"
+msgstr "رد"
+
+msgid "No reviews yet."
+msgstr "لا توجد تعليقات حتى الآن."
+
+msgid "Report Review"
+msgstr "مراجعة التقرير"
+
+msgid "Reason"
+msgstr "سبب"
+
+msgid "Spam"
+msgstr "رسائل إلكترونية مزعجة"
+
+msgid "Abuse"
+msgstr "إساءة"
+
+msgid "Fake review"
+msgstr "مراجعة مزيفة"
+
+msgid "Comment (optional)"
+msgstr "تعليق (اختياري)"
+
+msgid "Submit Report"
+msgstr "إرسال البلاغ"
+
+msgid "Cancel"
+msgstr "الغاء"
+
+msgid "Total number of products published by this vendor."
+msgstr "إجمالي عدد المنتجات التي نشرها هذا التاجر."
+
+msgid "Total orders placed for this vendor's products."
+msgstr "إجمالي الطلبات المقدمة لمنتجات هذا التاجر."
+
+msgid "Total Orders"
+msgstr "إجمالي الطلبات"
+
+msgid "Orders that were successfully completed without issues."
+msgstr "تم إنجاز الطلبات بنجاح ودون أي مشاكل."
+
+msgid "Completed Orders"
+msgstr "الطلبات المكتملة"
+
+msgid "Orders that were refunded or returned by customers."
+msgstr "الطلبات التي تم استرداد ثمنها أو إرجاعها من قبل العملاء."
+
+msgid "Refunded Orders"
+msgstr "الطلبات المسترجعة"
+
+msgid "Percentage of successful orders compared to total orders."
+msgstr "نسبة الطلبات الناجحة مقارنة بإجمالي الطلبات."
+
+msgid "Success Rate"
+msgstr "معدل النجاح"
+
+msgid "Average rating given by customers who reviewed this vendor."
+msgstr "متوسط ​​التقييم الذي قدمه العملاء الذين قاموا بتقييم هذا البائع."
+
+msgid "How to read these numbers"
+msgstr "كيفية قراءة هذه الأرقام"
+
+msgid "These indicators help you understand the vendor’s activity and reliability. Use them together (not one number alone) to form a fair impression."
+msgstr "تساعدك هذه المؤشرات على فهم نشاط التاجر وموثوقيته. استخدمها مجتمعة (وليس رقماً واحداً فقط) لتكوين انطباع عادل."
+
+msgid "Products:"
+msgstr "منتجات"
+
+msgid "A higher number usually means the vendor is active. New vendors may have fewer products — this is normal."
+msgstr "يشير الرقم الأعلى عادةً إلى أن التاجر نشط. قد يمتلك البائعون الجدد عددًا أقل من المنتجات، وهذا أمر طبيعي."
+
+msgid "Total Orders:"
+msgstr "إجمالي الطلبات:"
+
+msgid "Shows overall demand and experience. If it is low, the vendor may be new — rely more on rating and success rate."
+msgstr "يُظهر هذا المؤشر مستوى الطلب والخبرة بشكل عام. إذا كان منخفضًا، فقد يكون البائع جديدًا - لذا اعتمد أكثر على التقييم ونسبة النجاح."
+
+msgid "Completed Orders:"
+msgstr "الطلبات المكتملة:"
+
+msgid "The more completed orders, the more proven the vendor’s ability to deliver successfully."
+msgstr "كلما زاد عدد الطلبات المكتملة، كلما ثبتت قدرة البائع على التسليم بنجاح."
+
+msgid "Refunded Orders:"
+msgstr "الطلبات المسترجعة:"
+
+msgid "Refunds can happen for many reasons. A high number compared to completed orders may indicate repeated issues."
+msgstr "قد تحدث عمليات استرداد الأموال لأسباب عديدة. وقد يشير ارتفاع عدد عمليات الاسترداد مقارنةً بالطلبات المكتملة إلى تكرار المشكلات."
+
+msgid "Success Rate:"
+msgstr "معدل النجاح:"
+
+msgid "This is one of the most important indicators. Higher success rate generally means higher reliability."
+msgstr "يُعد هذا أحد أهم المؤشرات. فارتفاع معدل النجاح يعني عموماً ارتفاع مستوى الموثوقية."
+
+msgid "Rating:"
+msgstr "تقييم:"
+
+msgid "Average rating from customers. Read reviews when available to understand the reasons behind ratings."
+msgstr "متوسط ​​تقييم العملاء. اقرأ التقييمات عند توفرها لفهم أسباب التقييمات."
+
+msgid "Tip:"
+msgstr "نصيحة:"
+
+msgid "If the vendor is new (few orders/products), don’t judge too quickly. Check the rating, review details, and communication quality before deciding."
+msgstr "إذا كان التاجر جديداً (لديه طلبات/منتجات قليلة)، فلا تتسرع في الحكم عليه. تحقق من التقييم، وتفاصيل المراجعات، وجودة التواصل قبل اتخاذ القرار."
+
+msgid "You cannot report your own store."
+msgstr "لا يمكنك الإبلاغ عن متجرك الخاص."
+
+msgid "Please log in to report this vendor."
+msgstr "يرجى تسجيل الدخول للإبلاغ عن هذا التاجر."
+
+msgid "You must have at least one order from this vendor to submit a report."
+msgstr "يجب أن يكون لديك طلب واحد على الأقل من هذا التاجر لتقديم بلاغ."
+
+msgid "Report this vendor"
+msgstr "أبلغ عن هذا التاجر"
+
+msgid "You have already reported this vendor."
+msgstr "لقد أبلغت عن هذا التاجر بالفعل."
+
+msgid "Select all reasons that apply. Your report helps us keep the marketplace safe."
+msgstr "اختر جميع الأسباب التي تنطبق. يساعدنا تقريرك في الحفاظ على أمان السوق."
+
+msgid "Unprofessional communication"
+msgstr "التواصل غير المهني"
+
+msgid "Late delivery"
+msgstr "تأخر في التسليم"
+
+msgid "Product not as described"
+msgstr "المنتج غير مطابق للوصف"
+
+msgid "Repeated order issues"
+msgstr "مشاكل متكررة في الطلبات"
+
+msgid "Refund problems"
+msgstr "مشاكل استرداد الأموال"
+
+msgid "Fake or misleading information"
+msgstr "معلومات مزيفة أو مضللة"
+
+msgid "Other"
+msgstr "آخر"
+
+msgid "Additional details (optional)"
+msgstr "تفاصيل إضافية (اختياري)"
+
+msgid "Submit Vendor Report"
+msgstr "تقديم بلاغ عن التاجر."
+
+msgid "Please select at least one reason."
+msgstr "يرجى اختيار سبب واحد على الأقل."
+
+msgid "Vendor reported successfully."
+msgstr "تم الإبلاغ عن التاجر بنجاح."
+
+msgid "Order Progress"
+msgstr "حالة الطلب"
+
+msgid "Processing"
+msgstr "يعالج"
+
+msgid "Received"
+msgstr "استلمت"
+
+msgid "Ready"
+msgstr "مستعد"
+
+msgid "Shipped"
+msgstr "شركة الشحن"
+
+msgid "Out for delivery"
+msgstr "في الطريق  للتسليم"
+
+msgid "Completed"
+msgstr "مكتمل"
+
+msgid "Close"
+msgstr "غلق"
+
+msgid "WebsiteFlexi Dashboard & Marketplace — Owner control, managers, dashboard access and customer dress marketplace."
+msgstr "لوحة تحكم وسوق ويبسايت فليكسى - تحكم المالك، والمديرين، والوصول إلى لوحة التحكم، وسوق منتجات العملاء."
+
+msgid "WebsiteFlexi"
+msgstr "ويبسايت فليكسى"
+

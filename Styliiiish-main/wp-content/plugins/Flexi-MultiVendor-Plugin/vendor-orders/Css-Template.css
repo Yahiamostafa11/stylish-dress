@@ -1,0 +1,1144 @@
+
+
+
+
+
+/* Hide inbox in chat */
+.chat-open{
+  display:none;
+}
+
+
+
+
+
+/* Back */
+
+.wf-chat-back{
+  background:rgba(255,255,255,.2);
+  border:0;
+  color:#fff;
+  padding:6px 10px;
+  border-radius:8px;
+  font-size:14px;
+}
+
+
+
+
+.wf-msg{
+  max-width:82%;
+  font-size:14px;
+  padding:9px 13px;
+  border-radius:16px;
+}
+
+
+.wf-msg.vendor{
+  background:#1976d2;
+  color:#fff;
+  margin-left:auto;
+}
+
+
+.wf-msg.admin{
+  background:#fff;
+  border:1px solid #e1e7ef;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*****************************************************************************
+******************* DISKTOP SUPPORT TEAM TICKET *****************************
+******************************************************************************/
+
+
+
+/****************************** MODEL 1 ***************************/
+/* =====================
+   ROOT LAYOUT
+===================== */
+
+.wf-agent-panel{
+  flex-direction:column;
+  height:100vh;
+  min-height:100vh;
+  border-radius:0;
+  overflow:hidden;
+  display:none;
+}
+
+
+
+/* =====================
+   INBOX
+===================== */
+
+.wf-ticket-list{
+  width:100%;
+  max-height:38vh;
+  overflow-y:auto;
+  border-right:none;
+  border-bottom:1px solid #e2e8f0;
+  background:#f9fbff;
+  display:none;
+}
+
+
+
+.wf-empty{
+    
+}
+
+
+
+/* Ticket */
+
+.wf-ticket-item{
+  
+}
+
+.wf-ticket-item:hover{
+  
+}
+
+.wf-ticket-item.active{
+  
+}
+
+.wf-ticket-item.active::before{
+  
+}
+
+
+
+
+/* Badge */
+
+.wf-badge{
+ 
+}
+
+
+
+
+
+/* =====================
+   CHAT PANEL
+===================== */
+
+.wf-chat-panel{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  height:100%;
+}
+
+
+
+/* =====================================================
+   EMPTY STATE
+===================================================== */
+
+.wf-placeholder{
+  
+}
+
+.wf-placeholder::before{
+  
+}
+
+#wf-chat-container{
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/****************************** MODEL 2 ***************************/
+
+/* =====================
+   CHAT CARD
+===================== */
+
+.wf-chat-card{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  height:100%;
+  border-radius:0;
+}
+
+
+/* =====================
+   HEADER
+===================== */
+
+.wf-chat-header{
+  position:sticky;
+  top:0;
+  z-index:30;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:12px 14px;
+}
+
+
+
+/* =====================
+   BODY
+===================== */
+
+.wf-chat-body{
+  flex:1;
+  padding:10px;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+
+
+/* =====================
+   BUBBLES
+===================== */
+
+.wf-bubble{
+  max-width:85%;
+  font-size:15px;
+  padding:9px 13px;
+}
+
+
+
+
+/* =====================
+   INPUT
+===================== */
+
+.wf-chat-input{
+  position:sticky;
+  bottom:0;
+  background:#fff;
+  padding:8px 10px;
+  gap:6px;
+  box-shadow:0 -2px 6px rgba(0,0,0,.05);
+}
+
+
+.wf-chat-input textarea{
+  min-height:42px;
+  font-size:15px;
+}
+
+
+.wf-chat-input button{
+  width:42px;
+  height:42px;
+}
+
+
+
+#wf-front-chat-form {
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*****************************************************************************
+******************* DISKTOP VENDOR SUPPORT & SUPPORT TEAM TICKET *****************************
+******************************************************************************/
+
+
+
+/* =====================
+   MESSAGES
+===================== */
+
+.wf-support-messages{
+  flex:1;
+  padding:12px 10px;
+  background:#f3f6fb;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+
+
+
+
+
+/* =====================
+   INPUT BAR
+===================== */
+
+.wf-support-text{
+  flex:1;
+  padding:10px 14px;
+  border-radius:22px;
+  border:1px solid #d0d7e2;
+  font-size:15px;
+}
+
+
+
+.wf-support-send{
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  font-size:18px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*****************************************************************************
+******************* DISKTOP VENDOR SUPPORT TICKET *****************************
+******************************************************************************/
+
+
+/* =====================================================
+   SUPPORT MODAL
+===================================================== */
+
+.wf-support-modal{
+  background:rgba(15,20,25,.85);
+  backdrop-filter:blur(4px);
+}
+
+
+.wf-support-overlay{
+    
+}
+
+
+
+/* =====================
+   MODAL BOX
+===================== */
+
+.wf-support-box{
+  width:100vw;
+  height:100vh;
+  border-radius:0;
+  max-width:100%;
+  max-height:100%;
+  display:flex;
+  flex-direction:column;
+}
+
+
+
+
+
+/* =====================
+   ORDER HEADER
+===================== */
+
+.wf-support-order-card{
+  position:sticky;
+  top:0;
+  z-index:50;
+  display:flex;
+  align-items:center;
+  padding:12px;
+  background:#fff;
+  border-bottom:1px solid #e6eaf0;
+  box-shadow:0 2px 6px rgba(0,0,0,.06);
+  padding-top:
+    calc(12px + env(safe-area-inset-top));
+}
+
+
+
+/* Product */
+
+.wf-support-product{
+  flex:1;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+}
+
+
+
+.wf-support-thumb{
+  width:44px;
+  height:44px;
+  border-radius:8px;
+  object-fit:cover;
+}
+
+
+
+.wf-support-product-info{
+    
+}
+
+
+
+
+.wf-support-title{
+  font-size:14px;
+  font-weight:600;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+
+
+
+.wf-support-sub{
+  font-size:11px;
+  color:#666;
+}
+
+
+
+
+.wf-support-order-id {
+    
+}
+
+
+
+
+.wf-support-qty{
+    
+}
+
+
+
+
+
+/* Status */
+
+.wf-support-status{
+  align-items:flex-end;
+  gap:3px;
+}
+
+
+
+.wf-support-badge{
+    
+}
+
+
+
+.wf-support-live{
+  font-size:10px;
+  font-weight:600;
+}
+
+
+
+
+.wf-support-actions{
+    
+}
+
+
+
+/* =====================
+   CLOSE
+===================== */
+
+.wf-support-close{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  background:#f1f3f6;
+  font-size:20px;
+}
+
+
+.wf-support-close:active{
+  transform:scale(.9);
+}
+
+
+
+
+
+
+/* =====================
+   INPUT BAR
+===================== */
+
+.wf-support-input{
+  position:sticky;
+  bottom:0;
+
+  display:flex;
+  align-items:center;
+
+  gap:8px;
+  padding:10px;
+
+  background:#fff;
+
+  border-top:1px solid #e2e8f0;
+
+  padding-bottom:
+    calc(10px + env(safe-area-inset-bottom));
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* =====================================================
+   WF SUPPORT – MOBILE PRO UI
+===================================================== */
+
+@media(max-width:768px){
+
+
+/* Hide inbox in chat */
+.chat-open{
+  display:none;
+}
+
+
+
+
+
+/* Back */
+
+.wf-chat-back{
+  background:rgba(255,255,255,.2);
+  border:0;
+  color:#fff;
+  padding:6px 10px;
+  border-radius:8px;
+  font-size:14px;
+}
+
+
+
+
+.wf-msg{
+  max-width:82%;
+  font-size:14px;
+  padding:9px 13px;
+  border-radius:16px;
+}
+
+
+.wf-msg.vendor{
+  background:#1976d2;
+  color:#fff;
+  margin-left:auto;
+}
+
+
+.wf-msg.admin{
+  background:#fff;
+  border:1px solid #e1e7ef;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*****************************************************************************
+******************* MOBILE  SUPPORT TEAM TICKET *****************************
+******************************************************************************/
+
+
+
+/****************************** MODEL 1 ***************************/
+/* =====================
+   ROOT LAYOUT
+===================== */
+
+.wf-agent-panel{
+  flex-direction:column;
+  height:100vh;
+  min-height:100vh;
+  border-radius:0;
+  overflow:hidden;
+  display:none;
+}
+
+
+
+/* =====================
+   INBOX
+===================== */
+
+.wf-ticket-list{
+  width:100%;
+  max-height:38vh;
+  overflow-y:auto;
+  border-right:none;
+  border-bottom:1px solid #e2e8f0;
+  background:#f9fbff;
+  display:none;
+}
+
+
+
+.wf-empty{
+    
+}
+
+
+
+/* Ticket */
+
+.wf-ticket-item{
+  
+}
+
+.wf-ticket-item:hover{
+  
+}
+
+.wf-ticket-item.active{
+  
+}
+
+.wf-ticket-item.active::before{
+  
+}
+
+
+
+
+/* Badge */
+
+.wf-badge{
+ 
+}
+
+
+
+
+
+/* =====================
+   CHAT PANEL
+===================== */
+
+.wf-chat-panel{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  height:100%;
+}
+
+
+
+/* =====================================================
+   EMPTY STATE
+===================================================== */
+
+.wf-placeholder{
+  
+}
+
+.wf-placeholder::before{
+  
+}
+
+#wf-chat-container{
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/****************************** MODEL 2 ***************************/
+
+/* =====================
+   CHAT CARD
+===================== */
+
+.wf-chat-card{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  height:100%;
+  border-radius:0;
+}
+
+
+/* =====================
+   HEADER
+===================== */
+
+.wf-chat-header{
+  position:sticky;
+  top:0;
+  z-index:30;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:12px 14px;
+}
+
+
+
+/* =====================
+   BODY
+===================== */
+
+.wf-chat-body{
+  flex:1;
+  padding:10px;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+
+
+/* =====================
+   BUBBLES
+===================== */
+
+.wf-bubble{
+  max-width:85%;
+  font-size:15px;
+  padding:9px 13px;
+}
+
+
+
+
+/* =====================
+   INPUT
+===================== */
+
+.wf-chat-input{
+  position:sticky;
+  bottom:0;
+  background:#fff;
+  padding:8px 10px;
+  gap:6px;
+  box-shadow:0 -2px 6px rgba(0,0,0,.05);
+}
+
+
+.wf-chat-input textarea{
+  min-height:42px;
+  font-size:15px;
+}
+
+
+.wf-chat-input button{
+  width:42px;
+  height:42px;
+}
+
+
+
+#wf-front-chat-form {
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*****************************************************************************
+******************* MOBILE VENDOR SUPPORT & SUPPORT TEAM TICKET *****************************
+******************************************************************************/
+
+
+
+/* =====================
+   MESSAGES
+===================== */
+
+.wf-support-messages{
+  flex:1;
+  padding:12px 10px;
+  background:#f3f6fb;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+
+
+
+
+
+/* =====================
+   INPUT BAR
+===================== */
+
+.wf-support-text{
+  flex:1;
+  padding:10px 14px;
+  border-radius:22px;
+  border:1px solid #d0d7e2;
+  font-size:15px;
+}
+
+
+
+.wf-support-send{
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  font-size:18px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*****************************************************************************
+******************* MOBILE VENDOR SUPPORT TICKET *****************************
+******************************************************************************/
+
+
+/* =====================================================
+   SUPPORT MODAL
+===================================================== */
+
+.wf-support-modal{
+  background:rgba(15,20,25,.85);
+  backdrop-filter:blur(4px);
+}
+
+
+.wf-support-overlay{
+    
+}
+
+
+
+/* =====================
+   MODAL BOX
+===================== */
+
+.wf-support-box{
+  width:100vw;
+  height:100vh;
+  border-radius:0;
+  max-width:100%;
+  max-height:100%;
+  display:flex;
+  flex-direction:column;
+}
+
+
+
+
+
+/* =====================
+   ORDER HEADER
+===================== */
+
+.wf-support-order-card{
+  position:sticky;
+  top:0;
+  z-index:50;
+  display:flex;
+  align-items:center;
+  padding:12px;
+  background:#fff;
+  border-bottom:1px solid #e6eaf0;
+  box-shadow:0 2px 6px rgba(0,0,0,.06);
+  padding-top:
+    calc(12px + env(safe-area-inset-top));
+}
+
+
+
+/* Product */
+
+.wf-support-product{
+  flex:1;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-width:0;
+}
+
+
+
+.wf-support-thumb{
+  width:44px;
+  height:44px;
+  border-radius:8px;
+  object-fit:cover;
+}
+
+
+
+.wf-support-product-info{
+    
+}
+
+
+
+
+.wf-support-title{
+  font-size:14px;
+  font-weight:600;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+
+
+
+.wf-support-sub{
+  font-size:11px;
+  color:#666;
+}
+
+
+
+
+.wf-support-order-id {
+    
+}
+
+
+
+
+.wf-support-qty{
+    
+}
+
+
+
+
+
+/* Status */
+
+.wf-support-status{
+  align-items:flex-end;
+  gap:3px;
+}
+
+
+
+.wf-support-badge{
+    
+}
+
+
+
+.wf-support-live{
+  font-size:10px;
+  font-weight:600;
+}
+
+
+
+
+.wf-support-actions{
+    
+}
+
+
+
+/* =====================
+   CLOSE
+===================== */
+
+.wf-support-close{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  background:#f1f3f6;
+  font-size:20px;
+}
+
+
+.wf-support-close:active{
+  transform:scale(.9);
+}
+
+
+
+
+
+
+/* =====================
+   INPUT BAR
+===================== */
+
+.wf-support-input{
+  position:sticky;
+  bottom:0;
+
+  display:flex;
+  align-items:center;
+
+  gap:8px;
+  padding:10px;
+
+  background:#fff;
+
+  border-top:1px solid #e2e8f0;
+
+  padding-bottom:
+    calc(10px + env(safe-area-inset-bottom));
+}
+
+
+
+
+
+
+}
+
+
+
+
+

@@ -1,0 +1,337 @@
+/* ============================
+   WF UI GLOBAL
+============================ */
+
+:root{
+    --wf-main:#2563eb;
+    --wf-bg:#f8fafc;
+    --wf-card:#ffffff;
+    --wf-border:#e5e7eb;
+    --wf-text:#0f172a;
+    --wf-muted:#64748b;
+    --wf-radius:14px;
+    --wf-shadow:0 8px 25px rgba(0,0,0,.06);
+    --wf-transition:.25s ease;
+}
+
+body{
+    background:var(--wf-bg);
+}
+
+
+/* ============================
+   GRID
+============================ */
+
+.wf-ui-content{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+    gap:22px;
+    padding:15px;
+}
+
+
+
+/* ============================
+   CARD
+============================ */
+
+.wf-ui-card{
+    background:var(--wf-card);
+    border:1px solid var(--wf-border);
+    border-radius:var(--wf-radius);
+    box-shadow:var(--wf-shadow);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    transition:var(--wf-transition);
+    position:relative;
+}
+
+.wf-ui-card:hover{
+    transform:translateY(-5px);
+    box-shadow:0 12px 35px rgba(0,0,0,.12);
+}
+
+
+
+/* ============================
+   IMAGE
+============================ */
+
+.wf-ui-card-thumb{
+    width:100%;
+    height:200px;
+    background:#eee;
+    position:relative;
+    overflow:hidden;
+}
+
+.wf-ui-card-thumb img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+
+
+/* ============================
+   STATUS BADGE
+============================ */
+
+.wf-ui-status{
+    position:absolute;
+    top:12px;
+    left:12px;
+    padding:4px 10px;
+    font-size:12px;
+    border-radius:20px;
+    font-weight:600;
+    background:#e0f2fe;
+    color:#0369a1;
+}
+
+.wf-ui-status.publish{
+    background:#dcfce7;
+    color:#15803d;
+}
+
+.wf-ui-status.pending{
+    background:#fff7ed;
+    color:#c2410c;
+}
+
+.wf-ui-status.draft{
+    background:#f1f5f9;
+    color:#475569;
+}
+
+.wf-ui-status.deactivated{
+    background:#fee2e2;
+    color:#b91c1c;
+}
+
+
+
+/* ============================
+   BODY
+============================ */
+
+.wf-ui-card-body{
+    padding:16px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    flex:1;
+}
+
+
+
+/* Title */
+
+.wf-ui-card-title{
+    font-size:16px;
+    font-weight:700;
+    color:var(--wf-text);
+    line-height:1.4;
+}
+
+
+
+/* Meta */
+
+.wf-ui-card-meta{
+    font-size:13px;
+    color:var(--wf-muted);
+}
+
+
+
+/* ============================
+   FOOTER
+============================ */
+
+.wf-ui-card-footer{
+    padding:14px 16px;
+    border-top:1px solid var(--wf-border);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+
+
+/* ============================
+   BUTTONS
+============================ */
+
+.wf-ui-btn{
+    padding:6px 14px;
+    border-radius:8px;
+    border:1px solid transparent;
+    background:var(--wf-main);
+    color:#fff;
+    font-size:13px;
+    cursor:pointer;
+    transition:var(--wf-transition);
+}
+
+.wf-ui-btn:hover{
+    opacity:.9;
+}
+
+
+.wf-ui-btn.outline{
+    background:transparent;
+    color:var(--wf-main);
+    border-color:var(--wf-main);
+}
+
+
+.wf-ui-btn.danger{
+    background:#dc2626;
+}
+
+
+
+/* ============================
+   TOOLBAR
+============================ */
+
+.wf-ui-toolbar{
+    background:#fff;
+    padding:15px;
+    border-radius:12px;
+    margin-bottom:20px;
+    border:1px solid var(--wf-border);
+    box-shadow:var(--wf-shadow);
+}
+
+.wf-ui-filters{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+}
+
+
+
+/* ============================
+   MODAL
+============================ */
+
+.wf-ui-modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.5);
+    display:none;
+    z-index:9999;
+}
+
+.wf-ui-modal-box{
+    background:#fff;
+    width:90%;
+    max-width:600px;
+    margin:5% auto;
+    border-radius:16px;
+    padding:22px;
+    box-shadow:var(--wf-shadow);
+}
+
+
+
+/* ============================
+   ACTIONS
+============================ */
+
+.wf-ui-modal-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:15px;
+}
+
+
+
+/* ============================
+   PROGRESS
+============================ */
+
+.wf-ui-progress{
+    margin:15px 0;
+}
+
+.progress-bar{
+    height:8px;
+    background:#e5e7eb;
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.progress-inner{
+    height:100%;
+    width:0%;
+    background:var(--wf-main);
+    transition:.3s;
+}
+
+
+
+/* ============================
+   MOBILE
+============================ */
+
+@media(max-width:768px){
+
+    .wf-ui-content{
+        grid-template-columns:1fr;
+    }
+
+    .wf-ui-card-thumb{
+        height:180px;
+    }
+
+    .wf-ui-toolbar{
+        padding:12px;
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Desktop = Table */
+@media(min-width:992px){
+
+    .wf-ui-cards-view{
+        display:none;
+    }
+
+}
+
+/* Mobile = Cards */
+@media(max-width:991px){
+
+    .owner-products-table{
+        display:none;
+    }
+
+    .wf-ui-cards-view{
+        display:grid;
+        grid-template-columns:1fr;
+        gap:16px;
+    }
+
+}
