@@ -500,6 +500,11 @@ if ($data != null):
     </div>
     <!-- #page -->
     <?php wp_footer(); ?>
+    <script type="text/javascript">
+        setTimeout(function () {
+            document.getElementById('place_order').click();
+        }, 1500);
+    </script>
     </body>
     </html>
 <?php

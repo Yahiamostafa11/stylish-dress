@@ -486,7 +486,7 @@ $resolveProductListingImageUrl = function ($product, string $wpBaseUrl) use ($re
 $homeHandler = function (string $locale = 'ar') use ($localizeProductsCollectionByWpml, $resolveProductListingImageUrl, $applyMarketplaceCategoryExclusion) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
-    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: request()->getSchemeAndHttpHost()), '/');
+    $wpBaseUrl = rtrim((string) (config('styliiiish.wp_public_url') ?: request()->getSchemeAndHttpHost()), '/');
 
     $reviewFiles = collect(array_merge(
         glob(public_path('google-reviews/*.{png,jpg,jpeg,webp,avif,gif}'), GLOB_BRACE) ?: [],
@@ -676,7 +676,7 @@ $shopDataHandler = function (Request $request, string $locale = 'ar') use ($loca
     $category = trim(rawurldecode($category));
     $category = strtolower($category);
     $category = preg_replace('/[^a-z0-9\-_]/', '', $category) ?? '';
-    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+    $wpBaseUrl = rtrim((string) (config('styliiiish.wp_public_url') ?: $request->getSchemeAndHttpHost()), '/');
 
     $normalizeSearchText = static function (?string $value): string {
         $text = mb_strtolower(trim((string) $value), 'UTF-8');
@@ -1052,7 +1052,7 @@ $shopHandler = function (Request $request, string $locale = 'ar') use ($shopData
         ]);
     }
 
-    $wpBaseUrl = rtrim((string) env('WP_PUBLIC_URL', $request->getSchemeAndHttpHost()), '/');
+    $wpBaseUrl = rtrim((string) (config('styliiiish.wp_public_url') ?: $request->getSchemeAndHttpHost()), '/');
 
     $schemaProducts = $products
         ->take(120)
@@ -1088,7 +1088,7 @@ Route::get('/en/shop', fn (Request $request) => $shopHandler($request, 'en'));
 $merchantFeedHandler = function (string $locale = 'ar') use ($localizeProductsCollectionByWpml) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
-    $wpBaseUrl = rtrim((string) env('WP_PUBLIC_URL', request()->getSchemeAndHttpHost()), '/');
+    $wpBaseUrl = rtrim((string) (config('styliiiish.wp_public_url') ?: request()->getSchemeAndHttpHost()), '/');
 
     $rows = DB::table('wp_posts as p')
         ->leftJoin('wp_postmeta as price', function ($join) {
@@ -1200,7 +1200,7 @@ Route::get('/merchant-feed-en.xml', fn () => $merchantFeedHandler('en'));
 $singleProductHandler = function (Request $request, string $slug, string $locale = 'ar') use ($localizeProductsCollectionByWpml, $resolveWpmlProductLocalization, $normalizeBrandByLocale, $mapLocaleToWpmlCode, $resolveTranslatePressLanguageCodes, $buildProductSlugCandidates, $resolveProductListingImageUrl) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
-    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+    $wpBaseUrl = rtrim((string) (config('styliiiish.wp_public_url') ?: $request->getSchemeAndHttpHost()), '/');
     $isWpmlDebug = $request->boolean('debug_wpml');
     $allowOwnerPreview = $request->boolean('od_preview');
     $ownerPreviewProductId = (int) $request->query('od_product_id', 0);
@@ -2555,7 +2555,7 @@ $attachmentSlugHandler = function (Request $request, string $attachmentSlug) {
         abort(404);
     }
 
-    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+    $wpBaseUrl = rtrim((string) (config('styliiiish.wp_public_url') ?: $request->getSchemeAndHttpHost()), '/');
 
     $attachment = DB::table('wp_posts as p')
         ->leftJoin('wp_postmeta as pm', function ($join) {
@@ -2629,7 +2629,7 @@ $resolveProductForAjaxSections = function (Request $request, string $slug, strin
 
 $renderAjaxTabHtml = function (Request $request, string $slug, string $tab, string $locale = 'ar') use ($resolveProductForAjaxSections, $localizeProductsCollectionByTranslatePress) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
-    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+    $wpBaseUrl = rtrim((string) (config('styliiiish.wp_public_url') ?: $request->getSchemeAndHttpHost()), '/');
     $product = $resolveProductForAjaxSections($request, $slug, $currentLocale);
 
     if (!$product) {
@@ -3241,7 +3241,85 @@ $reportProductHandler = function (Request $request, string $slug, string $locale
     ]);
 };
 
-$submitProductReviewHandler = function (Request $request, string $slug, string $locale = 'ar') use ($resolveProductForAjaxSections) {
+/**
+ * Recompute WooCommerce's denormalised rating fields for one product.
+ *
+ * Mirrors what WC_Comments::get_average_rating_for_product() and friends maintain:
+ *   _wc_average_rating  ROUND(AVG(rating), 2) over approved reviews carrying a rating
+ *   _wc_rating_count    PHP-serialised map of star value => number of reviews
+ *   _wc_review_count    number of approved reviews
+ *   wp_posts.comment_count  number of approved comments
+ *
+ * Only approved comments count, matching Woo. Reviews that land in moderation are
+ * picked up when an administrator approves them, because approval happens inside
+ * WordPress where Woo's own hooks do run.
+ */
+$recalculateProductRating = function (int $productId): void {
+    if ($productId <= 0) {
+        return;
+    }
+
+    $rows = DB::table('wp_comments as c')
+        ->join('wp_commentmeta as cm', function ($join) {
+            $join->on('cm.comment_id', '=', 'c.comment_ID')->where('cm.meta_key', '=', 'rating');
+        })
+        ->where('c.comment_post_ID', $productId)
+        ->where('c.comment_approved', '1')
+        ->whereIn('c.comment_type', ['review', 'comment'])
+        ->pluck('cm.meta_value');
+
+    $counts = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
+    $sum = 0;
+    $total = 0;
+
+    foreach ($rows as $value) {
+        $rating = (int) $value;
+        if ($rating < 1 || $rating > 5) {
+            continue;
+        }
+        $counts[$rating]++;
+        $sum += $rating;
+        $total++;
+    }
+
+    // Woo stores only the star values that actually occur.
+    $counts = array_filter($counts);
+
+    $average = $total > 0 ? round($sum / $total, 2) : 0;
+
+    $reviewCount = (int) DB::table('wp_comments')
+        ->where('comment_post_ID', $productId)
+        ->where('comment_approved', '1')
+        ->whereIn('comment_type', ['review', 'comment'])
+        ->count();
+
+    $meta = [
+        '_wc_average_rating' => (string) $average,
+        '_wc_rating_count'   => serialize($counts),
+        '_wc_review_count'   => (string) $reviewCount,
+    ];
+
+    foreach ($meta as $key => $value) {
+        $exists = DB::table('wp_postmeta')
+            ->where('post_id', $productId)
+            ->where('meta_key', $key)
+            ->value('meta_id');
+
+        if ($exists) {
+            DB::table('wp_postmeta')->where('meta_id', $exists)->update(['meta_value' => $value]);
+        } else {
+            DB::table('wp_postmeta')->insert([
+                'post_id'    => $productId,
+                'meta_key'   => $key,
+                'meta_value' => $value,
+            ]);
+        }
+    }
+
+    DB::table('wp_posts')->where('ID', $productId)->update(['comment_count' => $reviewCount]);
+};
+
+$submitProductReviewHandler = function (Request $request, string $slug, string $locale = 'ar') use ($resolveProductForAjaxSections, $recalculateProductRating) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $product = $resolveProductForAjaxSections($request, $slug, $currentLocale);
 
@@ -3284,6 +3362,12 @@ $submitProductReviewHandler = function (Request $request, string $slug, string $
         'meta_key' => 'rating',
         'meta_value' => (string) ((int) ($validated['rating'] ?? 0)),
     ]);
+
+    // H2 (ZIJ Tech): WooCommerce keeps denormalised rating data on the product and
+    // recalculates it from its own hooks. Because this review is written straight into
+    // wp_comments, none of those hooks fire and the stars shown on the site drift away
+    // from the reviews actually submitted. Recompute the same values Woo would.
+    $recalculateProductRating((int) $product->ID);
 
     return response()->json([
         'success' => true,
@@ -3884,21 +3968,25 @@ Route::get('/item/{slug}/tabs/{tab}', fn (Request $request, string $slug, string
 Route::get('/ar/item/{slug}/tabs/{tab}', fn (Request $request, string $slug, string $tab) => $renderAjaxTabHtml($request, $slug, $tab, 'ar'));
 Route::get('/en/item/{slug}/tabs/{tab}', fn (Request $request, string $slug, string $tab) => $renderAjaxTabHtml($request, $slug, $tab, 'en'));
 
-Route::post('/item/{slug}/report', fn (Request $request, string $slug) => $reportProductHandler($request, $slug, 'ar'));
-Route::post('/ar/item/{slug}/report', fn (Request $request, string $slug) => $reportProductHandler($request, $slug, 'ar'));
-Route::post('/en/item/{slug}/report', fn (Request $request, string $slug) => $reportProductHandler($request, $slug, 'en'));
+/*
+ * H3 (ZIJ Tech): public write endpoints now carry rate limits. There was previously no
+ * throttle anywhere in this file. Limits live in config/styliiiish.php, env-overridable.
+ */
+Route::post('/item/{slug}/report', fn (Request $request, string $slug) => $reportProductHandler($request, $slug, 'ar'))->middleware('throttle:'.config('styliiiish.throttle.report'));
+Route::post('/ar/item/{slug}/report', fn (Request $request, string $slug) => $reportProductHandler($request, $slug, 'ar'))->middleware('throttle:'.config('styliiiish.throttle.report'));
+Route::post('/en/item/{slug}/report', fn (Request $request, string $slug) => $reportProductHandler($request, $slug, 'en'))->middleware('throttle:'.config('styliiiish.throttle.report'));
 
-Route::post('/item/{slug}/review', fn (Request $request, string $slug) => $submitProductReviewHandler($request, $slug, 'ar'));
-Route::post('/ar/item/{slug}/review', fn (Request $request, string $slug) => $submitProductReviewHandler($request, $slug, 'ar'));
-Route::post('/en/item/{slug}/review', fn (Request $request, string $slug) => $submitProductReviewHandler($request, $slug, 'en'));
+Route::post('/item/{slug}/review', fn (Request $request, string $slug) => $submitProductReviewHandler($request, $slug, 'ar'))->middleware('throttle:'.config('styliiiish.throttle.review'));
+Route::post('/ar/item/{slug}/review', fn (Request $request, string $slug) => $submitProductReviewHandler($request, $slug, 'ar'))->middleware('throttle:'.config('styliiiish.throttle.review'));
+Route::post('/en/item/{slug}/review', fn (Request $request, string $slug) => $submitProductReviewHandler($request, $slug, 'en'))->middleware('throttle:'.config('styliiiish.throttle.review'));
 
-Route::post('/item/{slug}/wishlist/add', fn (Request $request, string $slug) => $wishlistAddHandler($request, $slug, 'ar'));
-Route::post('/ar/item/{slug}/wishlist/add', fn (Request $request, string $slug) => $wishlistAddHandler($request, $slug, 'ar'));
-Route::post('/en/item/{slug}/wishlist/add', fn (Request $request, string $slug) => $wishlistAddHandler($request, $slug, 'en'));
+Route::post('/item/{slug}/wishlist/add', fn (Request $request, string $slug) => $wishlistAddHandler($request, $slug, 'ar'))->middleware('throttle:'.config('styliiiish.throttle.wishlist'));
+Route::post('/ar/item/{slug}/wishlist/add', fn (Request $request, string $slug) => $wishlistAddHandler($request, $slug, 'ar'))->middleware('throttle:'.config('styliiiish.throttle.wishlist'));
+Route::post('/en/item/{slug}/wishlist/add', fn (Request $request, string $slug) => $wishlistAddHandler($request, $slug, 'en'))->middleware('throttle:'.config('styliiiish.throttle.wishlist'));
 
-Route::delete('/item/wishlist/{id}', fn (Request $request, int $id) => $wishlistRemoveHandler($request, $id, 'ar'));
-Route::delete('/ar/item/wishlist/{id}', fn (Request $request, int $id) => $wishlistRemoveHandler($request, $id, 'ar'));
-Route::delete('/en/item/wishlist/{id}', fn (Request $request, int $id) => $wishlistRemoveHandler($request, $id, 'en'));
+Route::delete('/item/wishlist/{id}', fn (Request $request, int $id) => $wishlistRemoveHandler($request, $id, 'ar'))->middleware('throttle:'.config('styliiiish.throttle.wishlist'));
+Route::delete('/ar/item/wishlist/{id}', fn (Request $request, int $id) => $wishlistRemoveHandler($request, $id, 'ar'))->middleware('throttle:'.config('styliiiish.throttle.wishlist'));
+Route::delete('/en/item/wishlist/{id}', fn (Request $request, int $id) => $wishlistRemoveHandler($request, $id, 'en'))->middleware('throttle:'.config('styliiiish.throttle.wishlist'));
 
 Route::get('/item/wishlist/count', fn (Request $request) => $wishlistCountHandler($request, 'ar'));
 Route::get('/ar/item/wishlist/count', fn (Request $request) => $wishlistCountHandler($request, 'ar'));
@@ -3916,43 +4004,11 @@ Route::get('/cart', fn (Request $request) => $cartPageHandler($request, 'ar'));
 Route::get('/ar/cart', fn (Request $request) => $cartPageHandler($request, 'ar'));
 Route::get('/en/cart', fn (Request $request) => $cartPageHandler($request, 'en'));
 
-Route::get('/debug/wpml-product/{slug}', function (Request $request, string $slug) use ($resolveWpmlProductLocalization) {
-    $locale = strtolower((string) $request->query('locale', 'ar'));
-    $locale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
-
-    $resolution = $resolveWpmlProductLocalization($slug, $locale);
-
-    $wpmlRows = collect();
-    if (!empty($resolution['trid']) && Schema::hasTable('wp_icl_translations')) {
-        $wpmlRows = DB::table('wp_icl_translations')
-            ->where('element_type', 'post_product')
-            ->where('trid', (int) $resolution['trid'])
-            ->orderBy('language_code')
-            ->get(['element_id', 'language_code', 'source_language_code', 'trid']);
-    }
-
-    $candidateIds = collect([
-        (int) ($resolution['base_product_id'] ?? 0),
-        (int) ($resolution['localized_product_id'] ?? 0),
-    ])->merge($wpmlRows->pluck('element_id')->map(fn ($id) => (int) $id))->filter(fn ($id) => $id > 0)->unique()->values();
-
-    $posts = collect();
-    if ($candidateIds->isNotEmpty()) {
-        $posts = DB::table('wp_posts')
-            ->whereIn('ID', $candidateIds->all())
-            ->select('ID', 'post_title', 'post_name', 'post_status', 'post_type')
-            ->orderBy('ID')
-            ->get();
-    }
-
-    return response()->json([
-        'locale' => $locale,
-        'slug' => $slug,
-        'resolution' => $resolution,
-        'wpml_rows' => $wpmlRows,
-        'posts' => $posts,
-    ]);
-});
+/*
+ * H5 (ZIJ Tech): removed public route GET /debug/wpml-product/{slug}. It returned
+ * internal post IDs, post_status for unpublished products, and the full WPML
+ * translation mapping to any anonymous visitor.
+ */
 
 $adsHandler = function (string $locale = 'ar') use ($localizeProductsCollectionByWpml, $applyMarketplaceCategoryExclusion) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
@@ -4026,8 +4082,8 @@ Route::get('/en/ads', fn () => $adsHandler('en'));
 $blogHandler = function (Request $request, string $locale = 'ar') use ($localizeProductsCollectionByTranslatePress) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
-    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
-    $arBlogArchivePath = env('WP_AR_BLOG_ARCHIVE_PATH', '/ar/%d9%85%d8%af%d9%88%d9%86%d8%a9/');
+    $wpBaseUrl = rtrim((string) (config('styliiiish.wp_public_url') ?: $request->getSchemeAndHttpHost()), '/');
+    $arBlogArchivePath = config('styliiiish.blog.ar_archive_path');
     $arBlogArchivePath = '/' . ltrim((string) $arBlogArchivePath, '/');
     $page = max(1, (int) $request->query('page', 1));
     $perPage = 9;
@@ -4347,9 +4403,9 @@ Route::get('/en/blog', fn (Request $request) => $blogHandler($request, 'en'));
 $blogSingleHandler = function (Request $request, string $slug, string $locale = 'ar') use ($localizeProductsCollectionByTranslatePress, $resolveTranslatePressLanguageCodes, $normalizeBrandByLocale) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
-    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+    $wpBaseUrl = rtrim((string) (config('styliiiish.wp_public_url') ?: $request->getSchemeAndHttpHost()), '/');
 
-    $blogSingleCacheMinutes = max(1, (int) env('BLOG_SINGLE_CACHE_MINUTES', 15));
+    $blogSingleCacheMinutes = max(1, (int) config('styliiiish.blog.single_cache_minutes'));
     $cacheSlug = mb_strtolower(trim(rawurldecode((string) $slug)), 'UTF-8');
     $blogSingleCacheKey = 'blog_single_v2:' . $currentLocale . ':' . md5($cacheSlug);
 
@@ -4653,7 +4709,7 @@ $blogSingleHandler = function (Request $request, string $slug, string $locale = 
         }
     }
 
-    $remoteScrapeEnabled = filter_var((string) env('BLOG_SINGLE_REMOTE_SCRAPE', 'false'), FILTER_VALIDATE_BOOLEAN);
+    $remoteScrapeEnabled = filter_var((string) config('styliiiish.blog.single_remote_scrape'), FILTER_VALIDATE_BOOLEAN);
     if ($currentLocale === 'ar' && $post && $remoteScrapeEnabled) {
         $slugValue = trim((string) ($post->post_name ?? ''));
         $candidateUrls = collect([
@@ -4946,7 +5002,7 @@ Route::get('/en/contact-us', fn () => $contactHandler('en'));
 $aboutHandler = function (Request $request, string $locale = 'ar') {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
-    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+    $wpBaseUrl = rtrim((string) (config('styliiiish.wp_public_url') ?: $request->getSchemeAndHttpHost()), '/');
 
     return view('about', compact('currentLocale', 'localePrefix', 'wpBaseUrl'));
 };
@@ -4958,7 +5014,7 @@ Route::get('/en/about-us', fn (Request $request) => $aboutHandler($request, 'en'
 $privacyHandler = function (Request $request, string $locale = 'ar') {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
-    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+    $wpBaseUrl = rtrim((string) (config('styliiiish.wp_public_url') ?: $request->getSchemeAndHttpHost()), '/');
 
     return view('privacy-policy', compact('currentLocale', 'localePrefix', 'wpBaseUrl'));
 };
@@ -4971,7 +5027,7 @@ Route::get('/ar/سياسة-الخصوصية', fn (Request $request) => $privacyH
 $termsHandler = function (Request $request, string $locale = 'ar') {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
-    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+    $wpBaseUrl = rtrim((string) (config('styliiiish.wp_public_url') ?: $request->getSchemeAndHttpHost()), '/');
 
     return view('terms-conditions', compact('currentLocale', 'localePrefix', 'wpBaseUrl'));
 };
@@ -4983,7 +5039,7 @@ Route::get('/en/terms-conditions', fn (Request $request) => $termsHandler($reque
 $marketplacePolicyHandler = function (Request $request, string $locale = 'ar') {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
-    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+    $wpBaseUrl = rtrim((string) (config('styliiiish.wp_public_url') ?: $request->getSchemeAndHttpHost()), '/');
 
     return view('marketplace-policy', compact('currentLocale', 'localePrefix', 'wpBaseUrl'));
 };
@@ -4997,7 +5053,7 @@ Route::get('/Marketplace-Policy/', fn (Request $request) => $marketplacePolicyHa
 $refundReturnPolicyHandler = function (Request $request, string $locale = 'ar') {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
-    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+    $wpBaseUrl = rtrim((string) (config('styliiiish.wp_public_url') ?: $request->getSchemeAndHttpHost()), '/');
 
     return view('refund-return-policy', compact('currentLocale', 'localePrefix', 'wpBaseUrl'));
 };
@@ -5011,7 +5067,7 @@ Route::get('/Refund-Return-Policy/', fn (Request $request) => $refundReturnPolic
 $faqHandler = function (Request $request, string $locale = 'ar') {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
-    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+    $wpBaseUrl = rtrim((string) (config('styliiiish.wp_public_url') ?: $request->getSchemeAndHttpHost()), '/');
 
     return view('faq', compact('currentLocale', 'localePrefix', 'wpBaseUrl'));
 };
@@ -5025,7 +5081,7 @@ Route::get('/styliiiish-faq/', fn (Request $request) => $faqHandler($request, 'e
 $shippingPolicyHandler = function (Request $request, string $locale = 'ar') {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
-    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+    $wpBaseUrl = rtrim((string) (config('styliiiish.wp_public_url') ?: $request->getSchemeAndHttpHost()), '/');
 
     return view('shipping-delivery-policy', compact('currentLocale', 'localePrefix', 'wpBaseUrl'));
 };
@@ -5038,7 +5094,7 @@ Route::get('/shipping-delivery-policy/', fn (Request $request) => $shippingPolic
 $cookiePolicyHandler = function (Request $request, string $locale = 'ar') {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
-    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+    $wpBaseUrl = rtrim((string) (config('styliiiish.wp_public_url') ?: $request->getSchemeAndHttpHost()), '/');
 
     return view('cookie-policy', compact('currentLocale', 'localePrefix', 'wpBaseUrl'));
 };
@@ -5052,7 +5108,7 @@ Route::get('/🍪-cookie-policy/', fn (Request $request) => $cookiePolicyHandler
 $categoriesHandler = function (Request $request, string $locale = 'ar') use ($normalizeBrandByLocale, $resolveTranslatePressLanguageCodes) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
-    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+    $wpBaseUrl = rtrim((string) (config('styliiiish.wp_public_url') ?: $request->getSchemeAndHttpHost()), '/');
 
     $categories = DB::table('wp_terms as t')
         ->join('wp_term_taxonomy as tt', 't.term_id', '=', 'tt.term_id')
@@ -5214,7 +5270,7 @@ Route::get('/categories/', fn (Request $request) => $categoriesHandler($request,
 $marketplaceHandler = function (Request $request, string $locale = 'ar') use ($localizeProductsCollectionByWpml) {
     $currentLocale = in_array($locale, ['ar', 'en'], true) ? $locale : 'ar';
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
-    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+    $wpBaseUrl = rtrim((string) (config('styliiiish.wp_public_url') ?: $request->getSchemeAndHttpHost()), '/');
     $search = trim((string) $request->query('q', ''));
     $sort = (string) $request->query('sort', 'newest');
 
@@ -5425,7 +5481,7 @@ Route::get('/en/marketplace', fn (Request $request) => $marketplaceHandler($requ
 Route::get('/marketplace/', fn (Request $request) => $marketplaceHandler($request, 'en'));
 
 $accountHandler = function (Request $request, string $currentLocale) {
-    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+    $wpBaseUrl = rtrim((string) (config('styliiiish.wp_public_url') ?: $request->getSchemeAndHttpHost()), '/');
     $localePrefix = $currentLocale === 'en' ? '/en' : '/ar';
     return view('account', compact('currentLocale', 'localePrefix', 'wpBaseUrl'));
 };
@@ -5438,7 +5494,7 @@ Route::get('/my-account', fn (Request $request) => $accountHandler($request, 'en
 Route::get('/my-account/', fn (Request $request) => $accountHandler($request, 'en'));
 
 $checkoutRedirectHandler = function (Request $request, ?string $endpoint = null, ?string $orderId = null) {
-    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+    $wpBaseUrl = rtrim((string) (config('styliiiish.wp_public_url') ?: $request->getSchemeAndHttpHost()), '/');
     $requestPath = trim((string) $request->path(), '/');
 
     $endpointMap = [
@@ -5489,6 +5545,251 @@ Route::get('/payment/{endpoint}/{orderId?}', fn (Request $request, string $endpo
 Route::get('/en/payment/{endpoint}/{orderId?}', fn (Request $request, string $endpoint, ?string $orderId = null) => $checkoutRedirectHandler($request, $endpoint, $orderId));
 
 Route::get('/favicon.ico', function (Request $request) {
-    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL') ?: $request->getSchemeAndHttpHost()), '/');
+    $wpBaseUrl = rtrim((string) (config('styliiiish.wp_public_url') ?: $request->getSchemeAndHttpHost()), '/');
     return redirect()->away($wpBaseUrl . '/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png');
 });
+
+/*
+|--------------------------------------------------------------------------
+| React front-end JSON API
+|--------------------------------------------------------------------------
+|
+| Read-only JSON views over the same WordPress/WooCommerce tables the rest
+| of this file reads from. Kept self-contained (no dependency on the large
+| closures above) so it stays easy to reason about while the new React
+| front-end (react-frontend/) is wired up.
+|
+*/
+
+$apiCors = function ($response) {
+    return $response
+        ->header('Access-Control-Allow-Origin', '*')
+        ->header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+        ->header('Access-Control-Allow-Headers', 'Content-Type');
+};
+
+$apiWpBaseUrl = fn (Request $request) => rtrim(
+    (string) (config('styliiiish.wp_public_url') ?: $request->getSchemeAndHttpHost()),
+    '/'
+);
+
+$apiResolveImage = function (?string $guid, ?string $attachedFile, string $wpBaseUrl): ?string {
+    $guid = trim((string) $guid);
+    if ($guid !== '') {
+        return preg_replace('#^https?://[^/]+#i', $wpBaseUrl, $guid);
+    }
+
+    $file = ltrim(trim((string) $attachedFile), '/');
+    if ($file !== '') {
+        return $wpBaseUrl . '/wp-content/uploads/' . $file;
+    }
+
+    return null;
+};
+
+Route::options('/api/{any}', fn () => response('', 204))
+    ->where('any', '.*');
+
+Route::get('/api/products', function (Request $request) use ($apiCors, $apiWpBaseUrl, $apiResolveImage) {
+    $wpBaseUrl = $apiWpBaseUrl($request);
+    $search = trim((string) $request->query('search', ''));
+    $category = trim((string) $request->query('category', ''));
+    $limit = max(1, min(100, (int) $request->query('limit', 40)));
+
+    $query = DB::table('wp_posts as p')
+        ->leftJoin('wp_postmeta as price', fn ($j) => $j->on('p.ID', '=', 'price.post_id')->where('price.meta_key', '_price'))
+        ->leftJoin('wp_postmeta as regular', fn ($j) => $j->on('p.ID', '=', 'regular.post_id')->where('regular.meta_key', '_regular_price'))
+        ->leftJoin('wp_postmeta as sale', fn ($j) => $j->on('p.ID', '=', 'sale.post_id')->where('sale.meta_key', '_sale_price'))
+        ->leftJoin('wp_postmeta as thumb', fn ($j) => $j->on('p.ID', '=', 'thumb.post_id')->where('thumb.meta_key', '_thumbnail_id'))
+        ->leftJoin('wp_posts as img', 'thumb.meta_value', '=', 'img.ID')
+        ->leftJoin('wp_postmeta as img_file', fn ($j) => $j->on('img.ID', '=', 'img_file.post_id')->where('img_file.meta_key', '_wp_attached_file'))
+        ->where('p.post_type', 'product')
+        ->where('p.post_status', 'publish')
+        ->whereNotExists(function ($sub) {
+            $sub->select(DB::raw(1))
+                ->from('wp_term_relationships as tr_amnahi')
+                ->join('wp_term_taxonomy as tt_amnahi', 'tr_amnahi.term_taxonomy_id', '=', 'tt_amnahi.term_taxonomy_id')
+                ->join('wp_terms as t_amnahi', 'tt_amnahi.term_id', '=', 't_amnahi.term_id')
+                ->where('tt_amnahi.taxonomy', 'product_cat')
+                ->where('t_amnahi.slug', 'amnahi')
+                ->whereColumn('tr_amnahi.object_id', 'p.ID');
+        });
+
+    if ($search !== '') {
+        $query->where('p.post_title', 'like', '%' . $search . '%');
+    }
+
+    if ($category !== '') {
+        $query->whereExists(function ($sub) use ($category) {
+            $sub->select(DB::raw(1))
+                ->from('wp_term_relationships as tr_cat')
+                ->join('wp_term_taxonomy as tt_cat', 'tr_cat.term_taxonomy_id', '=', 'tt_cat.term_taxonomy_id')
+                ->join('wp_terms as t_cat', 'tt_cat.term_id', '=', 't_cat.term_id')
+                ->where('tt_cat.taxonomy', 'product_cat')
+                ->where('t_cat.slug', $category)
+                ->whereColumn('tr_cat.object_id', 'p.ID');
+        });
+    }
+
+    $rows = $query
+        ->orderBy('p.post_date', 'desc')
+        ->limit($limit)
+        ->select(
+            'p.ID as id',
+            'p.post_title as name',
+            'p.post_name as slug',
+            'p.post_excerpt as short_description',
+            'price.meta_value as price',
+            'regular.meta_value as regular_price',
+            'sale.meta_value as sale_price',
+            'img.guid as image_guid',
+            'img_file.meta_value as image_file'
+        )
+        ->get()
+        ->map(function ($row) use ($apiResolveImage, $wpBaseUrl) {
+            return [
+                'id' => (int) $row->id,
+                'name' => (string) $row->name,
+                'slug' => (string) $row->slug,
+                'short_description' => trim((string) $row->short_description),
+                'price' => $row->price !== null ? (float) $row->price : null,
+                'regular_price' => $row->regular_price !== null ? (float) $row->regular_price : null,
+                'sale_price' => $row->sale_price !== null ? (float) $row->sale_price : null,
+                'on_sale' => $row->sale_price !== null && $row->sale_price !== '' && $row->sale_price !== $row->regular_price,
+                'image' => $apiResolveImage($row->image_guid, $row->image_file, $wpBaseUrl),
+            ];
+        })
+        ->unique('id')
+        ->values();
+
+    return $apiCors(response()->json(['data' => $rows]));
+});
+
+// Dress-type categories for the Shop page's filter pills (e.g. "Bridesmaids'
+// Dresses", "Evening Dresses") — the brand's own WooCommerce product_cat
+// terms, same taxonomy as everything else. 'used-dress' and 'amnahi' are
+// deliberately excluded: those already have their own dedicated nav items
+// (Sales / Thrifted) and showing them again here would be a confusing
+// duplicate entry point into the same products.
+Route::get('/api/categories', function (Request $request) use ($apiCors) {
+    $rows = DB::table('wp_term_taxonomy as tt')
+        ->join('wp_terms as t', 't.term_id', '=', 'tt.term_id')
+        ->where('tt.taxonomy', 'product_cat')
+        ->whereNotIn('t.slug', ['used-dress', 'amnahi', 'uncategorized'])
+        ->select('t.slug', 't.name', 'tt.count')
+        ->orderBy('tt.count', 'desc')
+        ->orderBy('t.name')
+        ->get()
+        ->map(fn ($r) => [
+            'slug' => (string) $r->slug,
+            'name' => (string) $r->name,
+            'count' => (int) $r->count,
+        ]);
+
+    return $apiCors(response()->json(['data' => $rows]));
+});
+
+Route::get('/api/products/{id}', function (Request $request, string $id) use ($apiCors, $apiWpBaseUrl, $apiResolveImage) {
+    $wpBaseUrl = $apiWpBaseUrl($request);
+
+    $row = DB::table('wp_posts as p')
+        ->leftJoin('wp_postmeta as price', fn ($j) => $j->on('p.ID', '=', 'price.post_id')->where('price.meta_key', '_price'))
+        ->leftJoin('wp_postmeta as regular', fn ($j) => $j->on('p.ID', '=', 'regular.post_id')->where('regular.meta_key', '_regular_price'))
+        ->leftJoin('wp_postmeta as sale', fn ($j) => $j->on('p.ID', '=', 'sale.post_id')->where('sale.meta_key', '_sale_price'))
+        ->leftJoin('wp_postmeta as thumb', fn ($j) => $j->on('p.ID', '=', 'thumb.post_id')->where('thumb.meta_key', '_thumbnail_id'))
+        ->leftJoin('wp_posts as img', 'thumb.meta_value', '=', 'img.ID')
+        ->leftJoin('wp_postmeta as img_file', fn ($j) => $j->on('img.ID', '=', 'img_file.post_id')->where('img_file.meta_key', '_wp_attached_file'))
+        ->where('p.post_type', 'product')
+        ->where('p.post_status', 'publish')
+        ->where(function ($q) use ($id) {
+            $q->where('p.ID', ctype_digit($id) ? (int) $id : -1)
+              ->orWhere('p.post_name', $id);
+        })
+        ->whereNotExists(function ($sub) {
+            $sub->select(DB::raw(1))
+                ->from('wp_term_relationships as tr_amnahi')
+                ->join('wp_term_taxonomy as tt_amnahi', 'tr_amnahi.term_taxonomy_id', '=', 'tt_amnahi.term_taxonomy_id')
+                ->join('wp_terms as t_amnahi', 'tt_amnahi.term_id', '=', 't_amnahi.term_id')
+                ->where('tt_amnahi.taxonomy', 'product_cat')
+                ->where('t_amnahi.slug', 'amnahi')
+                ->whereColumn('tr_amnahi.object_id', 'p.ID');
+        })
+        ->select(
+            'p.ID as id',
+            'p.post_title as name',
+            'p.post_name as slug',
+            'p.post_content as description',
+            'p.post_excerpt as short_description',
+            'price.meta_value as price',
+            'regular.meta_value as regular_price',
+            'sale.meta_value as sale_price',
+            'img.guid as image_guid',
+            'img_file.meta_value as image_file'
+        )
+        ->first();
+
+    if (!$row) {
+        return $apiCors(response()->json(['message' => 'Product not found'], 404));
+    }
+
+    $gallery = DB::table('wp_postmeta as gm')
+        ->join('wp_posts as img', 'img.ID', '=', DB::raw('CAST(gm.meta_value AS UNSIGNED)'))
+        ->leftJoin('wp_postmeta as img_file', fn ($j) => $j->on('img.ID', '=', 'img_file.post_id')->where('img_file.meta_key', '_wp_attached_file'))
+        ->where('gm.post_id', $row->id)
+        ->where('gm.meta_key', '_product_image_gallery')
+        ->select('img.guid as image_guid', 'img_file.meta_value as image_file')
+        ->get()
+        ->map(fn ($g) => $apiResolveImage($g->image_guid, $g->image_file, $wpBaseUrl))
+        ->filter()
+        ->unique()
+        ->values();
+
+    // "Ready sizes" = real WooCommerce variations the admin set up for this
+    // product (pa_size attribute), as opposed to "Custom Measurements" which
+    // the client types in herself when her size isn't one of these.
+    $sizeOrder = ['xs' => 0, 's' => 1, 'm' => 2, 'l' => 3, 'xl' => 4, 'xxl' => 5, '2xl' => 5, '3xl' => 6, 'xxxl' => 6];
+
+    $sizes = DB::table('wp_posts as v')
+        ->leftJoin('wp_postmeta as size_slug', fn ($j) => $j->on('v.ID', '=', 'size_slug.post_id')->where('size_slug.meta_key', 'attribute_pa_size'))
+        ->leftJoin('wp_postmeta as v_price', fn ($j) => $j->on('v.ID', '=', 'v_price.post_id')->where('v_price.meta_key', '_price'))
+        ->leftJoin('wp_postmeta as v_stock', fn ($j) => $j->on('v.ID', '=', 'v_stock.post_id')->where('v_stock.meta_key', '_stock_status'))
+        ->where('v.post_parent', $row->id)
+        ->where('v.post_type', 'product_variation')
+        ->where('v.post_status', 'publish')
+        ->select(
+            'v.ID as variation_id',
+            'size_slug.meta_value as size_slug',
+            'v_price.meta_value as price',
+            'v_stock.meta_value as stock_status'
+        )
+        ->get()
+        ->filter(fn ($v) => !empty($v->size_slug))
+        ->map(fn ($v) => [
+            'variation_id' => (int) $v->variation_id,
+            'label' => strtoupper($v->size_slug),
+            'price' => $v->price !== null ? (float) $v->price : null,
+            'in_stock' => $v->stock_status !== 'outofstock',
+        ])
+        ->sortBy(fn ($v) => $sizeOrder[strtolower($v['label'])] ?? 99)
+        ->values();
+
+    return $apiCors(response()->json([
+        'data' => [
+            'id' => (int) $row->id,
+            'name' => (string) $row->name,
+            'slug' => (string) $row->slug,
+            'description' => trim((string) strip_tags((string) $row->description)),
+            'short_description' => trim((string) strip_tags((string) $row->short_description)),
+            'price' => $row->price !== null ? (float) $row->price : null,
+            'regular_price' => $row->regular_price !== null ? (float) $row->regular_price : null,
+            'sale_price' => $row->sale_price !== null ? (float) $row->sale_price : null,
+            'on_sale' => $row->sale_price !== null && $row->sale_price !== '' && $row->sale_price !== $row->regular_price,
+            'image' => $apiResolveImage($row->image_guid, $row->image_file, $wpBaseUrl),
+            'gallery' => $gallery,
+            'sizes' => $sizes,
+        ],
+    ]));
+});
+
+require __DIR__ . '/amnahi.php';
+require __DIR__ . '/checkout.php';

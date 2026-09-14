@@ -210,3 +210,136 @@ if ( ! function_exists('wf_get_vendor_reviews_stats') ) {
 
 
 
+
+/* ===========================================================================
+ * Centralised product-access gate  (added by ZIJ Tech — audit item H1)
+ * ---------------------------------------------------------------------------
+ * Every product AJAX handler in this plugin verifies the nonce `ajax_nonce`.
+ * That nonce is issued to EVERY logged-in user, so it proves the request came
+ * from our own pages — it proves nothing whatsoever about the caller's role.
+ * Authorisation therefore has to be explicit on each handler, and several were
+ * relying on the nonce alone.
+ *
+ * SYSTEM_RULES.md §4 already requires nonce + role + object ownership on every
+ * sensitive action. These helpers are the single place that decides, so new
+ * handlers cannot quietly forget one of the three.
+ * ======================================================================== */
+
+if ( ! function_exists('wf_od_is_manager') ) {
+    /**
+     * Manager-level access to the products module.
+     *
+     * @param int $user_id Defaults to the current user.
+     * @return bool
+     */
+    function wf_od_is_manager( $user_id = 0 ) {
+        $user_id = $user_id ? (int) $user_id : get_current_user_id();
+
+        if ( $user_id <= 0 ) {
+            return false;
+        }
+
+        if ( wf_od_is_user_plugin_admin( $user_id ) ) {
+            return true;
+        }
+
+        if ( user_can( $user_id, 'manage_woocommerce' ) ) {
+            return true;
+        }
+
+        return in_array( wf_od_get_user_type( $user_id ), array( 'manager', 'dashboard' ), true );
+    }
+}
+
+if ( ! function_exists('wf_od_can_edit_product') ) {
+    /**
+     * May this user read/modify this specific product?
+     *
+     * Managers may touch anything. Everyone else is limited to products they
+     * authored — this is what stops one vendor reaching another vendor's data.
+     *
+     * @param int $product_id
+     * @param int $user_id Defaults to the current user.
+     * @return bool
+     */
+    function wf_od_can_edit_product( $product_id, $user_id = 0 ) {
+        $product_id = (int) $product_id;
+        $user_id    = $user_id ? (int) $user_id : get_current_user_id();
+
+        if ( $user_id <= 0 || $product_id <= 0 ) {
+            return false;
+        }
+
+        if ( 'product' !== get_post_type( $product_id ) ) {
+            return false;
+        }
+
+        if ( wf_od_is_manager( $user_id ) ) {
+            return true;
+        }
+
+        return $user_id === (int) get_post_field( 'post_author', $product_id );
+    }
+}
+
+if ( ! function_exists('wf_od_guard_product') ) {
+    /**
+     * Gate for any handler that acts on one product. Ends the request on failure.
+     *
+     * @param int $product_id
+     * @return int The validated product id.
+     */
+    function wf_od_guard_product( $product_id ) {
+        $product_id = (int) $product_id;
+
+        if ( $product_id <= 0 || 'product' !== get_post_type( $product_id ) ) {
+            wp_send_json_error( array( 'message' => 'Invalid product' ), 400 );
+        }
+
+        if ( ! wf_od_can_edit_product( $product_id ) ) {
+            wp_send_json_error( array( 'message' => 'No permission' ), 403 );
+        }
+
+        return $product_id;
+    }
+}
+
+if ( ! function_exists('wf_od_guard_products_module') ) {
+    /**
+     * Gate for handlers that do not target one product (lists, taxonomy lookups).
+     * Requires a logged-in user; managers and marketplace vendors both qualify,
+     * but the data layer must still scope results by wf_od_resolve_products_mode().
+     */
+    function wf_od_guard_products_module() {
+        if ( ! is_user_logged_in() ) {
+            wp_send_json_error( array( 'message' => 'Login required' ), 401 );
+        }
+    }
+}
+
+if ( ! function_exists('wf_od_resolve_products_mode') ) {
+    /**
+     * Decide which product scope the caller actually gets.
+     *
+     * The client may ASK for a mode, but may only ever narrow its own access:
+     *   - 'user'  -> always honoured (show me only my own products)
+     *   - 'owner' -> honoured for managers only; anyone else is forced to 'user'
+     *
+     * Before this existed the mode came straight from $_POST and defaulted to
+     * 'owner', so any logged-in customer could enumerate the whole catalogue.
+     *
+     * @param string|null $requested Raw requested mode, or null to read $_POST.
+     * @return string 'owner'|'user'
+     */
+    function wf_od_resolve_products_mode( $requested = null ) {
+        if ( null === $requested ) {
+            $requested = isset( $_POST['mode'] ) ? sanitize_key( wp_unslash( $_POST['mode'] ) ) : '';
+        }
+
+        if ( 'user' === $requested ) {
+            return 'user';
+        }
+
+        return wf_od_is_manager() ? 'owner' : 'user';
+    }
+}

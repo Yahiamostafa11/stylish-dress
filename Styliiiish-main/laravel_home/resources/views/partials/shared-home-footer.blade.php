@@ -2,7 +2,7 @@
     $currentLocale = $currentLocale ?? 'ar';
     $isEnglish = ($isEnglish ?? ($currentLocale === 'en')) === true;
     $localePrefix = $localePrefix ?? ($isEnglish ? '/en' : '/ar');
-    $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? env('WP_PUBLIC_URL', 'https://styliiiish.com')), '/');
+    $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? (config('styliiiish.wp_public_url') ?: 'https://styliiiish.com')), '/');
     $wpLogo = $wpLogo ?? ($wpBaseUrl . '/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547-300x128.png');
     $wpLogo2x = $wpBaseUrl . '/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547-600x255.png';
     $wpLogoOriginal = $wpBaseUrl . '/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
@@ -83,7 +83,7 @@
     </div>
 
     <div class="container footer-bottom">
-        <span>{{ str_replace(':year', (string) date('Y'), $ft('rights', 'جميع الحقوق محفوظة © :year Styliiiish | تشغيل وتطوير', 'All rights reserved © :year Styliiiish | Powered by')) }} <a href="https://websiteflexi.com/" target="_blank" rel="noopener">Website Flexi</a></span>
+        <span>{{ str_replace(':year', (string) date('Y'), $ft('rights', 'جميع الحقوق محفوظة © :year Styliiiish | تشغيل وتطوير', 'All rights reserved © :year Styliiiish | Powered by')) }} <a href="https://zijtech.com/" target="_blank" rel="noopener">ZIJ Tech</a></span>
         <span><a href="{{ $localePrefix }}">styliiiish.com</a></span>
     </div>
 

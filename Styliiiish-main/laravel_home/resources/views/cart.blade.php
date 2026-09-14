@@ -3,7 +3,7 @@
     $currentLocale = $currentLocale ?? 'ar';
     $localePrefix = $localePrefix ?? '/ar';
     $isEnglish = $currentLocale === 'en';
-    $wpBaseUrl = rtrim((string) (env('WP_PUBLIC_URL', request()->getSchemeAndHttpHost())), '/');
+    $wpBaseUrl = rtrim((string) ((config('styliiiish.wp_public_url') ?: request()->getSchemeAndHttpHost())), '/');
     $wpCheckoutUrl = $isEnglish ? ($wpBaseUrl . '/checkout/') : ($wpBaseUrl . '/ar/الدفع/');
     $canonicalPath = $localePrefix . '/cart';
 

@@ -424,27 +424,13 @@ function websiteflexi_myaccount_welcome_box() {
 
 
 
-add_action('wp_ajax_styliiiish_update_status', function () {
-    check_ajax_referer('ajax_nonce','nonce');
-
-    if ( ! ( current_user_can('manage_woocommerce') || wf_od_is_user_plugin_admin() ) ) {
-        wp_send_json_error(['message' => 'No permission']);
-    }
-
-    $pid    = intval($_POST['product_id']);
-    $status = sanitize_text_field($_POST['status']);
-
-    if (!$pid || !$status) {
-        wp_send_json_error(['message' => 'Invalid parameters']);
-    }
-
-    wp_update_post([
-        'ID'          => $pid,
-        'post_status' => $status
-    ]);
-
-    wp_send_json_success(['message' => 'Status updated']);
-});
+/*
+ * H1/M2 (ZIJ Tech): the duplicate `wp_ajax_styliiiish_update_status` handler that
+ * lived here has been removed. It was registered BEFORE the one in
+ * modules/shared/ajax/manage-products-ajax.php, so it was the one actually running —
+ * and unlike that one it accepted ANY string as a post_status and performed no
+ * per-product ownership check. The surviving handler validates both.
+ */
 
 
 

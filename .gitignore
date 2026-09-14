@@ -79,3 +79,7 @@ desktop.ini
 .idea/
 *.swp
 *~
+
+# --- Tooling-local, not application code.
+.claude/
+Claude outputs/

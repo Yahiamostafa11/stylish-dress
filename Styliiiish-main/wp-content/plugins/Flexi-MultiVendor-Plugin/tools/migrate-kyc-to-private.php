@@ -1,4 +1,10 @@
 <?php
+
+/**
+ * @package   Styliiiish
+ * @author    Yahia Mostafa — ZIJ Tech <https://zijtech.com/>
+ * @copyright ZIJ Tech
+ */
 /**
  * One-time migration: move already-uploaded KYC documents out of the public uploads
  * tree and into private storage (wp-content/uploads/styliiiish-kyc/).
@@ -56,8 +62,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	require_once $found;
 }
 
+// Normally kyc-storage.php is loaded by the plugin bootstrap. Load it directly if not,
+// so this script still runs on an install where the plugin is inactive or the bootstrap
+// has not been updated yet.
 if ( ! function_exists( 'wf_kyc_doc_keys' ) ) {
-	exit( "includes/kyc-storage.php is not loaded. Activate the TaajVendor plugin first.\n" );
+	$storage = dirname( __DIR__ ) . '/includes/kyc-storage.php';
+
+	if ( is_file( $storage ) ) {
+		require_once $storage;
+	}
+}
+
+if ( ! function_exists( 'wf_kyc_doc_keys' ) ) {
+	exit( "Could not load includes/kyc-storage.php. Upload it next to this script's plugin folder first.\n" );
 }
 
 // --- Options -------------------------------------------------------------------------

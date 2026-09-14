@@ -1,4 +1,10 @@
 <?php
+
+/**
+ * @package   Styliiiish
+ * @author    Yahia Mostafa — ZIJ Tech <https://zijtech.com/>
+ * @copyright ZIJ Tech
+ */
 /**
  * KYC document storage — private-by-default.
  *

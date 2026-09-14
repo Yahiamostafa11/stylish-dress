@@ -12,7 +12,7 @@
         : ($isEnglish ? '/en' : '/ar');
     $currentLocale = $localePrefix === '/en' ? 'en' : 'ar';
     $isEnglish = $currentLocale === 'en';
-    $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? env('WP_PUBLIC_URL', 'https://styliiiish.com')), '/');
+    $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? (config('styliiiish.wp_public_url') ?: 'https://styliiiish.com')), '/');
     $wpLogo = $wpLogo ?? 'https://styliiiish.com/wp-content/uploads/2025/11/ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png';
 
     $wpMyAccountUrl = $wpMyAccountUrl ?? ($wpBaseUrl . '/my-account/');

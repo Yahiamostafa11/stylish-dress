@@ -3,7 +3,7 @@
     $currentLocale = $currentLocale ?? 'ar';
     $localePrefix = $localePrefix ?? '/ar';
     $isEnglish = $currentLocale === 'en';
-    $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? env('WP_PUBLIC_URL', request()->getSchemeAndHttpHost())), '/');
+    $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? (config('styliiiish.wp_public_url') ?: request()->getSchemeAndHttpHost())), '/');
     $canonicalPath = $localePrefix . '/wishlist';
 
     $translations = [

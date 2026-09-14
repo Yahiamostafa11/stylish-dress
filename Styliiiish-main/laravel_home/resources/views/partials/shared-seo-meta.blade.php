@@ -42,7 +42,7 @@
         ?? 'styliiiish, فساتين سهرة, فساتين زفاف, فساتين خطوبة, evening dresses egypt, bridal dresses egypt, engagement dresses'
     ));
 
-    $seoBaseUrl = rtrim((string) ($wpBaseUrl ?? env('WP_PUBLIC_URL', request()->getSchemeAndHttpHost())), '/');
+    $seoBaseUrl = rtrim((string) ($wpBaseUrl ?? (config('styliiiish.wp_public_url') ?: request()->getSchemeAndHttpHost())), '/');
     $seoCanonicalPath = (string) ($canonicalPath ?? request()->getPathInfo());
     if ($seoCanonicalPath === '' || $seoCanonicalPath[0] !== '/') {
         $seoCanonicalPath = '/' . ltrim($seoCanonicalPath, '/');

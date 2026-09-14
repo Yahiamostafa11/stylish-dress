@@ -63,7 +63,7 @@
 
         return $isEnglish ? $fallback['en'] : $fallback['ar'];
     };
-    $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? env('WP_PUBLIC_URL', 'https://styliiiish.com')), '/');
+    $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? (config('styliiiish.wp_public_url') ?: 'https://styliiiish.com')), '/');
     $wpMyAccountUrl = $wpMyAccountUrl ?? ($wpBaseUrl . '/my-account/');
     $wpLocalizedAccountUrl = $wpLocalizedAccountUrl ?? ($isEnglish ? ($wpBaseUrl . '/my-account/') : ($wpBaseUrl . '/ar/%d8%ad%d8%b3%d8%a7%d8%a8%d9%8a/'));
     $wpLoginUrl = $wpLoginUrl ?? $wpMyAccountUrl;

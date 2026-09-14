@@ -299,7 +299,7 @@
     $openFromMinutes = 11 * 60;
     $openUntilMinutes = 19 * 60;
     $isOpenNow = $currentMinutes >= $openFromMinutes && $currentMinutes < $openUntilMinutes;
-    $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? env('WP_PUBLIC_URL', 'https://styliiiish.com')), '/');
+    $wpBaseUrl = rtrim((string) ($wpBaseUrl ?? (config('styliiiish.wp_public_url') ?: 'https://styliiiish.com')), '/');
     $canonicalPath = $localePrefix;
     $wpMyAccountUrl = $wpBaseUrl . '/my-account/';
     $wpLocalizedAccountUrl = $isEnglish

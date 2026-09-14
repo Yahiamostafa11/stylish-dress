@@ -172,6 +172,14 @@ add_action('wp_ajax_styliiiish_get_attributes', function () {
     $is_add_mode  = (!$pid && $cat);   // Add Product
     $is_edit_mode = ($pid > 0);        // Edit Product
 
+    // H1: reading an existing product's attributes requires rights on that product.
+    // Add mode touches no existing product, so module-level access is enough.
+    if ($is_edit_mode) {
+        wf_od_guard_product($pid);
+    } else {
+        wf_od_guard_products_module();
+    }
+
 
     /* =================================
        OLD LOGIC (UNCHANGED)
@@ -346,14 +354,11 @@ add_action('wp_ajax_styliiiish_get_attributes', function () {
 add_action('wp_ajax_styliiiish_save_attributes', function () {
     check_ajax_referer('ajax_nonce','nonce');
 
-
-
     $pid   = intval($_POST['product_id']);
     $items = $_POST['items'] ?? [];
 
-    if (!$pid) {
-        wp_send_json_error(['message' => 'Invalid product']);
-    }
+    // H1: the nonce alone let ANY logged-in user rewrite attributes on ANY product.
+    wf_od_guard_product($pid);
 
     $product = wc_get_product($pid);
 
@@ -948,6 +953,10 @@ add_action('wp_ajax_styliiiish_update_status', function () {
         wp_send_json_error(['message' => 'Invalid data']);
     }
 
+    // H1: manager rights alone were enough to publish/unpublish any product. Keep the
+    // manager path, but route it through the same per-product gate as everything else.
+    wf_od_guard_product($product_id);
+
     $allowed_statuses = ['publish', 'draft', 'pending', 'private'];
     if (!in_array($status, $allowed_statuses, true)) {
         wp_send_json_error(['message' => 'Invalid status']);
@@ -1275,9 +1284,11 @@ function styliiiish_get_manage_products_data(
     $is_mobile = wp_is_mobile();
     $per_page  = $is_mobile ? 5 : 10;
 
-    // detect mode
-    if (isset($_POST['mode']) && in_array($_POST['mode'], ['owner','user'], true)) {
-        $mode = sanitize_text_field($_POST['mode']);
+    // H1: this used to re-read $_POST['mode'] and override the $mode argument, which
+    // defeated any check the caller had already made. Internal callers pass 'vendor'
+    // and are left alone; anything else is re-resolved against the real user.
+    if ('vendor' !== $mode) {
+        $mode = wf_od_resolve_products_mode($mode);
     }
 
     $is_user = ($mode === 'user');
@@ -1562,7 +1573,11 @@ add_action('wp_ajax_styliiiish_manage_products_list', function () {
     $search = sanitize_text_field($_POST['search'] ?? '');
     $cat    = intval($_POST['cat'] ?? 0);
     $status = sanitize_key($_POST['status'] ?? '');
-    $mode   = sanitize_key($_POST['mode'] ?? 'owner');
+
+    // H1: mode used to come straight from $_POST and default to 'owner', so any
+    // logged-in customer could list the owner's entire catalogue. The caller may
+    // now only ever narrow its own scope.
+    $mode   = wf_od_resolve_products_mode();
 
 
     /* Get data */
@@ -1782,9 +1797,8 @@ add_action('wp_ajax_styliiiish_trigger_pending_check', function () {
 
     $product_id = isset($_POST['product_id']) ? intval($_POST['product_id']) : 0;
 
-    if (!$product_id) {
-        wp_send_json_error(['message' => 'Invalid ID']);
-    }
+    // H1: recomputes and can change a product's status. Was callable for any product id.
+    wf_od_guard_product($product_id);
 
     styliiiish_auto_pending_check($product_id);
 
@@ -1797,9 +1811,9 @@ add_action('wp_ajax_styliiiish_force_pending_check', function () {
     check_ajax_referer('ajax_nonce','nonce');
 
     $product_id = intval($_POST['product_id']);
-    if (!$product_id) {
-        wp_send_json_error(['message' => 'Invalid ID']);
-    }
+
+    // H1: same as above — status-changing side effect on an arbitrary product id.
+    wf_od_guard_product($product_id);
 
     styliiiish_auto_pending_check($product_id);
 
@@ -2161,9 +2175,8 @@ add_action('wp_ajax_styliiiish_get_product_for_edit', function(){
 
     $pid = intval($_POST['product_id']);
 
-    if(!$pid || get_post_type($pid) !== 'product'){
-        wp_send_json_error('Invalid product');
-    }
+    // H1: was readable for ANY product id by any logged-in user (IDOR).
+    wf_od_guard_product($pid);
 
     $post = get_post($pid);
 
