@@ -24,11 +24,11 @@ export function CartProvider({ children }) {
     }
   }, [items]);
 
-  const addItem = ({ productId, name, image, price, quantity = 1, measurements = null, sizeType = null, unit = null, notes = "" }) => {
+  const addItem = ({ productId, variationId = null, name, image, price, quantity = 1, measurements = null, sizeType = null, unit = null, notes = "" }) => {
     const cartItemId = `${productId}-${Date.now()}`;
     setItems((prev) => [
       ...prev,
-      { cartItemId, productId, name, image, price, quantity, measurements, sizeType, unit, notes },
+      { cartItemId, productId, variationId, name, image, price, quantity, measurements, sizeType, unit, notes },
     ]);
     return cartItemId;
   };

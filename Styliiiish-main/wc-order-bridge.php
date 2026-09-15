@@ -126,7 +126,11 @@ try {
         }
 
         $orderItem = $order->get_item($itemId);
-        if ($orderItem && !empty($line['measurements']) && is_array($line['measurements'])) {
+        // Skip for ready-size lines: add_product() with a WC_Product_Variation
+        // already records the size as a real product attribute, which the
+        // order screen displays automatically ("Size: XL") — adding it again
+        // here as custom meta would just show the same line twice.
+        if ($orderItem && !$variationId && !empty($line['measurements']) && is_array($line['measurements'])) {
             foreach ($line['measurements'] as $label => $value) {
                 if ($value === '' || $value === null) {
                     continue;

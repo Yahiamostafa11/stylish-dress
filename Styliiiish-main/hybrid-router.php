@@ -161,103 +161,84 @@ if (preg_match('#^/(ar|en|ara)/wp-content/(.+)$#u', $request_uri, $matches)) {
     exit;
 }
 
-// Exact routes handled by Laravel
-$laravel_exact_routes = [
-    '/',
-    '/index.php',
-    '/ar',
-    '/en',
-    '/shop',
-    '/ar/shop',
-    '/en/shop',
-    '/item',
-    '/ar/item',
-    '/en/item',
-    '/categories',
-    '/ar/categories',
-    '/en/categories',
-    '/categories/',
-    '/marketplace',
-    '/ar/marketplace',
-    '/en/marketplace',
-    '/marketplace/',
-    '/blog',
-    '/ar/blog',
-    '/en/blog',
-    '/about-us',
-    '/ar/about-us',
-    '/en/about-us',
-    '/privacy-policy',
-    '/ar/privacy-policy',
-    '/en/privacy-policy',
-    '/ar/سياسة-الخصوصية',
-    '/terms-conditions',
-    '/ar/terms-conditions',
-    '/en/terms-conditions',
-    '/marketplace-policy',
-    '/ar/marketplace-policy',
-    '/en/marketplace-policy',
-    '/Marketplace-Policy',
-    '/Marketplace-Policy/',
-    '/refund-return-policy',
-    '/ar/refund-return-policy',
-    '/en/refund-return-policy',
-    '/Refund-Return-Policy',
-    '/Refund-Return-Policy/',
-    '/faq',
-    '/ar/faq',
-    '/en/faq',
-    '/styliiiish-faq',
-    '/styliiiish-faq/',
-    '/shipping-delivery-policy',
-    '/ar/shipping-delivery-policy',
-    '/en/shipping-delivery-policy',
-    '/shipping-delivery-policy/',
-    '/cookie-policy',
-    '/ar/cookie-policy',
-    '/en/cookie-policy',
-    '/🍪-cookie-policy',
-    '/🍪-cookie-policy/',
-    '/contact-us',
-    '/ar/contact-us',
-    '/en/contact-us',
-    '/ads',
-    '/ar/ads',
-    '/en/ads',
-    '/google-reviews',
-    '/brand',
-    '/favicon.ico',
+// ===== React storefront cutover =====
+//
+// The React SPA (react-frontend/, built into react-dist/) replaces the old
+// Laravel-Blade storefront (home/shop/item/categories/blog/etc.) as of this
+// cutover. Laravel itself is NOT removed — it still serves /api/* (the
+// checkout, products, امنحي, chat endpoints the React app calls) and a
+// couple of machine-consumed feeds that have no React equivalent. Everything
+// else that isn't an explicit WordPress carve-out now falls through to the
+// React app's index.html and lets its client-side router take over.
+//
+// Known, accepted gaps from this cutover (no React page exists yet):
+// /blog, /blog/{slug}, /ads, /google-reviews, /brand, and old /item/{slug}
+// product links (the new product route is /product/{id}, a numeric id, and
+// there is no slug->id table to redirect through). Revisit if/when React
+// grows equivalents for these.
+$react_dist_dir = __DIR__ . '/react-dist';
+
+// Always-Laravel: JSON API the React app calls, plus feeds no React page can
+// generate (Google Merchant Center polls these directly by URL).
+if (
+    strpos($request_uri, '/api/') === 0 ||
+    $path === '/api' ||
+    in_array($path, ['/merchant-feed.xml', '/merchant-feed-en.xml'], true)
+) {
+    require __DIR__ . '/laravel_home/public/index.php';
+    exit;
+}
+
+// Legacy URL -> new React route. 301s (not redirects inside the SPA) so
+// search engines and old bookmarks transfer to the new address instead of
+// silently 404ing.
+$legacy_redirect_map = [
+    '/about-us' => '/about',
+    '/ar/about-us' => '/about',
+    '/en/about-us' => '/about',
+    '/contact-us' => '/contact',
+    '/ar/contact-us' => '/contact',
+    '/en/contact-us' => '/contact',
+    '/refund-return-policy' => '/refund-policy',
+    '/ar/refund-return-policy' => '/refund-policy',
+    '/en/refund-return-policy' => '/refund-policy',
+    '/Refund-Return-Policy' => '/refund-policy',
+    '/shipping-delivery-policy' => '/shipping-policy',
+    '/ar/shipping-delivery-policy' => '/shipping-policy',
+    '/en/shipping-delivery-policy' => '/shipping-policy',
+    '/styliiiish-faq' => '/faq',
+    '/ar/faq' => '/faq',
+    '/en/faq' => '/faq',
+    '/🍪-cookie-policy' => '/cookie-policy',
+    '/ar/cookie-policy' => '/cookie-policy',
+    '/en/cookie-policy' => '/cookie-policy',
+    '/categories' => '/shop',
+    '/ar/categories' => '/shop',
+    '/en/categories' => '/shop',
+    '/ar/shop' => '/shop',
+    '/en/shop' => '/shop',
+    '/ar/marketplace' => '/marketplace',
+    '/en/marketplace' => '/marketplace',
+    '/ar/privacy-policy' => '/privacy-policy',
+    '/en/privacy-policy' => '/privacy-policy',
+    '/ar/سياسة-الخصوصية' => '/privacy-policy',
+    '/ar/terms-conditions' => '/terms-conditions',
+    '/en/terms-conditions' => '/terms-conditions',
+    '/ar/marketplace-policy' => '/marketplace-policy',
+    '/en/marketplace-policy' => '/marketplace-policy',
+    '/Marketplace-Policy' => '/marketplace-policy',
+    '/ar' => '/',
+    '/en' => '/',
 ];
 
-// Prefix routes (assets/subpaths) handled by Laravel
-$laravel_prefix_routes = [
-    '/ar/',
-    '/en/',
-    '/shop/',
-    '/item/',
-    '/categories/',
-    '/marketplace/',
-    '/blog/',
-    '/about-us/',
-    '/privacy-policy/',
-    '/ar/سياسة-الخصوصية/',
-    '/terms-conditions/',
-    '/marketplace-policy/',
-    '/Marketplace-Policy/',
-    '/refund-return-policy/',
-    '/Refund-Return-Policy/',
-    '/faq/',
-    '/styliiiish-faq/',
-    '/shipping-delivery-policy/',
-    '/cookie-policy/',
-    '/🍪-cookie-policy/',
-    '/contact-us/',
-    '/ads/',
-    '/google-reviews/',
-    '/brand/',
-    '/build/',
-    '/storage/',
-];
+if (isset($legacy_redirect_map[$path])) {
+    $target = $legacy_redirect_map[$path];
+    if (!empty($_SERVER['QUERY_STRING'])) {
+        $target .= '?' . $_SERVER['QUERY_STRING'];
+    }
+    header('Location: ' . $target, true, 301);
+    exit;
+}
 
 // Routes that must stay on WordPress (e.g. translated plugin endpoints)
 $wordpress_exact_routes = [
@@ -302,9 +283,21 @@ $wordpress_prefix_routes = [
     '/ar/dress-rental-in-cairo/',
     '/ar/تأجير-فساتين-في-القاهرة/',
     '/en/dress-rental-in-cairo/',
+    '/wp-json/',
     '/ar/wp-json/',
     '/en/wp-json/',
     '/ara/wp-json/',
+    '/wc-auth/',
+    '/wp-admin/',
+    '/wp-login.php',
+    '/xmlrpc.php',
+    // These duplicate what .htaccess's own RewriteCond exclusions already
+    // handle in real production (Apache never even invokes this script for
+    // /wp-admin/, /wp-json/, /wp-login.php, etc. — see the "HYBRID ROUTER"
+    // block in .htaccess). They're listed here anyway as a safety net: PHP's
+    // built-in dev server (`php -S ... hybrid-router.php`, used for local
+    // testing) has no equivalent to those Apache conditions and would send
+    // bare /wp-json/ etc. to the React SPA shell without this.
     '/ar/حسابي/',
     '/ara/حسابي/',
     '/حسابي/',
@@ -318,108 +311,62 @@ $wordpress_prefix_routes = [
     '/ara/لوحة-معلومات-المالك/',
 ];
 
-$send_to_laravel = null;
+$send_to_wordpress = false;
 
 if (isset($_GET['wc-ajax']) && (string) $_GET['wc-ajax'] !== '') {
-    $send_to_laravel = false;
+    $send_to_wordpress = true;
 }
 
 if (in_array($request_uri, $wordpress_exact_routes, true) || in_array($path, $wordpress_exact_routes, true)) {
-    $send_to_laravel = false;
+    $send_to_wordpress = true;
 }
 
-if ($send_to_laravel === null) {
+if (!$send_to_wordpress) {
     foreach ($wordpress_prefix_routes as $wp_prefix) {
         if (strpos($request_uri, $wp_prefix) === 0) {
-            $send_to_laravel = false;
+            $send_to_wordpress = true;
             break;
         }
     }
 }
 
-if ($send_to_laravel === null) {
-    $send_to_laravel = in_array($path, $laravel_exact_routes, true);
-
-    if (!$send_to_laravel) {
-        foreach ($laravel_prefix_routes as $prefix) {
-            if (strpos($request_uri, $prefix) === 0) {
-                $send_to_laravel = true;
-                break;
-            }
-        }
-    }
-}
-
-// Default strategy: Laravel handles all non-explicit-WordPress routes.
-if ($send_to_laravel === null) {
-    $send_to_laravel = true;
-}
-
-if ($send_to_laravel) {
-    $laravel_public = __DIR__ . '/laravel_home/public';
-    $requested_file = realpath($laravel_public . $request_uri);
-
-    if ($requested_file === false && $request_uri === '/favicon.ico') {
-        $favicon_fallbacks = [
-            realpath($laravel_public . '/favicon.ico'),
-            realpath($laravel_public . '/brand/icons.png'),
-            realpath($laravel_public . '/brand/logo.png'),
-        ];
-
-        foreach ($favicon_fallbacks as $fallback_file) {
-            if ($fallback_file !== false && is_file($fallback_file)) {
-                $requested_file = $fallback_file;
-                break;
-            }
-        }
-    }
-
-    if ($requested_file === false && strpos($request_uri, '/google-reviews/') === 0) {
-        $fallback_reviews_dir = realpath(__DIR__ . '/laravel_home/Google Reviews');
-        $fallback_candidate = $fallback_reviews_dir
-            ? realpath($fallback_reviews_dir . '/' . basename($request_uri))
-            : false;
-
-        if (
-            $fallback_candidate !== false &&
-            strpos($fallback_candidate, $fallback_reviews_dir) === 0 &&
-            is_file($fallback_candidate)
-        ) {
-            $requested_file = $fallback_candidate;
-        }
-    }
-
-    if (
-        $requested_file !== false &&
-        (
-            strpos($requested_file, realpath($laravel_public)) === 0 ||
-            strpos($requested_file, realpath(__DIR__ . '/laravel_home/Google Reviews')) === 0
-        ) &&
-        is_file($requested_file) &&
-        // SECURITY: only stream allowlisted static assets. Without this, any .php / .env /
-        // backup file under laravel_home/public is returned as plain text — e.g. GET /index.php
-        // used to dump the Laravel front controller's source. Non-allowlisted paths now fall
-        // through to Laravel below, which routes or 404s them normally.
-        $styliiiish_is_servable_static($requested_file)
-    ) {
-        $ext = strtolower(pathinfo($requested_file, PATHINFO_EXTENSION));
-
-        header('Content-Type: ' . $styliiiish_servable_mime_types[$ext]);
-        header('X-Content-Type-Options: nosniff');
-
-        if (strpos($request_uri, '/google-reviews/') === 0) {
-            header('Cache-Control: public, max-age=300, must-revalidate');
-        } else {
-            header('Cache-Control: public, max-age=604800');
-        }
-        readfile($requested_file);
-        exit;
-    }
-
-    require __DIR__ . '/laravel_home/public/index.php';
+if ($send_to_wordpress) {
+    // ===== WordPress normal loading =====
+    define('WP_USE_THEMES', true);
+    require __DIR__ . '/wp-blog-header.php';
     exit;
 }
 
-// ===== WordPress normal loading =====
-define('WP_USE_THEMES', true);
-require __DIR__ . '/wp-blog-header.php';
+// ===== Everything else -> the React SPA =====
+// Try a real static file inside react-dist/ first (the Vite build's JS/CSS/
+// images); otherwise serve the SPA shell and let React Router decide what
+// the path means client-side (this is what makes deep links like /shop or
+// /product/123 work on a full page load, not just client-side navigation).
+$react_requested_file = realpath($react_dist_dir . $request_uri);
+
+if (
+    $react_requested_file !== false &&
+    strpos($react_requested_file, realpath($react_dist_dir)) === 0 &&
+    is_file($react_requested_file) &&
+    // SECURITY: same allowlist as the Laravel/WP asset serving above — never
+    // stream a file whose extension isn't recognized as safe to return as-is.
+    $styliiiish_is_servable_static($react_requested_file)
+) {
+    $ext = strtolower(pathinfo($react_requested_file, PATHINFO_EXTENSION));
+    header('Content-Type: ' . $styliiiish_servable_mime_types[$ext]);
+    header('X-Content-Type-Options: nosniff');
+    header('Cache-Control: public, max-age=604800');
+    readfile($react_requested_file);
+    exit;
+}
+
+$react_index = $react_dist_dir . '/index.html';
+if (is_file($react_index)) {
+    header('Content-Type: text/html; charset=UTF-8');
+    readfile($react_index);
+    exit;
+}
+
+// react-dist/ hasn't been built/deployed yet on this environment — fail safe
+// to the old Laravel storefront rather than showing a blank/broken page.
+require __DIR__ . '/laravel_home/public/index.php';
