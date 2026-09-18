@@ -14,6 +14,7 @@ const NAV = [
   { href: "/sell", key: "nav.sell" },
   { href: "/about", key: "nav.about" },
   { href: "/contact", key: "nav.contact" },
+  { href: "/reviews", key: "nav.reviews" },
 ];
 
 export default function Header() {

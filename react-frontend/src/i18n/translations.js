@@ -177,6 +177,21 @@ export const translations = {
     "contact.submit": "إرسال",
     "contact.success": "شكرًا ليكي! استلمنا رسالتك وهنتواصل معاكي قريب.",
 
+    // reviews
+    "nav.reviews": "آراء عملائنا",
+    "reviews.eyebrow": "قالوا عننا",
+    "reviews.title": "آراء عميلاتنا",
+    "reviews.subtitle": "شوفي تجارب بنات زيك مع فساتين Styliiiish.",
+    "reviews.empty": "لسه مفيش آراء منشورة، تابعينا قريب!",
+    "reviews.imageAlt": "رأي عميلة",
+    "reviews.formTitle": "شاركينا رأيك",
+    "reviews.nameLabel": "اسمك",
+    "reviews.messageLabel": "رأيك في الخدمة",
+    "reviews.submit": "إرسال رأيك",
+    "reviews.sending": "بيتم الإرسال...",
+    "reviews.success": "شكرًا ليكي! استلمنا رأيك وهنشاركه قريب.",
+    "reviews.errorMsg": "حصل خطأ، جربي تاني كمان شوية.",
+
     // wishlist
     "wishlist.eyebrow": "قائمتك",
     "wishlist.title": "المفضلة",
@@ -823,6 +838,21 @@ export const translations = {
     "contact.messageLabel": "Your Message",
     "contact.submit": "Send",
     "contact.success": "Thank you! We've received your message and will be in touch soon.",
+
+    // reviews
+    "nav.reviews": "Reviews",
+    "reviews.eyebrow": "What They Say",
+    "reviews.title": "Customer Reviews",
+    "reviews.subtitle": "See what customers like you think about Styliiiish.",
+    "reviews.empty": "No reviews posted yet — check back soon!",
+    "reviews.imageAlt": "Customer review",
+    "reviews.formTitle": "Share Your Review",
+    "reviews.nameLabel": "Your Name",
+    "reviews.messageLabel": "Your Review",
+    "reviews.submit": "Send Your Review",
+    "reviews.sending": "Sending...",
+    "reviews.success": "Thank you! We've received your review and will share it soon.",
+    "reviews.errorMsg": "Something went wrong, please try again shortly.",
 
     // wishlist
     "wishlist.eyebrow": "Your List",

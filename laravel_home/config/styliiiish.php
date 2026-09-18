@@ -62,10 +62,23 @@ return [
      | UI interaction that must stay responsive.
      */
     'throttle' => [
-        'review'   => env('THROTTLE_REVIEW', '5,60'),
-        'report'   => env('THROTTLE_REPORT', '10,60'),
-        'wishlist' => env('THROTTLE_WISHLIST', '60,1'),
-        'amnahi'   => env('THROTTLE_AMNAHI', '30,1'),
+        'review'      => env('THROTTLE_REVIEW', '5,60'),
+        'report'      => env('THROTTLE_REPORT', '10,60'),
+        'wishlist'    => env('THROTTLE_WISHLIST', '60,1'),
+        'amnahi'      => env('THROTTLE_AMNAHI', '30,1'),
+        'testimonial' => env('THROTTLE_TESTIMONIAL', '5,60'),
+    ],
+
+    /*
+     | Reviews page testimonial box (routes/reviews.php).
+     |
+     | These are general "what customers think of us" testimonials, not
+     | WooCommerce product reviews — they're emailed to the owner rather than
+     | published automatically. She curates them onto the page as a
+     | screenshot herself, same as the pre-existing static ones.
+     */
+    'reviews' => [
+        'notify_email' => env('REVIEWS_NOTIFY_EMAIL', env('MAIL_FROM_ADDRESS', 'hello@styliiiish.com')),
     ],
 
     /*

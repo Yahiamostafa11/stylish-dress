@@ -27,6 +27,7 @@ import ShippingPolicy from "./pages/ShippingPolicy";
 import CookiePolicy from "./pages/CookiePolicy";
 import MarketplacePolicy from "./pages/MarketplacePolicy";
 import Faq from "./pages/Faq";
+import Reviews from "./pages/Reviews";
 
 export default function App() {
   return (
@@ -44,6 +45,7 @@ export default function App() {
         <Route path="/sell" element={<Sell />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/reviews" element={<Reviews />} />
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />

@@ -12,6 +12,7 @@ const EXPLORE_LINKS = [
 const COMPANY_LINKS = [
   { href: "/about", key: "nav.about" },
   { href: "/contact", key: "nav.contact" },
+  { href: "/reviews", key: "nav.reviews" },
   { href: "/wishlist", key: "header.wishlist" },
   { href: "/login", key: "header.login" },
 ];

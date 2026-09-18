@@ -113,6 +113,12 @@ export function expressInterest(listingId) {
   return postJson(`/amnahi/listings/${listingId}/interest`, {}, { auth: true }).then((r) => r.data);
 }
 
+// ---- reviews ----
+
+export function submitReview({ name, message }) {
+  return postJson("/reviews", { name, message });
+}
+
 // ---- checkout ----
 
 export function submitCheckout({ customer, items }) {
