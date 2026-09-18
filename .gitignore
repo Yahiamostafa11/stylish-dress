@@ -25,6 +25,7 @@ Styliiiish-main.zip
 
 # --- Secrets. Must never enter history; history is forever.
 **/wp-config.php
+**/wp-config.*.php
 **/laravel_home/.env
 **/.env
 **/.env.*
