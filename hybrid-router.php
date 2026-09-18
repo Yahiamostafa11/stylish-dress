@@ -276,6 +276,12 @@ $wordpress_exact_routes = [
     '/ar/لوحة-معلومات-المالك/',
     '/ara/لوحة-معلومات-المالك',
     '/ara/لوحة-معلومات-المالك/',
+    // wps-hide-login rewrites this to wp-login.php entirely inside WordPress
+    // (whl_page option) — it's not a real file, so it has to be listed here
+    // explicitly or it falls through to the React SPA shell instead of ever
+    // reaching WordPress. Keep this in sync if that plugin setting changes.
+    '/secure-admin',
+    '/secure-admin/',
 ];
 
 $wordpress_prefix_routes = [
