@@ -294,6 +294,17 @@ $wordpress_prefix_routes = [
     '/en/wp-json/',
     '/ara/wp-json/',
     '/wc-auth/',
+    '/wc-api/',
+    // WooCommerce's own payment pages. The React /checkout is an exact match
+    // only, so these sub-paths must go to WordPress: checkout.php returns a
+    // pay_url under /checkout/order-pay/, and Paymob sends the customer back
+    // to /checkout/order-received/ afterwards.
+    '/checkout/order-pay/',
+    '/checkout/order-received/',
+    '/en/checkout/order-pay/',
+    '/en/checkout/order-received/',
+    '/ar/الدفع/',
+    '/ara/الدفع/',
     '/wp-admin/',
     '/wp-login.php',
     '/xmlrpc.php',
@@ -320,6 +331,11 @@ $wordpress_prefix_routes = [
 $send_to_wordpress = false;
 
 if (isset($_GET['wc-ajax']) && (string) $_GET['wc-ajax'] !== '') {
+    $send_to_wordpress = true;
+}
+
+// Payment gateway callbacks (Paymob etc.) hit the site root as /?wc-api=...
+if (isset($_GET['wc-api']) && (string) $_GET['wc-api'] !== '') {
     $send_to_wordpress = true;
 }
 
