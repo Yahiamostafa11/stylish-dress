@@ -377,7 +377,13 @@ if (
     $ext = strtolower(pathinfo($react_requested_file, PATHINFO_EXTENSION));
     header('Content-Type: ' . $styliiiish_servable_mime_types[$ext]);
     header('X-Content-Type-Options: nosniff');
-    header('Cache-Control: public, max-age=604800');
+    // /assets/ filenames carry a content hash and /fonts/ never changes in
+    // place, so both are safe to cache for a year; everything else keeps a week.
+    if (strpos($request_uri, '/assets/') === 0 || strpos($request_uri, '/fonts/') === 0) {
+        header('Cache-Control: public, max-age=31536000, immutable');
+    } else {
+        header('Cache-Control: public, max-age=604800');
+    }
     readfile($react_requested_file);
     exit;
 }
