@@ -45,6 +45,12 @@ export default function DiscoveryPopup() {
     setOpen(true);
   };
 
+  const goSell = () => {
+    navigate("/sell");
+    setOpen(false);
+    setMinimized(true);
+  };
+
   const showResults = () => {
     const params = new URLSearchParams();
     if (category) params.set("category", category);
@@ -91,6 +97,9 @@ export default function DiscoveryPopup() {
                   {CATEGORY_LABEL_KEYS[c.slug] ? t(CATEGORY_LABEL_KEYS[c.slug]) : c.name}
                 </button>
               ))}
+              <button type="button" className="discovery-pill discovery-pill-sell" onClick={goSell}>
+                {t("discovery.sellYourDress")}
+              </button>
             </div>
           </div>
         )}

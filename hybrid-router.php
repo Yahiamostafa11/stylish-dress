@@ -38,7 +38,7 @@ if (in_array($path, ['/ar/حسابي/customer-logout', '/ara/حسابي/customer
 // Always serve favicon from known files before any framework routing.
 if ($path === '/favicon.ico') {
     $favicon_candidates = [
-        __DIR__ . '/wp-content/uploads/2025/11/cropped-ChatGPT-Image-Nov-2-2025-03_11_14-AM-e1762046066547.png',
+        __DIR__ . '/react-dist/brand-mark.png',
         __DIR__ . '/laravel_home/public/favicon.ico',
         __DIR__ . '/laravel_home/public/brand/icons.png',
     ];

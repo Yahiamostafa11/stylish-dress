@@ -216,6 +216,8 @@ nav.main a.on{color:var(--rose-600);font-weight:600;border-bottom:2px solid var(
 .discovery-pill{height:36px;padding:0 16px;border-radius:999px;border:1px solid var(--line);
   background:#fff;color:var(--ink-700);font-size:12.5px;cursor:pointer;transition:.15s}
 .discovery-pill.on{background:var(--rose-600);border-color:var(--rose-600);color:#fff}
+.discovery-pill-sell{border-style:dashed;border-color:var(--mint-700);color:var(--mint-700);font-weight:600}
+.discovery-pill-sell:hover{background:var(--mint-050)}
 .discovery-actions{display:flex;align-items:center;gap:14px;margin-top:8px}
 .discovery-actions .btn{flex:1}
 .discovery-skip{background:none;border:0;color:var(--muted-500);font-size:12.5px;
