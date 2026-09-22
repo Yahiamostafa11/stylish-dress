@@ -5594,6 +5594,9 @@ Route::get('/api/products', function (Request $request) use ($apiCors, $apiWpBas
     $wpBaseUrl = $apiWpBaseUrl($request);
     $search = trim((string) $request->query('search', ''));
     $category = trim((string) $request->query('category', ''));
+    $size = trim((string) $request->query('size', ''));
+    $minPrice = $request->query('min_price');
+    $maxPrice = $request->query('max_price');
     $limit = max(1, min(100, (int) $request->query('limit', 40)));
 
     $query = DB::table('wp_posts as p')
@@ -5629,6 +5632,35 @@ Route::get('/api/products', function (Request $request) use ($apiCors, $apiWpBas
                 ->where('t_cat.slug', $category)
                 ->whereColumn('tr_cat.object_id', 'p.ID');
         });
+    }
+
+    // pa_size is a global WooCommerce attribute, so WordPress attaches its
+    // terms to the parent product (not just the variation) the same way
+    // product_cat is — the storefront's native attribute-filter widget
+    // relies on exactly this, so it's safe to filter on here too.
+    if ($size !== '') {
+        $query->whereExists(function ($sub) use ($size) {
+            $sub->select(DB::raw(1))
+                ->from('wp_term_relationships as tr_size')
+                ->join('wp_term_taxonomy as tt_size', 'tr_size.term_taxonomy_id', '=', 'tt_size.term_taxonomy_id')
+                ->join('wp_terms as t_size', 'tt_size.term_id', '=', 't_size.term_id')
+                ->where('tt_size.taxonomy', 'pa_size')
+                ->where('t_size.slug', $size)
+                ->whereColumn('tr_size.object_id', 'p.ID');
+        });
+    }
+
+    $hasMinPrice = $minPrice !== null && $minPrice !== '' && is_numeric($minPrice);
+    $hasMaxPrice = $maxPrice !== null && $maxPrice !== '' && is_numeric($maxPrice);
+
+    if ($hasMinPrice || $hasMaxPrice) {
+        $query->where('price.meta_value', 'REGEXP', '^[0-9.]+$');
+        if ($hasMinPrice) {
+            $query->where(DB::raw('CAST(price.meta_value AS DECIMAL(10,2))'), '>=', (float) $minPrice);
+        }
+        if ($hasMaxPrice) {
+            $query->where(DB::raw('CAST(price.meta_value AS DECIMAL(10,2))'), '<=', (float) $maxPrice);
+        }
     }
 
     $rows = $query
@@ -5687,6 +5719,68 @@ Route::get('/api/categories', function (Request $request) use ($apiCors) {
         ]);
 
     return $apiCors(response()->json(['data' => $rows]));
+});
+
+// pa_size is WooCommerce's global size attribute (XS/S/M/L/XL/XXL/3XL here).
+// Used by the "help me choose" popup's size step and by Shop's size filter.
+Route::get('/api/sizes', function (Request $request) use ($apiCors) {
+    $sizeOrder = ['xs' => 0, 's' => 1, 'm' => 2, 'l' => 3, 'xl' => 4, 'xxl' => 5, '2xl' => 5, '3xl' => 6, 'xxxl' => 6];
+
+    $rows = DB::table('wp_term_taxonomy as tt')
+        ->join('wp_terms as t', 't.term_id', '=', 'tt.term_id')
+        ->where('tt.taxonomy', 'pa_size')
+        ->where('tt.count', '>', 0)
+        ->select('t.slug', 't.name', 'tt.count')
+        ->get()
+        ->sortBy(fn ($r) => $sizeOrder[strtolower($r->slug)] ?? 99)
+        ->values()
+        ->map(fn ($r) => [
+            'slug' => (string) $r->slug,
+            'name' => (string) $r->name,
+            'count' => (int) $r->count,
+        ]);
+
+    return $apiCors(response()->json(['data' => $rows]));
+});
+
+// Powers the "help me choose" popup's budget step: real quartile breakpoints
+// from what's actually in stock right now, rather than hardcoded EGP amounts
+// that would drift stale as prices change. Same base filters as /api/products
+// (published, non-امنحي) so the buckets only reflect products a shopper could
+// actually land on.
+Route::get('/api/price-range', function (Request $request) use ($apiCors) {
+    $prices = DB::table('wp_posts as p')
+        ->join('wp_postmeta as price', fn ($j) => $j->on('p.ID', '=', 'price.post_id')->where('price.meta_key', '_price'))
+        ->where('p.post_type', 'product')
+        ->where('p.post_status', 'publish')
+        ->where('price.meta_value', 'REGEXP', '^[0-9.]+$')
+        ->where(DB::raw('CAST(price.meta_value AS DECIMAL(10,2))'), '>', 0)
+        ->whereNotExists(function ($sub) {
+            $sub->select(DB::raw(1))
+                ->from('wp_term_relationships as tr_amnahi')
+                ->join('wp_term_taxonomy as tt_amnahi', 'tr_amnahi.term_taxonomy_id', '=', 'tt_amnahi.term_taxonomy_id')
+                ->join('wp_terms as t_amnahi', 'tt_amnahi.term_id', '=', 't_amnahi.term_id')
+                ->where('tt_amnahi.taxonomy', 'product_cat')
+                ->where('t_amnahi.slug', 'amnahi')
+                ->whereColumn('tr_amnahi.object_id', 'p.ID');
+        })
+        ->pluck('price.meta_value')
+        ->map(fn ($v) => (float) $v)
+        ->sort()
+        ->values();
+
+    if ($prices->isEmpty()) {
+        return $apiCors(response()->json(['data' => ['min' => 0, 'max' => 0, 'breakpoints' => []]]));
+    }
+
+    $round = fn ($n) => (int) (round($n / 100) * 100);
+    $percentile = fn ($p) => $prices[(int) floor($prices->count() * $p)] ?? $prices->last();
+
+    return $apiCors(response()->json(['data' => [
+        'min' => $round($prices->first()),
+        'max' => $round($prices->last()),
+        'breakpoints' => [$round($percentile(0.33)), $round($percentile(0.66))],
+    ]]));
 });
 
 Route::get('/api/products/{id}', function (Request $request, string $id) use ($apiCors, $apiWpBaseUrl, $apiResolveImage) {
