@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import TipsWidget from "./components/TipsWidget";
@@ -8,7 +8,6 @@ import Measurements from "./pages/Measurements";
 import Shop from "./pages/Shop";
 import Rent from "./pages/Rent";
 import Marketplace from "./pages/Marketplace";
-import AmnahiHome from "./pages/AmnahiHome";
 import AmnahiListing from "./pages/AmnahiListing";
 import Sell from "./pages/Sell";
 import About from "./pages/About";
@@ -41,7 +40,7 @@ export default function App() {
         <Route path="/shop" element={<Shop />} />
         <Route path="/rent" element={<Rent />} />
         <Route path="/marketplace" element={<Marketplace />} />
-        <Route path="/amnahi" element={<AmnahiHome />} />
+        <Route path="/amnahi" element={<Navigate to="/sell" replace />} />
         <Route path="/amnahi/:id" element={<AmnahiListing />} />
         <Route path="/sell" element={<Sell />} />
         <Route path="/about" element={<About />} />

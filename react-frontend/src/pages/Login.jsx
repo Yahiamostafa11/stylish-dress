@@ -10,7 +10,7 @@ export default function Login() {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
-  const redirectTo = location.state?.from ?? "/amnahi";
+  const redirectTo = location.state?.from ?? "/sell";
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");

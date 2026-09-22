@@ -5,7 +5,6 @@ export const translations = {
     "nav.shop": "فساتين",
     "nav.rent": "إيجار",
     "nav.marketplace": "تصفيات",
-    "nav.amnahi": "امنحي",
     "nav.sell": "بيعي فستانك",
     "nav.about": "من نحن",
     "nav.contact": "تواصلي معنا",
@@ -135,7 +134,6 @@ export const translations = {
     "amnahi.eyebrow": "امنحي",
     "amnahi.title": "فساتين من بنات زيك",
     "amnahi.subtitle": "سوق امنحي مختلف — فساتين حقيقية عرضتها بنات زيك، تصفحي وتواصلي مباشرة مع صاحبة الفستان لتتفقوا على التسليم.",
-    "amnahi.sellCta": "بيعي فستانك في امنحي ←",
     "amnahi.loading": "جاري تحميل الإعلانات...",
     "amnahi.error": "تعذر تحميل الإعلانات الآن",
     "amnahi.empty": "مفيش إعلانات دلوقتي — كوني أول وحدة تبيعي فستانك!",
@@ -169,6 +167,7 @@ export const translations = {
     "sell.errorNoImage": "ضيفي صورة واحدة على الأقل للفستان",
     "sell.errorTooBig": "ميجا",
     "sell.errorGeneric": "حصل خطأ أثناء نشر الإعلان",
+    "sell.loginPrompt": "سجّلي دخولك عشان تنشري فستانك في امنحي.",
 
     // about
     "about.eyebrow": "من إحنا",
@@ -683,7 +682,6 @@ export const translations = {
     "nav.shop": "Dresses",
     "nav.rent": "Rent",
     "nav.marketplace": "Sales",
-    "nav.amnahi": "Thrifted",
     "nav.sell": "Sell Your Dress",
     "nav.about": "About Us",
     "nav.contact": "Contact Us",
@@ -813,7 +811,6 @@ export const translations = {
     "amnahi.eyebrow": "Thrifted",
     "amnahi.title": "Dresses From Girls Like You",
     "amnahi.subtitle": "Thrifted is different — real dresses listed by girls like you. Browse and message the owner directly to arrange the handoff.",
-    "amnahi.sellCta": "Sell Your Dress on Thrifted →",
     "amnahi.loading": "Loading listings...",
     "amnahi.error": "Couldn't load listings right now",
     "amnahi.empty": "No listings yet — be the first to sell your dress!",
@@ -847,6 +844,7 @@ export const translations = {
     "sell.errorNoImage": "Add at least one photo of the dress",
     "sell.errorTooBig": "MB",
     "sell.errorGeneric": "Something went wrong while posting the listing",
+    "sell.loginPrompt": "Log in to post your dress on Thrifted.",
 
     // about
     "about.eyebrow": "About Us",

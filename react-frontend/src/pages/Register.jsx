@@ -10,7 +10,7 @@ export default function Register() {
   const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
-  const redirectTo = location.state?.from ?? "/amnahi";
+  const redirectTo = location.state?.from ?? "/sell";
 
   const [form, setForm] = useState({ name: "", email: "", phone: "", password: "" });
   const [error, setError] = useState("");

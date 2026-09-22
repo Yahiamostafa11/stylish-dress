@@ -10,7 +10,6 @@ const NAV = [
   { href: "/shop", key: "nav.shop" },
   { href: "/rent", key: "nav.rent" },
   { href: "/marketplace", key: "nav.marketplace" },
-  { href: "/amnahi", key: "nav.amnahi" },
   { href: "/sell", key: "nav.sell" },
   { href: "/about", key: "nav.about" },
   { href: "/contact", key: "nav.contact" },
