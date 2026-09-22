@@ -53,12 +53,23 @@ function postForm(path, formData, { auth = false } = {}) {
 
 // ---- catalog ----
 
-export function fetchProducts({ search = "", category = "", limit = 40 } = {}) {
+export function fetchProducts({ search = "", category = "", size = "", minPrice = "", maxPrice = "", limit = 40 } = {}) {
   const params = new URLSearchParams();
   if (search) params.set("search", search);
   if (category) params.set("category", category);
+  if (size) params.set("size", size);
+  if (minPrice) params.set("min_price", String(minPrice));
+  if (maxPrice) params.set("max_price", String(maxPrice));
   if (limit) params.set("limit", String(limit));
   return get(`/products?${params.toString()}`).then((r) => r.data);
+}
+
+export function fetchSizes() {
+  return get("/sizes").then((r) => r.data);
+}
+
+export function fetchPriceRange() {
+  return get("/price-range").then((r) => r.data);
 }
 
 export function fetchProduct(id) {

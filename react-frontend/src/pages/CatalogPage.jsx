@@ -11,6 +11,10 @@ export default function CatalogPage({ eyebrowKey, titleKey, subtitleKey, limit =
   const [params, setParams] = useSearchParams();
   const urlSearch = params.get("search") || "";
   const urlCategory = params.get("category") || "";
+  const urlSize = params.get("size") || "";
+  const urlMinPrice = params.get("min_price") || "";
+  const urlMaxPrice = params.get("max_price") || "";
+  const hasDiscoveryFilters = Boolean(urlSize || urlMinPrice || urlMaxPrice);
   const [search, setSearch] = useState(urlSearch);
   const [products, setProducts] = useState([]);
   const [status, setStatus] = useState("loading");
@@ -22,7 +26,7 @@ export default function CatalogPage({ eyebrowKey, titleKey, subtitleKey, limit =
   useEffect(() => {
     let cancelled = false;
     setStatus("loading");
-    fetchProducts({ search: urlSearch, category: urlCategory, limit })
+    fetchProducts({ search: urlSearch, category: urlCategory, size: urlSize, minPrice: urlMinPrice, maxPrice: urlMaxPrice, limit })
       .then((data) => {
         if (!cancelled) {
           setProducts(data);
@@ -35,21 +39,36 @@ export default function CatalogPage({ eyebrowKey, titleKey, subtitleKey, limit =
     return () => {
       cancelled = true;
     };
-  }, [urlSearch, urlCategory, limit]);
+  }, [urlSearch, urlCategory, urlSize, urlMinPrice, urlMaxPrice, limit]);
+
+  const discoveryParams = () => {
+    const next = {};
+    if (urlSize) next.size = urlSize;
+    if (urlMinPrice) next.min_price = urlMinPrice;
+    if (urlMaxPrice) next.max_price = urlMaxPrice;
+    return next;
+  };
 
   const onSubmit = (e) => {
     e.preventDefault();
     const q = search.trim();
-    const next = {};
+    const next = discoveryParams();
     if (q) next.search = q;
     if (urlCategory) next.category = urlCategory;
     setParams(next);
   };
 
   const onSelectCategory = (slug) => {
-    const next = {};
+    const next = discoveryParams();
     if (urlSearch) next.search = urlSearch;
     if (slug) next.category = slug;
+    setParams(next);
+  };
+
+  const clearDiscoveryFilters = () => {
+    const next = {};
+    if (urlSearch) next.search = urlSearch;
+    if (urlCategory) next.category = urlCategory;
     setParams(next);
   };
 
@@ -71,6 +90,13 @@ export default function CatalogPage({ eyebrowKey, titleKey, subtitleKey, limit =
       </Reveal>
 
       {showCategories && <CategoryPills activeSlug={urlCategory} onSelect={onSelectCategory} />}
+
+      {hasDiscoveryFilters && (
+        <p className="discovery-active">
+          {t("discovery.filtersActive")}
+          <button type="button" onClick={clearDiscoveryFilters}>{t("discovery.clear")}</button>
+        </p>
+      )}
 
       {status === "loading" && <p className="state-msg">{t("catalog.loading")}</p>}
       {status === "error" && <p className="state-msg error">{t("catalog.error")}</p>}

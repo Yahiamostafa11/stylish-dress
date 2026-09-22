@@ -6,7 +6,7 @@ import { useLanguage } from "../context/LanguageContext";
 // storefront can reuse directly (their `name` is the English admin label),
 // so each slug maps to a translation key here. A slug with no mapping falls
 // back to its raw WordPress name rather than disappearing.
-const LABEL_KEYS = {
+export const CATEGORY_LABEL_KEYS = {
   dress: "category.dress",
   "large-size-dresses": "category.largeSizeDresses",
   "final-clearance-dresses": "category.finalClearanceDresses",
@@ -53,7 +53,7 @@ export default function CategoryPills({ activeSlug, onSelect }) {
           className={`cat-pill${activeSlug === c.slug ? " on" : ""}`}
           onClick={() => onSelect(c.slug)}
         >
-          {LABEL_KEYS[c.slug] ? t(LABEL_KEYS[c.slug]) : c.name}
+          {CATEGORY_LABEL_KEYS[c.slug] ? t(CATEGORY_LABEL_KEYS[c.slug]) : c.name}
         </button>
       ))}
     </div>

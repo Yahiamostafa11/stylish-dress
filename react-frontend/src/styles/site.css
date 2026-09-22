@@ -201,6 +201,35 @@ nav.main a.on{color:var(--rose-600);font-weight:600;border-bottom:2px solid var(
   box-shadow:0 10px 26px rgba(186,93,112,.4);z-index:9;
   animation:tips-bubble-in .4s cubic-bezier(.22,1,.36,1);transition:transform .2s ease,box-shadow .2s ease}
 .tips-bubble:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(186,93,112,.48)}
+
+.discovery-overlay{position:fixed;inset:0;background:rgba(47,16,20,.45);z-index:20;
+  display:flex;align-items:center;justify-content:center;padding:20px}
+.discovery-modal{background:#fff;border-radius:var(--r-lg);max-width:440px;width:100%;
+  padding:28px;box-shadow:0 24px 60px rgba(47,16,20,.25);max-height:88vh;overflow-y:auto}
+.discovery-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.discovery-top strong{font-size:17px;color:var(--ink-900)}
+.discovery-top button{background:none;border:0;cursor:pointer;padding:4px}
+.discovery-sub{font-size:13px;color:var(--muted-500);margin:0 0 20px}
+.discovery-group{margin-bottom:20px}
+.discovery-group h4{font-size:13px;font-weight:600;color:var(--ink-900);margin:0 0 10px}
+.discovery-pills{display:flex;flex-wrap:wrap;gap:8px}
+.discovery-pill{height:36px;padding:0 16px;border-radius:999px;border:1px solid var(--line);
+  background:#fff;color:var(--ink-700);font-size:12.5px;cursor:pointer;transition:.15s}
+.discovery-pill.on{background:var(--rose-600);border-color:var(--rose-600);color:#fff}
+.discovery-actions{display:flex;align-items:center;gap:14px;margin-top:8px}
+.discovery-actions .btn{flex:1}
+.discovery-skip{background:none;border:0;color:var(--muted-500);font-size:12.5px;
+  cursor:pointer;text-decoration:underline;padding:0}
+.discovery-bubble{position:fixed;bottom:22px;inset-inline-end:22px;width:54px;height:54px;
+  border-radius:50%;background:var(--mint-700);border:0;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 10px 26px rgba(63,113,96,.4);z-index:9;transition:.15s}
+.discovery-bubble:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(63,113,96,.48)}
+
+.discovery-active{display:flex;align-items:center;gap:10px;font-size:12.5px;
+  color:var(--muted-500);margin:-10px 0 20px}
+.discovery-active button{background:none;border:0;color:var(--rose-600);font-weight:600;
+  font-size:12.5px;cursor:pointer;text-decoration:underline;padding:0}
 .tips-bubble::before{content:'';position:absolute;inset:0;border-radius:50%;
   box-shadow:0 0 0 0 rgba(186,93,112,.45);animation:tips-pulse 2.8s ease-out infinite}
 .tips-bubble svg{position:relative;z-index:1;filter:drop-shadow(0 1px 1px rgba(0,0,0,.12))}
