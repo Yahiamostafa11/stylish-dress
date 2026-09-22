@@ -183,11 +183,12 @@ export default function Sell() {
         <span className="story-eyebrow">{t("amnahi.eyebrow")}</span>
         <h1>{t("amnahi.title")}</h1>
         <p className="page-sub">{t("amnahi.subtitle")}</p>
+        <a className="btn btn-mint" href="#sell-form">{t("amnahi.sellCta")}</a>
       </Reveal>
 
       <AmnahiGrid />
 
-      <div className="page-head" style={{ marginTop: 48 }}>
+      <div className="page-head" id="sell-form" style={{ marginTop: 48 }}>
         <span className="story-eyebrow">{t("sell.eyebrow")}</span>
         <h1>{t("sell.title")}</h1>
         <p className="page-sub">{t("sell.subtitle")}</p>
