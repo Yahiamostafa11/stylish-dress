@@ -7,7 +7,7 @@ import Reveal from "../components/Reveal";
 import { useLanguage } from "../context/LanguageContext";
 
 export default function Home() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [products, setProducts] = useState([]);
   const [status, setStatus] = useState("loading");
 
@@ -26,7 +26,7 @@ export default function Home() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [lang]);
 
   return (
     <div className="wrap">

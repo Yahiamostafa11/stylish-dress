@@ -8,7 +8,7 @@ import DressGlyph from "../components/DressGlyph";
 export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const { isFavorite, toggleFavorite } = useFavorites();
 
   const [product, setProduct] = useState(null);
@@ -32,7 +32,7 @@ export default function ProductDetail() {
     return () => {
       cancelled = true;
     };
-  }, [id]);
+  }, [id, lang]);
 
   if (status === "loading") {
     return <div className="wrap page"><p className="state-msg">{t("product.detailLoading")}</p></div>;

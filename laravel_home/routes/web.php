@@ -5590,6 +5590,47 @@ $apiResolveImage = function (?string $guid, ?string $attachedFile, string $wpBas
 Route::options('/api/{any}', fn () => response('', 204))
     ->where('any', '.*');
 
+// Arabic product text: WordPress stores product titles/descriptions in English
+// (TranslatePress' default language), with the Arabic in its dictionary table.
+// Looks each text up there when the client asks for lang=ar; anything without a
+// dictionary entry falls back to the original English.
+if (!function_exists('apiProductTranslator')) {
+    function apiProductTranslator(Request $request, array $texts): callable
+    {
+        $map = [];
+        if (strtolower((string) $request->query('lang', '')) === 'ar' && Schema::hasTable('wp_trp_dictionary_en_us_ar')) {
+            $lookup = collect($texts)->map(fn ($t) => trim((string) $t))->filter()->unique()->values()->all();
+            foreach (array_chunk($lookup, 200) as $chunk) {
+                DB::table('wp_trp_dictionary_en_us_ar')
+                    ->whereIn('original', $chunk)
+                    ->where('status', '!=', 0)
+                    ->whereNotNull('translated')
+                    ->where('translated', '!=', '')
+                    ->get(['original', 'translated'])
+                    ->each(function ($r) use (&$map) {
+                        $map[trim($r->original)] ??= trim($r->translated);
+                    });
+            }
+        }
+
+        return fn (string $text): string => $map[trim($text)] ?? $text;
+    }
+}
+
+// Splits raw product HTML into paragraphs and returns their plain text, each
+// translated on its own (dictionary entries are per-paragraph, not per-page).
+if (!function_exists('apiProductParagraphs')) {
+    function apiProductParagraphs(string $html): array
+    {
+        $parts = preg_split('/\R+|<\/(?:p|div|li|h[1-6])>|<br\s*\/?>/i', $html) ?: [];
+
+        return array_values(array_filter(array_map(
+            fn ($p) => trim(html_entity_decode(strip_tags($p), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')),
+            $parts
+        ), fn ($p) => $p !== ''));
+    }
+}
+
 Route::get('/api/products', function (Request $request) use ($apiCors, $apiWpBaseUrl, $apiResolveImage) {
     $wpBaseUrl = $apiWpBaseUrl($request);
     $search = trim((string) $request->query('search', ''));
@@ -5677,13 +5718,17 @@ Route::get('/api/products', function (Request $request) use ($apiCors, $apiWpBas
             'img.guid as image_guid',
             'img_file.meta_value as image_file'
         )
-        ->get()
-        ->map(function ($row) use ($apiResolveImage, $wpBaseUrl) {
+        ->get();
+
+    $trList = apiProductTranslator($request, $rows->flatMap(fn ($r) => [$r->name, $r->short_description])->all());
+
+    $rows = $rows
+        ->map(function ($row) use ($apiResolveImage, $wpBaseUrl, $trList) {
             return [
                 'id' => (int) $row->id,
-                'name' => (string) $row->name,
+                'name' => $trList((string) $row->name),
                 'slug' => (string) $row->slug,
-                'short_description' => trim((string) $row->short_description),
+                'short_description' => $trList(trim((string) $row->short_description)),
                 'price' => $row->price !== null ? (float) $row->price : null,
                 'regular_price' => $row->regular_price !== null ? (float) $row->regular_price : null,
                 'sale_price' => $row->sale_price !== null ? (float) $row->sale_price : null,
@@ -5867,13 +5912,17 @@ Route::get('/api/products/{id}', function (Request $request, string $id) use ($a
         ->sortBy(fn ($v) => $sizeOrder[strtolower($v['label'])] ?? 99)
         ->values();
 
+    $paragraphs = apiProductParagraphs((string) $row->description);
+    $shortPlain = trim((string) strip_tags((string) $row->short_description));
+    $trDetail = apiProductTranslator($request, array_merge([$row->name, $shortPlain], $paragraphs));
+
     return $apiCors(response()->json([
         'data' => [
             'id' => (int) $row->id,
-            'name' => (string) $row->name,
+            'name' => $trDetail((string) $row->name),
             'slug' => (string) $row->slug,
-            'description' => trim((string) strip_tags((string) $row->description)),
-            'short_description' => trim((string) strip_tags((string) $row->short_description)),
+            'description' => implode("\n\n", array_map($trDetail, $paragraphs)),
+            'short_description' => $trDetail($shortPlain),
             'price' => $row->price !== null ? (float) $row->price : null,
             'regular_price' => $row->regular_price !== null ? (float) $row->regular_price : null,
             'sale_price' => $row->sale_price !== null ? (float) $row->sale_price : null,

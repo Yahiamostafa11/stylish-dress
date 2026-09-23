@@ -7,7 +7,7 @@ import Reveal from "../components/Reveal";
 import { useLanguage } from "../context/LanguageContext";
 
 export default function CatalogPage({ eyebrowKey, titleKey, subtitleKey, limit = 60, showCategories = false }) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [params, setParams] = useSearchParams();
   const urlSearch = params.get("search") || "";
   const urlCategory = params.get("category") || "";
@@ -39,7 +39,7 @@ export default function CatalogPage({ eyebrowKey, titleKey, subtitleKey, limit =
     return () => {
       cancelled = true;
     };
-  }, [urlSearch, urlCategory, urlSize, urlMinPrice, urlMaxPrice, limit]);
+  }, [urlSearch, urlCategory, urlSize, urlMinPrice, urlMaxPrice, limit, lang]);
 
   const discoveryParams = () => {
     const next = {};

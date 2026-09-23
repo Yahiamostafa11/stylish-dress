@@ -25,10 +25,19 @@ async function handle(res) {
   return res.json();
 }
 
+function getLang() {
+  try {
+    return localStorage.getItem("styliiiish_lang") || "ar";
+  } catch {
+    return "ar";
+  }
+}
+
 function get(path, { auth = false } = {}) {
   const headers = {};
   if (auth) headers.Authorization = `Bearer ${getToken() ?? ""}`;
-  return fetch(`${API_BASE}${path}`, { headers }).then(handle);
+  const sep = path.includes("?") ? "&" : "?";
+  return fetch(`${API_BASE}${path}${sep}lang=${getLang()}`, { headers }).then(handle);
 }
 
 function postJson(path, data, { auth = false } = {}) {
