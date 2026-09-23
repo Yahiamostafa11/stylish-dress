@@ -148,6 +148,7 @@ export const translations = {
     "amnahi.interestedError": "حصل خطأ، جربي تاني",
     "amnahi.listingLoading": "جاري التحميل...",
     "amnahi.listingError": "الإعلان مش متاح",
+    "amnahi.pendingNotice": "إعلانك تحت المراجعة وهيظهر للجميع بعد الموافقة عليه.",
 
     // sell form
     "sell.eyebrow": "امنحي",
@@ -826,6 +827,7 @@ export const translations = {
     "amnahi.interestedError": "Something went wrong, try again",
     "amnahi.listingLoading": "Loading...",
     "amnahi.listingError": "This listing isn't available",
+    "amnahi.pendingNotice": "Your listing is under review and will be visible to everyone once approved.",
 
     // sell form
     "sell.eyebrow": "Thrifted",

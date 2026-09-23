@@ -103,7 +103,7 @@ export function fetchAmnahiListings({ limit = 30 } = {}) {
 }
 
 export function fetchAmnahiListing(id) {
-  return get(`/amnahi/listings/${id}`).then((r) => r.data);
+  return get(`/amnahi/listings/${id}`, { auth: !!getToken() }).then((r) => r.data);
 }
 
 export function fetchMyAmnahiListings() {

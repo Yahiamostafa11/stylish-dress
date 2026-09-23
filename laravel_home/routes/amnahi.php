@@ -431,7 +431,7 @@ Route::get('/api/amnahi/mine', function (Request $request) use ($amnahiCors, $am
     return $amnahiCors(response()->json(['data' => $rows]));
 });
 
-Route::get('/api/amnahi/listings/{id}', function (Request $request, string $id) use ($amnahiCors, $amnahiResolveImage, $amnahiWpBaseUrl) {
+Route::get('/api/amnahi/listings/{id}', function (Request $request, string $id) use ($amnahiCors, $amnahiAuthUser, $amnahiResolveImage, $amnahiWpBaseUrl) {
     $wpBaseUrl = $amnahiWpBaseUrl($request);
 
     $row = DB::table('wp_posts as p')
@@ -460,7 +460,10 @@ Route::get('/api/amnahi/listings/{id}', function (Request $request, string $id) 
         )
         ->first();
 
-    if (!$row || $row->status !== 'publish') {
+    // Unpublished (pending) listings are visible to their own seller only.
+    $viewer = $row && $row->status !== 'publish' ? $amnahiAuthUser($request) : null;
+    $isOwner = $viewer && (int) $viewer->ID === (int) $row->seller_id;
+    if (!$row || ($row->status !== 'publish' && !($isOwner && in_array($row->status, ['pending', 'draft'], true)))) {
         return $amnahiCors(response()->json(['message' => 'الإعلان غير متاح'], 404));
     }
 
@@ -483,6 +486,7 @@ Route::get('/api/amnahi/listings/{id}', function (Request $request, string $id) 
     return $amnahiCors(response()->json([
         'data' => [
             'id' => (int) $row->id,
+            'status' => (string) $row->status,
             'seller_id' => (int) $row->seller_id,
             'seller_name' => (string) $row->seller_name,
             'name' => (string) $row->name,

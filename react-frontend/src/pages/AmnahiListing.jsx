@@ -65,6 +65,11 @@ export default function AmnahiListing() {
 
   return (
     <div className="wrap page">
+      {listing.status !== "publish" && (
+        <p className="state-msg" style={{ background: "#fdf1f3", borderRadius: 10, padding: "10px 14px", marginBottom: 16, textAlign: "start" }}>
+          {t("amnahi.pendingNotice")}
+        </p>
+      )}
       <div className="contact-grid">
         <div>
           <div className="item-thumb" style={{ width: "100%", height: 420, marginBottom: 10 }}>
