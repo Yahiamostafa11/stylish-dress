@@ -81,6 +81,17 @@ $amnahiAuthUser = function (Request $request) {
     return DB::table('wp_users')->where('ID', $userId)->first();
 };
 
+
+// A product counts as an امنحي listing if the site flagged it on upload OR a
+// moderator filed it under the 'amnahi' category in wp-admin (those have no flag).
+$amnahiScope = function ($q) {
+    $q->whereExists(fn ($s) => $s->select(DB::raw(1))->from('wp_postmeta as flag')
+            ->whereColumn('flag.post_id', 'p.ID')->where('flag.meta_key', '_styliiiish_amnahi_listing'))
+      ->orWhereExists(fn ($s) => $s->select(DB::raw(1))->from('wp_term_relationships as am_tr')
+            ->join('wp_term_taxonomy as am_tt', 'am_tt.term_taxonomy_id', '=', 'am_tr.term_taxonomy_id')
+            ->join('wp_terms as am_t', 'am_t.term_id', '=', 'am_tt.term_id')
+            ->whereColumn('am_tr.object_id', 'p.ID')->where('am_tt.taxonomy', 'product_cat')->where('am_t.slug', 'amnahi'));
+};
 $amnahiThrottle = (string) config('styliiiish.throttle.amnahi', '30,1');
 
 // Emails the seller the moment a buyer starts a NEW chat about her listing
@@ -360,12 +371,12 @@ Route::post('/api/amnahi/listings', function (Request $request) use ($amnahiCors
     ], 201));
 })->middleware('throttle:' . $amnahiThrottle);
 
-Route::get('/api/amnahi/listings', function (Request $request) use ($amnahiCors, $amnahiResolveImage, $amnahiWpBaseUrl) {
+Route::get('/api/amnahi/listings', function (Request $request) use ($amnahiScope, $amnahiCors, $amnahiResolveImage, $amnahiWpBaseUrl) {
     $wpBaseUrl = $amnahiWpBaseUrl($request);
     $limit = max(1, min(60, (int) $request->query('limit', 30)));
 
     $rows = DB::table('wp_posts as p')
-        ->join('wp_postmeta as flag', fn ($j) => $j->on('p.ID', '=', 'flag.post_id')->where('flag.meta_key', '_styliiiish_amnahi_listing'))
+        ->where($amnahiScope)
         ->leftJoin('wp_postmeta as price', fn ($j) => $j->on('p.ID', '=', 'price.post_id')->where('price.meta_key', '_price'))
         ->leftJoin('wp_postmeta as thumb', fn ($j) => $j->on('p.ID', '=', 'thumb.post_id')->where('thumb.meta_key', '_thumbnail_id'))
         ->leftJoin('wp_posts as img', 'thumb.meta_value', '=', 'img.ID')
@@ -399,7 +410,7 @@ Route::get('/api/amnahi/listings', function (Request $request) use ($amnahiCors,
     return $amnahiCors(response()->json(['data' => $rows]));
 });
 
-Route::get('/api/amnahi/mine', function (Request $request) use ($amnahiCors, $amnahiAuthUser, $amnahiResolveImage, $amnahiWpBaseUrl) {
+Route::get('/api/amnahi/mine', function (Request $request) use ($amnahiScope, $amnahiCors, $amnahiAuthUser, $amnahiResolveImage, $amnahiWpBaseUrl) {
     $user = $amnahiAuthUser($request);
     if (!$user) {
         return $amnahiCors(response()->json(['message' => 'Unauthorized'], 401));
@@ -408,7 +419,7 @@ Route::get('/api/amnahi/mine', function (Request $request) use ($amnahiCors, $am
     $wpBaseUrl = $amnahiWpBaseUrl($request);
 
     $rows = DB::table('wp_posts as p')
-        ->join('wp_postmeta as flag', fn ($j) => $j->on('p.ID', '=', 'flag.post_id')->where('flag.meta_key', '_styliiiish_amnahi_listing'))
+        ->where($amnahiScope)
         ->leftJoin('wp_postmeta as price', fn ($j) => $j->on('p.ID', '=', 'price.post_id')->where('price.meta_key', '_price'))
         ->leftJoin('wp_postmeta as thumb', fn ($j) => $j->on('p.ID', '=', 'thumb.post_id')->where('thumb.meta_key', '_thumbnail_id'))
         ->leftJoin('wp_posts as img', 'thumb.meta_value', '=', 'img.ID')
@@ -431,11 +442,11 @@ Route::get('/api/amnahi/mine', function (Request $request) use ($amnahiCors, $am
     return $amnahiCors(response()->json(['data' => $rows]));
 });
 
-Route::get('/api/amnahi/listings/{id}', function (Request $request, string $id) use ($amnahiCors, $amnahiAuthUser, $amnahiResolveImage, $amnahiWpBaseUrl) {
+Route::get('/api/amnahi/listings/{id}', function (Request $request, string $id) use ($amnahiScope, $amnahiCors, $amnahiAuthUser, $amnahiResolveImage, $amnahiWpBaseUrl) {
     $wpBaseUrl = $amnahiWpBaseUrl($request);
 
     $row = DB::table('wp_posts as p')
-        ->join('wp_postmeta as flag', fn ($j) => $j->on('p.ID', '=', 'flag.post_id')->where('flag.meta_key', '_styliiiish_amnahi_listing'))
+        ->where($amnahiScope)
         ->leftJoin('wp_postmeta as price', fn ($j) => $j->on('p.ID', '=', 'price.post_id')->where('price.meta_key', '_price'))
         ->leftJoin('wp_postmeta as dtype', fn ($j) => $j->on('p.ID', '=', 'dtype.post_id')->where('dtype.meta_key', '_styliiiish_amnahi_dress_type'))
         ->leftJoin('wp_postmeta as thumb', fn ($j) => $j->on('p.ID', '=', 'thumb.post_id')->where('thumb.meta_key', '_thumbnail_id'))
