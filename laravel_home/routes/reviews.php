@@ -54,4 +54,4 @@ Route::post('/api/reviews', function (Request $request) use ($reviewsCors) {
     return $reviewsCors(response()->json([
         'message' => 'Thanks! Your review was sent.',
     ]));
-})->middleware('throttle:'.config('styliiiish.throttle.testimonial'));
+})->middleware('throttle:reviews');

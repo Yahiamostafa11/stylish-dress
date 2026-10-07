@@ -1,9 +1,11 @@
 <?php
 
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
@@ -97,7 +99,30 @@ $amnahiScope = function ($q) {
             ->join('wp_terms as am_t', 'am_t.term_id', '=', 'am_tt.term_id')
             ->whereColumn('am_tr.object_id', 'p.ID')->where('am_tt.taxonomy', 'product_cat')->where('am_t.slug', 'amnahi'));
 };
-$amnahiThrottle = (string) config('styliiiish.throttle.amnahi', '30,1');
+// Every endpoint gets its OWN counter. (Numeric "throttle:5,1" middleware keeps a
+// single counter per IP shared by every route that uses it, so e.g. submitting a
+// review could lock the same visitor out of logging in.)
+$amnahiLimit = function (string $configKey, string $default): array {
+    [$max, $minutes] = array_map('intval', array_pad(explode(',', (string) config($configKey, $default)), 2, 1));
+
+    return [max(1, $max), max(1, $minutes)];
+};
+RateLimiter::for('amnahi', function (Request $r) use ($amnahiLimit) {
+    [$max, $minutes] = $amnahiLimit('styliiiish.throttle.amnahi', '30,1');
+
+    return Limit::perMinutes($minutes, $max)->by('amnahi|' . ($r->route()?->uri() ?? $r->path()) . '|' . $r->ip());
+});
+RateLimiter::for('amnahi-chat', fn (Request $r) => Limit::perMinute(60)->by('amnahi-chat|' . $r->ip()));
+RateLimiter::for('amnahi-forgot', fn (Request $r) => [
+    Limit::perMinute(5)->by('forgot-ip|' . $r->ip()),
+    Limit::perHour(5)->by('forgot-mail|' . strtolower((string) $r->input('email'))),
+]);
+RateLimiter::for('amnahi-reset', fn (Request $r) => Limit::perMinute(10)->by('reset-ip|' . $r->ip()));
+RateLimiter::for('reviews', function (Request $r) use ($amnahiLimit) {
+    [$max, $minutes] = $amnahiLimit('styliiiish.throttle.testimonial', '5,60');
+
+    return Limit::perMinutes($minutes, $max)->by('reviews|' . $r->ip());
+});
 
 
 /*
@@ -145,7 +170,7 @@ Route::post('/api/auth/register', function (Request $request) use ($amnahiCors, 
         'token' => $amnahiIssueToken($userId),
         'user' => ['id' => $userId, 'name' => $data['name'], 'email' => $data['email']],
     ], 201));
-})->middleware('throttle:' . $amnahiThrottle);
+})->middleware('throttle:amnahi');
 
 Route::post('/api/auth/login', function (Request $request) use ($amnahiCors, $amnahiIssueToken) {
     $data = $request->validate([
@@ -162,7 +187,7 @@ Route::post('/api/auth/login', function (Request $request) use ($amnahiCors, $am
         'token' => $amnahiIssueToken((int) $user->ID),
         'user' => ['id' => (int) $user->ID, 'name' => $user->display_name, 'email' => $user->user_email],
     ]));
-})->middleware('throttle:' . $amnahiThrottle);
+})->middleware('throttle:amnahi');
 
 Route::get('/api/auth/me', function (Request $request) use ($amnahiCors, $amnahiAuthUser) {
     $user = $amnahiAuthUser($request);
@@ -185,7 +210,7 @@ Route::post('/api/auth/forgot-password', function (Request $request) use ($amnah
     }
 
     return $amnahiCors(response()->json(['message' => 'ok']));
-})->middleware('throttle:5,1');
+})->middleware('throttle:amnahi-forgot');
 
 Route::post('/api/auth/reset-password', function (Request $request) use ($amnahiCors, $amnahiIssueToken) {
     $data = $request->validate([
@@ -207,7 +232,7 @@ Route::post('/api/auth/reset-password', function (Request $request) use ($amnahi
         'token' => $amnahiIssueToken((int) $user->ID),
         'user' => ['id' => (int) $user->ID, 'name' => $user->display_name, 'email' => $user->user_email],
     ]));
-})->middleware('throttle:10,1');
+})->middleware('throttle:amnahi-reset');
 
 /*
 |--------------------------------------------------------------------------
@@ -383,7 +408,7 @@ Route::post('/api/amnahi/listings', function (Request $request) use ($amnahiCors
     return $amnahiCors(response()->json([
         'data' => ['id' => $productId, 'status' => $autoPublish ? 'publish' : 'pending'],
     ], 201));
-})->middleware('throttle:' . $amnahiThrottle);
+})->middleware('throttle:amnahi');
 
 Route::get('/api/amnahi/listings', function (Request $request) use ($amnahiScope, $amnahiCors, $amnahiResolveImage, $amnahiWpBaseUrl) {
     $wpBaseUrl = $amnahiWpBaseUrl($request);
@@ -568,7 +593,7 @@ Route::post('/api/amnahi/listings/{id}/interest', function (Request $request, st
     }
 
     return $amnahiCors(response()->json(['data' => ['conversation_id' => $conversationId]], 201));
-})->middleware('throttle:' . $amnahiThrottle);
+})->middleware('throttle:amnahi');
 
 Route::get('/api/conversations', function (Request $request) use ($amnahiCors, $amnahiAuthUser) {
     $user = $amnahiAuthUser($request);
@@ -651,4 +676,4 @@ Route::post('/api/conversations/{id}/messages', function (Request $request, stri
     }
 
     return $amnahiCors(response()->json(['data' => ['id' => $messageId]], 201));
-})->middleware('throttle:60,1');
+})->middleware('throttle:amnahi-chat');
