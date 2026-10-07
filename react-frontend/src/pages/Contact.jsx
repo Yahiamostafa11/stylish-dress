@@ -1,3 +1,4 @@
+import { CONTACT_EMAIL } from "../config/site";
 import { useState } from "react";
 import { useLanguage } from "../context/LanguageContext";
 
@@ -21,7 +22,7 @@ const CONTACT_KEYS = [
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#BA5D70" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg>
     ),
     titleKey: "contact.emailTitle",
-    value: "hello@styliiiish.com",
+    value: CONTACT_EMAIL,
   },
   {
     icon: (

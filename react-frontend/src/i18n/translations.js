@@ -22,6 +22,7 @@ export const translations = {
     "footer.companyTitle": "الشركة",
     "footer.contactTitle": "تواصلي معنا",
     "footer.rights": "جميع الحقوق محفوظة.",
+    "footer.designedBy": "تصميم وتطوير",
     "footer.note": "تصور للواجهة — تُحدّد نسبة الخصم وشروط كل خدمة قبل الإطلاق",
 
     // tips widget
@@ -747,6 +748,7 @@ export const translations = {
     "footer.companyTitle": "Company",
     "footer.contactTitle": "Get in Touch",
     "footer.rights": "All rights reserved.",
+    "footer.designedBy": "Designed & developed by",
     "footer.note": "Interface preview — discount rates and terms for each service will be finalized before launch",
 
     // tips widget

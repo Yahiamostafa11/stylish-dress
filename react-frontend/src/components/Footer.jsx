@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useLanguage } from "../context/LanguageContext";
+import { CONTACT_EMAIL } from "../config/site";
 
 const EXPLORE_LINKS = [
   { href: "/shop", key: "nav.shop" },
@@ -67,7 +68,7 @@ export default function Footer() {
         <div className="footer-col">
           <h5>{t("footer.contactTitle")}</h5>
           <ul>
-            <li><a href="mailto:hello@styliiiish.com">hello@styliiiish.com</a></li>
+            <li><a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></li>
             <li><Link to="/contact">{t("nav.contact")}</Link></li>
           </ul>
         </div>
@@ -85,6 +86,10 @@ export default function Footer() {
       <div className="wrap footer-bottom">
         <span>© {year} Styliiiish. {t("footer.rights")}</span>
         <span className="footer-note">{t("footer.note")}</span>
+        <span className="footer-credit">
+          {t("footer.designedBy")}{" "}
+          <a href="https://zijtech.com/" target="_blank" rel="noopener">ZIJ Technologies</a>
+        </span>
       </div>
     </footer>
   );

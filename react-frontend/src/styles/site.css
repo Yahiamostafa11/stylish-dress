@@ -508,3 +508,7 @@ nav.main a.on{color:var(--rose-600);font-weight:600;border-bottom:2px solid var(
 .rv-lightbox{position:fixed;inset:0;z-index:2000;background:rgba(20,10,14,.78);display:flex;align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
 .rv-lightbox img{max-width:min(92vw,720px);max-height:90vh;border-radius:14px;background:#fff;box-shadow:0 20px 60px rgba(0,0,0,.5)}
 .rv-close{position:absolute;top:14px;inset-inline-end:18px;width:42px;height:42px;border-radius:50%;border:0;background:#fff;font-size:26px;line-height:1;cursor:pointer}
+
+.footer-credit{opacity:.9}
+.footer-credit a{color:#fff;font-weight:600;border-bottom:1px solid rgba(255,255,255,.35);transition:border-color .2s ease}
+.footer-credit a:hover{border-bottom-color:#fff}

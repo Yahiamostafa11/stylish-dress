@@ -78,7 +78,7 @@ return [
      | screenshot herself, same as the pre-existing static ones.
      */
     'reviews' => [
-        'notify_email' => env('REVIEWS_NOTIFY_EMAIL', env('MAIL_FROM_ADDRESS', 'hello@styliiiish.com')),
+        'notify_email' => env('REVIEWS_NOTIFY_EMAIL', env('MAIL_FROM_ADDRESS', 'info@zijtech.com')),
     ],
 
     /*

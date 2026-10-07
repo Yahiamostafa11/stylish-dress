@@ -57,7 +57,7 @@ if (!defined('ABSPATH')) {
 
 <div class="styliiiish-minimal-footer">
     &copy; <?php echo esc_html(date('Y')); ?> Styliiiish &middot;
-    <a href="mailto:hello@styliiiish.com">hello@styliiiish.com</a>
+    <a href="mailto:info@zijtech.com">info@zijtech.com</a>
 </div>
 
 <?php wp_footer(); ?>
