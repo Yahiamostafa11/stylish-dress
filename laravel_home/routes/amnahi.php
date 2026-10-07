@@ -60,7 +60,11 @@ $amnahiWpBaseUrl = fn (Request $request) => rtrim(
 );
 
 $amnahiIssueToken = function (int $userId): string {
-    return Crypt::encryptString(json_encode(['uid' => $userId, 'exp' => now()->addDays(30)->timestamp]));
+    // 'fp' ties the token to the current password, so changing/resetting the
+    // password signs out every session that was opened with an older one.
+    $fp = amnahiPasswordFingerprint((string) DB::table('wp_users')->where('ID', $userId)->value('user_pass'));
+
+    return Crypt::encryptString(json_encode(['uid' => $userId, 'fp' => $fp, 'exp' => now()->addDays(30)->timestamp]));
 };
 
 $amnahiAuthUser = function (Request $request) {
@@ -85,7 +89,12 @@ $amnahiAuthUser = function (Request $request) {
         return null;
     }
 
-    return DB::table('wp_users')->where('ID', $userId)->first();
+    $user = DB::table('wp_users')->where('ID', $userId)->first();
+    if ($user && isset($payload['fp']) && !hash_equals((string) $payload['fp'], amnahiPasswordFingerprint($user->user_pass))) {
+        return null;
+    }
+
+    return $user;
 };
 
 
@@ -117,6 +126,7 @@ RateLimiter::for('amnahi-forgot', fn (Request $r) => [
     Limit::perMinute(5)->by('forgot-ip|' . $r->ip()),
     Limit::perHour(5)->by('forgot-mail|' . strtolower((string) $r->input('email'))),
 ]);
+RateLimiter::for('amnahi-account', fn (Request $r) => Limit::perMinute(10)->by('account|' . $r->ip()));
 RateLimiter::for('amnahi-reset', fn (Request $r) => Limit::perMinute(10)->by('reset-ip|' . $r->ip()));
 RateLimiter::for('reviews', function (Request $r) use ($amnahiLimit) {
     [$max, $minutes] = $amnahiLimit('styliiiish.throttle.testimonial', '5,60');
@@ -233,6 +243,87 @@ Route::post('/api/auth/reset-password', function (Request $request) use ($amnahi
         'user' => ['id' => (int) $user->ID, 'name' => $user->display_name, 'email' => $user->user_email],
     ]));
 })->middleware('throttle:amnahi-reset');
+
+/*
+|--------------------------------------------------------------------------
+| Account (logged-in): change password / change email
+|--------------------------------------------------------------------------
+*/
+
+Route::post('/api/account/password', function (Request $request) use ($amnahiCors, $amnahiAuthUser, $amnahiIssueToken) {
+    $user = $amnahiAuthUser($request);
+    if (!$user) {
+        return $amnahiCors(response()->json(['message' => 'سجّلي دخولك الأول'], 401));
+    }
+
+    $data = $request->validate([
+        'current_password' => 'required|string',
+        'new_password' => 'required|string|min:6|max:100',
+    ]);
+
+    if (!amnahiCheckPassword($data['current_password'], (string) $user->user_pass)) {
+        return $amnahiCors(response()->json(['message' => 'كلمة المرور الحالية غلط'], 422));
+    }
+
+    DB::table('wp_users')->where('ID', $user->ID)->update(['user_pass' => amnahiHashPassword($data['new_password'])]);
+    amnahiMailSecurityNotice((string) $user->user_email, 'كلمة المرور بتاعة حسابك على Styliiiish اتغيّرت دلوقتي.');
+
+    // The old session token is now invalid (password fingerprint changed) — hand back a fresh one.
+    return $amnahiCors(response()->json([
+        'token' => $amnahiIssueToken((int) $user->ID),
+        'user' => ['id' => (int) $user->ID, 'name' => $user->display_name, 'email' => $user->user_email],
+    ]));
+})->middleware('throttle:amnahi-account');
+
+// Step 1: ask to change. Nothing changes yet — a confirmation link goes to the NEW address.
+Route::post('/api/account/email', function (Request $request) use ($amnahiCors, $amnahiAuthUser) {
+    $user = $amnahiAuthUser($request);
+    if (!$user) {
+        return $amnahiCors(response()->json(['message' => 'سجّلي دخولك الأول'], 401));
+    }
+
+    $data = $request->validate([
+        'new_email' => 'required|email|max:100',
+        'current_password' => 'required|string',
+    ]);
+
+    if (!amnahiCheckPassword($data['current_password'], (string) $user->user_pass)) {
+        return $amnahiCors(response()->json(['message' => 'كلمة المرور الحالية غلط'], 422));
+    }
+    if (strcasecmp($data['new_email'], (string) $user->user_email) === 0) {
+        return $amnahiCors(response()->json(['message' => 'ده نفس إيميلك الحالي'], 422));
+    }
+    if (DB::table('wp_users')->where('user_email', $data['new_email'])->where('ID', '!=', $user->ID)->exists()) {
+        return $amnahiCors(response()->json(['message' => 'الإيميل ده مسجّل عند حساب تاني'], 422));
+    }
+
+    amnahiMailEmailChangeConfirm($user, $data['new_email'], amnahiEmailChangeToken($user, $data['new_email']));
+
+    return $amnahiCors(response()->json(['message' => 'ok']));
+})->middleware('throttle:amnahi-account');
+
+// Step 2: she clicked the link in the new inbox.
+Route::post('/api/account/email/confirm', function (Request $request) use ($amnahiCors) {
+    $data = $request->validate(['token' => 'required|string|max:2000']);
+
+    $resolved = amnahiResolveEmailChangeToken($data['token']);
+    if (!$resolved) {
+        return $amnahiCors(response()->json(['message' => 'الرابط ده منتهي أو اتستخدم قبل كده، اطلبي تغيير الإيميل تاني'], 422));
+    }
+    [$user, $newEmail] = $resolved;
+
+    if (DB::table('wp_users')->where('user_email', $newEmail)->where('ID', '!=', $user->ID)->exists()) {
+        return $amnahiCors(response()->json(['message' => 'الإيميل ده اتسجّل عند حساب تاني في الوقت ده'], 422));
+    }
+
+    $oldEmail = (string) $user->user_email;
+    DB::table('wp_users')->where('ID', $user->ID)->update(['user_email' => $newEmail]);
+    amnahiMailSecurityNotice($oldEmail, 'إيميل حسابك على Styliiiish اتغيّر لـ ' . $newEmail . '.');
+
+    return $amnahiCors(response()->json([
+        'user' => ['id' => (int) $user->ID, 'name' => $user->display_name, 'email' => $newEmail],
+    ]));
+})->middleware('throttle:amnahi-account');
 
 /*
 |--------------------------------------------------------------------------

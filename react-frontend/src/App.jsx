@@ -17,6 +17,9 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import Account from "./pages/Account";
+import RequireAuth from "./components/RequireAuth";
+import ConfirmEmail from "./pages/ConfirmEmail";
 import Conversations from "./pages/Conversations";
 import ConversationThread from "./pages/ConversationThread";
 import Cart from "./pages/Cart";
@@ -53,6 +56,8 @@ export default function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/confirm-email" element={<ConfirmEmail />} />
+        <Route path="/account" element={<RequireAuth><Account /></RequireAuth>} />
         <Route path="/messages" element={<Conversations />} />
         <Route path="/messages/:id" element={<ConversationThread />} />
         <Route path="/cart" element={<Cart />} />

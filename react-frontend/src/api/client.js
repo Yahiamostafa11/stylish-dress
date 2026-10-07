@@ -107,6 +107,18 @@ export function resetPassword({ token, password }) {
   return postJson("/auth/reset-password", { token, password });
 }
 
+export function changePassword({ currentPassword, newPassword }) {
+  return postJson("/account/password", { current_password: currentPassword, new_password: newPassword }, { auth: true });
+}
+
+export function requestEmailChange({ newEmail, currentPassword }) {
+  return postJson("/account/email", { new_email: newEmail, current_password: currentPassword }, { auth: true });
+}
+
+export function confirmEmailChange(token) {
+  return postJson("/account/email/confirm", { token });
+}
+
 export function fetchMe() {
   return get("/auth/me", { auth: true }).then((r) => r.user);
 }

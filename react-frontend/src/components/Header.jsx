@@ -21,7 +21,7 @@ export default function Header() {
   const navigate = useNavigate();
   const { favorites } = useFavorites();
   const { count: cartCount } = useCart();
-  const { isAuthed, user, logout } = useAuth();
+  const { isAuthed, user } = useAuth();
   const { t, lang, toggleLang } = useLanguage();
   const [search, setSearch] = useState("");
 
@@ -29,11 +29,6 @@ export default function Header() {
     e.preventDefault();
     const q = search.trim();
     navigate(q ? `/shop?search=${encodeURIComponent(q)}` : "/shop");
-  };
-
-  const onLogout = () => {
-    logout();
-    navigate("/");
   };
 
   return (
@@ -83,9 +78,9 @@ export default function Header() {
           </Link>
 
           {isAuthed ? (
-            <button onClick={onLogout} className="account-btn" title={`${t("header.logout")} (${user?.name ?? ""})`} aria-label={t("header.logout")}>
+            <Link to="/account" className="account-btn" title={user?.name ?? t("header.account")} aria-label={t("header.account")}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5C4A48" strokeWidth="1.7" strokeLinecap="round"><circle cx="12" cy="8" r="3.6" /><path d="M4.5 20a7.5 7.5 0 0 1 15 0" /></svg>
-            </button>
+            </Link>
           ) : (
             <Link to="/login" aria-label={t("header.login")}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5C4A48" strokeWidth="1.7" strokeLinecap="round"><circle cx="12" cy="8" r="3.6" /><path d="M4.5 20a7.5 7.5 0 0 1 15 0" /></svg>

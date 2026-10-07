@@ -253,3 +253,89 @@ if (!function_exists('amnahiMailPasswordReset')) {
         );
     }
 }
+
+/*
+|--------------------------------------------------------------------------
+| Account changes
+|--------------------------------------------------------------------------
+*/
+
+if (!function_exists('amnahiPasswordFingerprint')) {
+    function amnahiPasswordFingerprint(?string $hash): string
+    {
+        return substr(hash('sha256', (string) $hash), 0, 16);
+    }
+}
+
+if (!function_exists('amnahiEmailChangeToken')) {
+    function amnahiEmailChangeToken(object $user, string $newEmail): string
+    {
+        return Crypt::encryptString(json_encode([
+            'k' => 'emailchange',
+            'uid' => (int) $user->ID,
+            'new' => $newEmail,
+            'fp' => amnahiPasswordFingerprint($user->user_pass),
+            'exp' => now()->addHour()->timestamp,
+        ]));
+    }
+}
+
+if (!function_exists('amnahiResolveEmailChangeToken')) {
+    /** @return array{0: object, 1: string}|null  [user, newEmail] */
+    function amnahiResolveEmailChangeToken(string $token): ?array
+    {
+        try {
+            $payload = json_decode(Crypt::decryptString($token), true);
+        } catch (\Throwable $e) {
+            return null;
+        }
+
+        if (!is_array($payload) || ($payload['k'] ?? '') !== 'emailchange' || (int) ($payload['exp'] ?? 0) < time()) {
+            return null;
+        }
+
+        $user = DB::table('wp_users')->where('ID', (int) ($payload['uid'] ?? 0))->first();
+        if (!$user || !hash_equals((string) ($payload['fp'] ?? ''), amnahiPasswordFingerprint($user->user_pass))) {
+            return null;
+        }
+
+        return [$user, (string) ($payload['new'] ?? '')];
+    }
+}
+
+if (!function_exists('amnahiMailEmailChangeConfirm')) {
+    /** Sent to the NEW address; the change only happens when she clicks the link. */
+    function amnahiMailEmailChangeConfirm(object $user, string $newEmail, string $token): bool
+    {
+        return amnahiMailSend(
+            $newEmail,
+            'أكدي الإيميل الجديد – Styliiiish',
+            amnahiMailHtml(
+                'تأكيد الإيميل الجديد ✉️',
+                '<p>أهلاً ' . e((string) $user->display_name ?: 'يا قمر') . '،</p>'
+                . '<p>طلبتي تغيير إيميل حسابك على Styliiiish لـ <strong>' . e($newEmail) . '</strong>. اضغطي على الزرار عشان نأكد التغيير. الرابط شغال لمدة <strong>ساعة</strong>.</p>',
+                amnahiSiteUrl('/confirm-email?token=' . rawurlencode($token)),
+                'تأكيد الإيميل',
+                'لو إنتِ مطلبتيش التغيير ده، تجاهلي الرسالة ومفيش حاجة هتتغير.'
+            )
+        );
+    }
+}
+
+if (!function_exists('amnahiMailSecurityNotice')) {
+    /** Heads-up to the OLD address that something about the account changed. */
+    function amnahiMailSecurityNotice(string $to, string $what): bool
+    {
+        return amnahiMailSend(
+            $to,
+            'تنبيه أمان على حسابك – Styliiiish',
+            amnahiMailHtml(
+                'تنبيه أمان 🔔',
+                '<p>' . e($what) . '</p>'
+                . '<p>لو إنتِ اللي عملتي كده، مفيش داعي لأي حاجة. ولو لأ، اطلبي إعادة تعيين كلمة المرور فوراً وكلمينا.</p>',
+                amnahiSiteUrl('/forgot-password'),
+                'إعادة تعيين كلمة المرور'
+            )
+        );
+    }
+}
