@@ -1,0 +1,230 @@
+/* =========================================================================
+   Styliiiish — Owner Dashboard skin
+   Re-styles the Flexi/TaajVendor owner dashboard to match the new storefront
+   (same palette, Cairo type, radii and card treatment as the React site).
+   Everything is scoped under body.sty-od so it can't leak into other pages,
+   and it only overrides appearance — no markup/behaviour of the plugin changes.
+   ========================================================================= */
+
+@font-face{font-family:"Cairo";font-style:normal;font-weight:200 1000;font-display:swap;
+  src:url(/fonts/cairo-arabic.woff2) format("woff2");
+  unicode-range:U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC}
+@font-face{font-family:"Cairo";font-style:normal;font-weight:200 1000;font-display:swap;
+  src:url(/fonts/cairo-latin.woff2) format("woff2");
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
+body.sty-od{
+  --rose-600:#BA5D70; --rose-500:#C06376; --rose-400:#D08A97;
+  --rose-300:#F1D8D2; --rose-200:#F7E0DC; --rose-100:#F8ECE8;
+  --mint-700:#3F7160; --mint-100:#E2EFE8; --mint-050:#F1F7F3;
+  --amber-700:#8a5a14; --amber-100:#FBF0D9;
+  --ink-900:#2F1014; --ink-700:#433131;
+  --muted-600:#7A7668; --muted-500:#9C7F6C;
+  --surface:#FDFCFA; --page:#FEFDFA; --inert:#F6F3EE; --line:#EFE7E4;
+  --r-sm:10px; --r-md:14px; --r-lg:20px;
+  --shadow:0 2px 14px rgba(47,16,20,.055);
+  --font:"Cairo","Tajawal","Segoe UI",system-ui,sans-serif;
+  background:var(--page) !important; color:var(--ink-700); font-family:var(--font);
+}
+body.sty-od, body.sty-od button, body.sty-od input, body.sty-od select, body.sty-od textarea,
+body.sty-od .swal2-popup{font-family:var(--font)}
+
+/* ---- retire the old theme chrome on this page ---- */
+body.sty-od .topbar,
+body.sty-od .main-header,
+body.sty-od .promo,
+body.sty-od .header-categories-strip,
+body.sty-od .site-footer,
+body.sty-od .mini-cart,
+body.sty-od .mini-cart-backdrop,
+body.sty-od .wishlist-dropdown{display:none !important}
+
+/* ---- new header (mirrors the storefront header) ---- */
+.sty-od-header{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:900}
+.sty-od-bar{max-width:1320px;margin:0 auto;padding:0 28px;height:76px;display:flex;align-items:center;gap:26px}
+.sty-od-brand{display:flex;align-items:center;gap:10px;flex-shrink:0;text-decoration:none}
+.sty-od-brand img{width:40px;height:44px;display:block}
+.sty-od-brand-txt{display:flex;flex-direction:column;line-height:1}
+.sty-od-brand-name{font-size:24px;font-weight:700;color:var(--ink-900);letter-spacing:.2px}
+.sty-od-brand-tag{font-size:11px;color:var(--rose-600);margin-top:4px;font-weight:500}
+.sty-od-nav{display:flex;align-items:center;gap:22px;margin-inline-start:auto;overflow-x:auto;scrollbar-width:none}
+.sty-od-nav::-webkit-scrollbar{display:none}
+.sty-od-nav a{font-size:14px;color:var(--ink-700);padding:6px 0;white-space:nowrap;text-decoration:none}
+.sty-od-nav a:hover{color:var(--rose-600)}
+.sty-od-actions{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.sty-od-chip{height:34px;padding:0 15px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--rose-600);
+  font-size:12.5px;font-weight:700;display:inline-flex;align-items:center;text-decoration:none;white-space:nowrap;transition:background .15s,color .15s}
+.sty-od-chip:hover{background:var(--rose-600);color:#fff;border-color:var(--rose-600)}
+.sty-od-chip.solid{background:var(--rose-600);color:#fff;border-color:var(--rose-600)}
+.sty-od-chip.solid:hover{background:var(--rose-500)}
+@media (max-width:900px){
+  .sty-od-bar{height:auto;padding:12px 16px;flex-wrap:wrap;gap:10px 14px}
+  .sty-od-nav{order:3;width:100%;margin:0;gap:18px}
+  .sty-od-actions{margin-inline-start:auto}
+}
+
+/* ---- page frame ---- */
+body.sty-od #content, body.sty-od .site-content{background:transparent}
+body.sty-od .owner-dashboard-container{max-width:1320px;margin:28px auto 56px;padding:0 28px;background:transparent !important;border-radius:0}
+@media (max-width:900px){body.sty-od .owner-dashboard-container{padding:0 14px;margin-top:18px}}
+body.sty-od .owner-dashboard-container > h2{font-size:30px;font-weight:700;color:var(--ink-900);margin:0 0 22px !important;letter-spacing:.2px}
+
+/* ---- main section cards ---- */
+body.sty-od .owner-card{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:20px 26px;margin-bottom:14px;
+  box-shadow:var(--shadow);transition:border-color .18s,transform .18s,box-shadow .18s}
+body.sty-od .owner-card:hover{background:#fff;border-color:var(--rose-300);transform:translateY(-2px);box-shadow:0 8px 24px rgba(186,93,112,.12)}
+body.sty-od .owner-card h3{font-size:19px;font-weight:700;color:var(--ink-900)}
+body.sty-od .owner-card h3 span:last-child, body.sty-od .owner-card h3 .arrow{color:var(--rose-600)}
+body.sty-od .owner-section{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:24px;margin-top:6px;margin-bottom:18px;box-shadow:var(--shadow)}
+
+/* ---- statistics ---- */
+body.sty-od .stats-grid{gap:16px}
+body.sty-od .stat-card{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);box-shadow:var(--shadow);padding:22px 18px}
+body.sty-od .stat-card h3{font-size:14.5px;font-weight:600;color:var(--muted-600)}
+body.sty-od .stat-card .stat-number{font-size:30px;font-weight:700;color:var(--rose-600)}
+body.sty-od .styliiiish-stat-box{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);box-shadow:var(--shadow)}
+body.sty-od .styliiiish-stat-box .label{color:var(--muted-600)}
+
+/* ---- toolbar / filters ---- */
+body.sty-od .styliiiish-toolbar{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);box-shadow:var(--shadow);padding:14px 16px}
+body.sty-od .styliiiish-filters-group label{color:var(--muted-600);font-weight:600;font-size:13px}
+
+/* ---- form controls ---- */
+body.sty-od .owner-dashboard-container input[type="text"],
+body.sty-od .owner-dashboard-container input[type="search"],
+body.sty-od .owner-dashboard-container input[type="number"],
+body.sty-od .owner-dashboard-container input[type="email"],
+body.sty-od .owner-dashboard-container select,
+body.sty-od .owner-dashboard-container textarea,
+body.sty-od #styliiiish-search,
+body.sty-od #styliiiish-bulk-action,
+body.sty-od #styliiiish-per-row{
+  border:1px solid var(--line);border-radius:var(--r-sm);background:#fff;color:var(--ink-700);padding:8px 12px;font-size:14px;
+  transition:border-color .15s,box-shadow .15s}
+body.sty-od .owner-dashboard-container input:focus,
+body.sty-od .owner-dashboard-container select:focus,
+body.sty-od .owner-dashboard-container textarea:focus,
+body.sty-od #styliiiish-search:focus,
+body.sty-od #styliiiish-bulk-action:focus{border-color:var(--rose-400);box-shadow:0 0 0 3px rgba(186,93,112,.14);outline:none}
+body.sty-od input[type="checkbox"]{accent-color:var(--rose-600)}
+body.sty-od .select2-container--default .select2-selection--single,
+body.sty-od .select2-container--default .select2-selection--multiple{border:1px solid var(--line);border-radius:var(--r-sm);min-height:38px}
+body.sty-od .select2-container--default .select2-results__option--highlighted[aria-selected]{background:var(--rose-600)}
+
+/* ---- buttons ---- */
+body.sty-od .owner-dashboard-container .button,
+body.sty-od .owner-dashboard-container button.button,
+body.sty-od #styliiiish-bulk-apply,
+body.sty-od .pagination-wrapper a.button{
+  background:#fff;color:var(--ink-700);border:1px solid var(--line);border-radius:var(--r-sm);padding:8px 16px;font-weight:600;font-size:13.5px;
+  line-height:1.4;cursor:pointer;box-shadow:none;transition:background .15s,color .15s,border-color .15s}
+body.sty-od .owner-dashboard-container .button:hover,
+body.sty-od .pagination-wrapper a.button:hover{border-color:var(--rose-400);color:var(--rose-600);background:var(--rose-100)}
+body.sty-od .owner-dashboard-container .button-primary,
+body.sty-od .owner-dashboard-container .email-send-btn,
+body.sty-od #styliiiish-bulk-apply,
+body.sty-od #saveCatsBtn,
+body.sty-od .styliiiish-page-link.button-primary.styliiiish-current-page{
+  background:var(--rose-600);color:#fff;border-color:var(--rose-600)}
+body.sty-od .owner-dashboard-container .button-primary:hover,
+body.sty-od .owner-dashboard-container .email-send-btn:hover,
+body.sty-od #styliiiish-bulk-apply:hover,
+body.sty-od #saveCatsBtn:hover{background:var(--rose-500);color:#fff;border-color:var(--rose-500)}
+body.sty-od .owner-action-btn,
+body.sty-od .btn-edit,body.sty-od .btn-view,body.sty-od .btn-delete{border-radius:var(--r-sm);font-weight:600}
+body.sty-od .btn-edit{background:var(--rose-100);color:var(--rose-600);border:1px solid var(--rose-300)}
+body.sty-od .btn-view{background:#fff;color:var(--ink-700);border:1px solid var(--line)}
+body.sty-od .btn-delete{background:#fff;color:#b3261e;border:1px solid #f0c9c5}
+
+/* ---- tables ---- */
+body.sty-od .owner-products-table,
+body.sty-od .orders-table{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden}
+body.sty-od .owner-products-table th,
+body.sty-od .orders-table th{background:var(--inert);color:var(--muted-600);font-size:12.5px;font-weight:700;letter-spacing:.2px;
+  text-transform:none;padding:12px 14px;border-bottom:1px solid var(--line)}
+body.sty-od .owner-products-table td,
+body.sty-od .orders-table td{padding:12px 14px;border-bottom:1px solid var(--line);color:var(--ink-700);font-size:14px}
+body.sty-od .owner-products-table tr:hover td,
+body.sty-od .orders-table tr:hover td{background:var(--rose-100)}
+body.sty-od .owner-products-table tr:last-child td,
+body.sty-od .orders-table tr:last-child td{border-bottom:0}
+body.sty-od .owner-products-table img{border-radius:var(--r-sm)}
+body.sty-od .inline-edit{border:1px solid transparent;border-radius:8px;background:transparent}
+body.sty-od .inline-edit:hover{background:var(--rose-100)}
+body.sty-od .inline-edit:focus{background:#fff;border-color:var(--rose-400)}
+
+/* ---- status badges ---- */
+body.sty-od .orders-badge{border-radius:999px;padding:3px 11px;font-size:12px;font-weight:700;border:0}
+body.sty-od .os-pending{background:var(--amber-100);color:var(--amber-700)}
+body.sty-od .os-processing{background:var(--rose-100);color:var(--rose-600)}
+body.sty-od .os-completed,body.sty-od .os-delivered{background:var(--mint-100);color:var(--mint-700)}
+body.sty-od .os-cancelled,body.sty-od .os-failed,body.sty-od .os-refunded{background:#f1ecea;color:var(--muted-600)}
+body.sty-od .sty-badge{border-radius:999px;font-weight:700}
+body.sty-od .sty-badge-pending{background:var(--amber-100);color:var(--amber-700);border:0}
+body.sty-od .sty-badge-draft{background:#f1ecea;color:var(--muted-600);border:0}
+
+/* ---- "Customer Dresses Added" review list ---- */
+body.sty-od .sty-vendor-review-head h4{color:var(--ink-900);font-weight:700}
+body.sty-od .sty-vendor-review-desc{color:var(--muted-600)}
+body.sty-od .vp-filter-btn{border:1px solid var(--line) !important;background:#fff;color:var(--ink-700);border-radius:999px;padding:8px 18px;font-weight:600;box-shadow:none}
+body.sty-od .vp-filter-btn:hover{background:var(--rose-100);color:var(--rose-600);border-color:var(--rose-300) !important}
+body.sty-od .vp-filter-btn.active{background:var(--rose-600);color:#fff;border-color:var(--rose-600) !important;box-shadow:0 6px 16px rgba(186,93,112,.25)}
+body.sty-od .sty-vendor-list{gap:14px}
+body.sty-od .sty-vendor-card{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);box-shadow:var(--shadow);padding:14px 16px;transition:transform .18s,box-shadow .18s,border-color .18s}
+body.sty-od .sty-vendor-card:hover{transform:translateY(-2px);border-color:var(--rose-300);box-shadow:0 8px 22px rgba(186,93,112,.12)}
+body.sty-od .sty-vendor-thumb img{border-radius:12px;border:1px solid var(--line)}
+body.sty-od .sty-vendor-title{color:var(--ink-900);font-weight:700;font-size:15.5px}
+body.sty-od .sty-vendor-meta,body.sty-od .sty-vendor-desc,body.sty-od .sty-vendor-cond,body.sty-od .sty-vendor-source{color:var(--muted-600)}
+body.sty-od .sty-btn{border-radius:999px;font-weight:700;font-size:12.5px;padding:7px 14px;border:1px solid transparent;font-family:var(--font)}
+body.sty-od .sty-approve{background:var(--mint-700);color:#fff}
+body.sty-od .sty-approve:hover{background:#34604f}
+body.sty-od .sty-reject{background:#fff;color:var(--rose-600);border-color:var(--rose-300)}
+body.sty-od .sty-reject:hover{background:var(--rose-100);color:var(--rose-600)}
+body.sty-od .sty-edit{background:var(--rose-100);color:var(--rose-600);border-color:var(--rose-300)}
+body.sty-od .sty-edit:hover{background:var(--rose-200)}
+body.sty-od .sty-view{background:#fff;color:var(--ink-700);border-color:var(--line)}
+body.sty-od .sty-view:hover{background:var(--inert)}
+body.sty-od .sty-no-items{background:#fff;border:1px dashed var(--rose-300);border-radius:var(--r-md);color:var(--muted-600);box-shadow:none}
+
+/* ---- modals / dialogs ---- */
+body.sty-od .image-modal-box,
+body.sty-od #editCatsModal > div{border-radius:var(--r-lg)}
+body.sty-od #cats-checkboxes label{border-radius:var(--r-sm);border:1px solid var(--line)}
+body.sty-od #cats-checkboxes label:hover{background:var(--rose-100)}
+body.sty-od #cats-checkboxes input:checked + span{color:var(--rose-600);font-weight:700}
+body.sty-od .swal2-popup{border-radius:var(--r-lg);padding:1.6em}
+body.sty-od .swal2-title{color:var(--ink-900);font-weight:700}
+body.sty-od .swal2-styled.swal2-confirm,body.sty-od .swal2-confirm.sty-btn-primary{background:var(--rose-600) !important;border-radius:var(--r-sm);box-shadow:none}
+body.sty-od .swal2-styled.swal2-cancel,body.sty-od .swal2-cancel.sty-btn-secondary{border-radius:var(--r-sm)}
+body.sty-od .swal2-styled:focus{box-shadow:0 0 0 3px rgba(186,93,112,.25)}
+body.sty-od .styliiiish-loader{color:var(--rose-600)}
+body.sty-od .progress-bar{background:var(--inert);border-radius:999px}
+body.sty-od .progress-inner{background:var(--rose-600);border-radius:999px}
+
+/* ---- slim footer ---- */
+.sty-od-footer{border-top:1px solid var(--line);background:var(--surface);color:var(--muted-500);text-align:center;font-size:12.5px;padding:20px 16px}
+.sty-od-footer a{color:var(--rose-600);text-decoration:none;font-weight:600}
+
+/* ---- overrides for rules in the plugin sheet that are !important or theme-driven ---- */
+body.sty-od h1,body.sty-od h2,body.sty-od h3,body.sty-od h4,body.sty-od h5,body.sty-od h6{font-family:var(--font);letter-spacing:0}
+body.sty-od #styliiiish-add-product{
+  background:var(--rose-600) !important;border:1px solid var(--rose-600) !important;color:#fff !important;border-radius:var(--r-sm) !important;
+  box-shadow:0 6px 16px rgba(186,93,112,.25);font-family:var(--font)}
+body.sty-od #styliiiish-add-product:hover{background:var(--rose-500) !important;box-shadow:0 8px 18px rgba(186,93,112,.32)}
+body.sty-od #styliiiish-add-product:focus{box-shadow:0 0 0 3px rgba(186,93,112,.25),0 8px 18px rgba(186,93,112,.3)}
+body.sty-od .styliiiish-page-link.button-primary.styliiiish-current-page{background:var(--rose-600) !important;border-color:var(--rose-600) !important;color:#fff !important}
+body.sty-od .cats-edit-btn{background:var(--rose-600)}
+body.sty-od .os-processing{background:var(--rose-100) !important;color:var(--rose-600) !important}
+body.sty-od .tag-main{background:var(--rose-600)}
+body.sty-od .styliiiish-img-item:hover{border-color:var(--rose-400)}
+body.sty-od .attr-modal-content select:focus,body.sty-od #styliiiish-bulk-action:focus{border-color:var(--rose-400)}
+body.sty-od .email-send-btn{background:var(--rose-600)}
+body.sty-od .sty-edit{color:var(--rose-600)}
+body.sty-od a{color:var(--rose-600)}
+body.sty-od .owner-dashboard-container a:not(.button):not(.sty-btn):hover{color:var(--rose-500)}
+body.sty-od .stat-number .woocommerce-Price-amount,
+body.sty-od .stat-number .woocommerce-Price-currencySymbol,
+body.sty-od .stat-number .amount{color:inherit}
+body.sty-od .woocommerce-Price-amount{color:var(--rose-600);font-weight:700}
+body.sty-od .site-content,body.sty-od #content{padding-top:0 !important;padding-bottom:0 !important;margin-top:0 !important}
+body.sty-od .sty-od-actions{flex-wrap:wrap}

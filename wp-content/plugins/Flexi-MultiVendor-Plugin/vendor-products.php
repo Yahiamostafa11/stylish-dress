@@ -594,7 +594,7 @@ function sty_render_vendor_single_card($product_id){
 
     // Condition Attribute
     $condition_terms = wc_get_product_terms($product_id, 'pa_product-condition', ['fields' => 'names']);
-    $condition = !empty($condition_terms) ? implode(', ', $condition_terms) : '�';
+    $condition = !empty($condition_terms) ? implode(', ', $condition_terms) : '—';
 
     ob_start(); ?>
 
