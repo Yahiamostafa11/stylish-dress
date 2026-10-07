@@ -312,6 +312,11 @@ Route::post('/api/account/email/confirm', function (Request $request) use ($amna
     }
     [$user, $newEmail] = $resolved;
 
+    // Already applied (link clicked twice) — treat as used up.
+    if (strcasecmp((string) $user->user_email, $newEmail) === 0) {
+        return $amnahiCors(response()->json(['message' => 'الرابط ده اتستخدم قبل كده'], 422));
+    }
+
     if (DB::table('wp_users')->where('user_email', $newEmail)->where('ID', '!=', $user->ID)->exists()) {
         return $amnahiCors(response()->json(['message' => 'الإيميل ده اتسجّل عند حساب تاني في الوقت ده'], 422));
     }
