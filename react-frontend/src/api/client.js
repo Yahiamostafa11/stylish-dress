@@ -99,6 +99,14 @@ export function loginAccount({ email, password }) {
   return postJson("/auth/login", { email, password });
 }
 
+export function forgotPassword(email) {
+  return postJson("/auth/forgot-password", { email });
+}
+
+export function resetPassword({ token, password }) {
+  return postJson("/auth/reset-password", { token, password });
+}
+
 export function fetchMe() {
   return get("/auth/me", { auth: true }).then((r) => r.user);
 }

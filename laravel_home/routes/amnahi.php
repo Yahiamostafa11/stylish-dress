@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
+require_once __DIR__ . '/amnahi_helpers.php';
+
 /*
 |--------------------------------------------------------------------------
 | امنحي — peer-to-peer marketplace: auth, listings, chat
@@ -71,7 +73,8 @@ $amnahiAuthUser = function (Request $request) {
         return null;
     }
 
-    if (!is_array($payload) || (int) ($payload['exp'] ?? 0) < time()) {
+    // Purpose-bound tokens (e.g. password reset) are not login tokens.
+    if (!is_array($payload) || isset($payload['k']) || (int) ($payload['exp'] ?? 0) < time()) {
         return null;
     }
 
@@ -96,41 +99,6 @@ $amnahiScope = function ($q) {
 };
 $amnahiThrottle = (string) config('styliiiish.throttle.amnahi', '30,1');
 
-// Emails the seller the moment a buyer starts a NEW chat about her listing
-// (not on every message — just this first "أنا مهتمة" click). Wrapped by the
-// caller in a try/catch: a mail hiccup should never block the buyer's chat
-// from being created.
-$amnahiNotifySellerOfInterest = function (int $sellerId, int $buyerId, int $listingId, int $conversationId): void {
-    $seller = DB::table('wp_users')->where('ID', $sellerId)->first();
-    if (!$seller || empty($seller->user_email)) {
-        return;
-    }
-
-    $buyerName = (string) DB::table('wp_users')->where('ID', $buyerId)->value('display_name');
-    $listingTitle = (string) DB::table('wp_posts')->where('ID', $listingId)->value('post_title');
-    $chatUrl = config('styliiiish.frontend_url') . '/messages/' . $conversationId;
-
-    $html = '
-        <div style="font-family:Tahoma,Arial,sans-serif;max-width:480px;margin:0 auto;padding:24px">
-            <h2 style="color:#8E2F43;margin:0 0 16px">فيه بنت مهتمة بفستانك على امنحي! 👗</h2>
-            <p style="color:#433131;font-size:14px;line-height:1.8">
-                <strong>' . e($buyerName ?: 'مستخدمة') . '</strong> بعتت رسالة عشان تسأل عن
-                <strong>«' . e($listingTitle ?: 'إعلانك') . '»</strong>.
-            </p>
-            <p style="margin:24px 0">
-                <a href="' . e($chatUrl) . '" style="background:#BA5D70;color:#fff;padding:12px 24px;
-                    border-radius:8px;text-decoration:none;font-weight:600;display:inline-block">
-                    ردي عليها دلوقتي
-                </a>
-            </p>
-            <p style="color:#9C7F6C;font-size:12px">Styliiiish &middot; امنحي</p>
-        </div>
-    ';
-
-    Mail::html($html, function ($message) use ($seller) {
-        $message->to($seller->user_email)->subject('فيه بنت مهتمة بفستانك على امنحي 👗');
-    });
-};
 
 /*
 |--------------------------------------------------------------------------
@@ -155,7 +123,7 @@ Route::post('/api/auth/register', function (Request $request) use ($amnahiCors, 
 
     $userId = DB::table('wp_users')->insertGetId([
         'user_login' => $login,
-        'user_pass' => password_hash($data['password'], PASSWORD_BCRYPT),
+        'user_pass' => amnahiHashPassword($data['password']),
         'user_nicename' => Str::slug($data['name']) ?: $login,
         'user_email' => $data['email'],
         'user_url' => '',
@@ -186,7 +154,7 @@ Route::post('/api/auth/login', function (Request $request) use ($amnahiCors, $am
     ]);
 
     $user = DB::table('wp_users')->where('user_email', $data['email'])->first();
-    if (!$user || !password_verify($data['password'], $user->user_pass)) {
+    if (!$user || !amnahiCheckPassword($data['password'], (string) $user->user_pass)) {
         return $amnahiCors(response()->json(['message' => 'بيانات الدخول غير صحيحة'], 401));
     }
 
@@ -206,6 +174,40 @@ Route::get('/api/auth/me', function (Request $request) use ($amnahiCors, $amnahi
         'user' => ['id' => (int) $user->ID, 'name' => $user->display_name, 'email' => $user->user_email],
     ]));
 });
+
+// Always answers the same way, so it can't be used to discover which emails have accounts.
+Route::post('/api/auth/forgot-password', function (Request $request) use ($amnahiCors) {
+    $data = $request->validate(['email' => 'required|email|max:100']);
+
+    $user = DB::table('wp_users')->where('user_email', $data['email'])->first();
+    if ($user) {
+        amnahiMailPasswordReset($user, amnahiResetToken($user));
+    }
+
+    return $amnahiCors(response()->json(['message' => 'ok']));
+})->middleware('throttle:5,1');
+
+Route::post('/api/auth/reset-password', function (Request $request) use ($amnahiCors, $amnahiIssueToken) {
+    $data = $request->validate([
+        'token' => 'required|string|max:2000',
+        'password' => 'required|string|min:6|max:100',
+    ]);
+
+    $user = amnahiResolveResetToken($data['token']);
+    if (!$user) {
+        return $amnahiCors(response()->json(['message' => 'الرابط ده منتهي أو اتستخدم قبل كده، اطلبي رابط جديد'], 422));
+    }
+
+    DB::table('wp_users')->where('ID', $user->ID)->update([
+        'user_pass' => amnahiHashPassword($data['password']),
+        'user_activation_key' => '',
+    ]);
+
+    return $amnahiCors(response()->json([
+        'token' => $amnahiIssueToken((int) $user->ID),
+        'user' => ['id' => (int) $user->ID, 'name' => $user->display_name, 'email' => $user->user_email],
+    ]));
+})->middleware('throttle:10,1');
 
 /*
 |--------------------------------------------------------------------------
@@ -369,6 +371,15 @@ Route::post('/api/amnahi/listings', function (Request $request) use ($amnahiCors
         }
     }
 
+    // Tell the seller what happens next. When moderation is on, the "it's live"
+    // email is sent later by the wp-admin publish hook (mu-plugin).
+    if ($autoPublish) {
+        DB::table('wp_postmeta')->insert(['post_id' => $productId, 'meta_key' => '_styliiiish_amnahi_live_mailed', 'meta_value' => '1']);
+        amnahiMailListingLive((int) $user->ID, (int) $productId, (string) $data['title']);
+    } else {
+        amnahiMailListingReceived((int) $user->ID, (int) $productId, (string) $data['title']);
+    }
+
     return $amnahiCors(response()->json([
         'data' => ['id' => $productId, 'status' => $autoPublish ? 'publish' : 'pending'],
     ], 201));
@@ -519,7 +530,7 @@ Route::get('/api/amnahi/listings/{id}', function (Request $request, string $id) 
 |--------------------------------------------------------------------------
 */
 
-Route::post('/api/amnahi/listings/{id}/interest', function (Request $request, string $id) use ($amnahiCors, $amnahiAuthUser, $amnahiNotifySellerOfInterest) {
+Route::post('/api/amnahi/listings/{id}/interest', function (Request $request, string $id) use ($amnahiCors, $amnahiAuthUser) {
     $buyer = $amnahiAuthUser($request);
     if (!$buyer) {
         return $amnahiCors(response()->json(['message' => 'سجّلي دخولك الأول'], 401));
@@ -551,7 +562,7 @@ Route::post('/api/amnahi/listings/{id}/interest', function (Request $request, st
     ]);
 
     try {
-        $amnahiNotifySellerOfInterest((int) $sellerId, (int) $buyer->ID, (int) $id, (int) $conversationId);
+        amnahiMailNewMessage((int) $sellerId, (int) $buyer->ID, (int) $id, (int) $conversationId, true);
     } catch (\Throwable $e) {
         report($e);
     }
@@ -628,6 +639,16 @@ Route::post('/api/conversations/{id}/messages', function (Request $request, stri
     ]);
 
     DB::table('chat_conversations')->where('id', $id)->update(['updated_at' => now()]);
+
+    // Email the other side (throttled inside the helper), never blocking the chat.
+    try {
+        $recipientId = (int) $conversation->buyer_user_id === (int) $user->ID
+            ? (int) $conversation->seller_user_id
+            : (int) $conversation->buyer_user_id;
+        amnahiMailNewMessage($recipientId, (int) $user->ID, (int) $conversation->listing_id, (int) $id);
+    } catch (\Throwable $e) {
+        report($e);
+    }
 
     return $amnahiCors(response()->json(['data' => ['id' => $messageId]], 201));
 })->middleware('throttle:60,1');

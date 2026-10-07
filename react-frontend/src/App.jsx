@@ -15,6 +15,8 @@ import Contact from "./pages/Contact";
 import Wishlist from "./pages/Wishlist";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Conversations from "./pages/Conversations";
 import ConversationThread from "./pages/ConversationThread";
 import Cart from "./pages/Cart";
@@ -49,6 +51,8 @@ export default function App() {
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/messages" element={<Conversations />} />
         <Route path="/messages/:id" element={<ConversationThread />} />
         <Route path="/cart" element={<Cart />} />

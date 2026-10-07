@@ -50,6 +50,10 @@ export default function Login() {
           <PasswordField required value={form.password} onChange={(e) => setField("password", e.target.value)} />
         </div>
 
+        <p style={{ margin: "0 0 4px", fontSize: 12.5 }}>
+          <Link to="/forgot-password" style={{ color: "var(--rose-600)", fontWeight: 600 }}>{t("login.forgot")}</Link>
+        </p>
+
         {error && <p style={{ color: "var(--rose-600)", fontSize: 12.5, margin: "8px 0" }}>{error}</p>}
 
         <button className="btn btn-rose" style={{ width: "100%", marginTop: 12 }} type="submit" disabled={busy}>
