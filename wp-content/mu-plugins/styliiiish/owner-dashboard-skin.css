@@ -228,3 +228,70 @@ body.sty-od .stat-number .amount{color:inherit}
 body.sty-od .woocommerce-Price-amount{color:var(--rose-600);font-weight:700}
 body.sty-od .site-content,body.sty-od #content{padding-top:0 !important;padding-bottom:0 !important;margin-top:0 !important}
 body.sty-od .sty-od-actions{flex-wrap:wrap}
+
+/* =========================================================================
+   Live panels in Statistics: Visitors + Emails (owner-dashboard-live.js)
+   ========================================================================= */
+body.sty-od .sty-live{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:22px}
+@media (max-width:1000px){body.sty-od .sty-live{grid-template-columns:1fr}}
+body.sty-od .sty-live-card{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);padding:22px 24px;min-width:0}
+body.sty-od .sty-live-card header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+body.sty-od .sty-live-card h4{margin:0;font-size:17px;font-weight:700;color:var(--ink-900)}
+body.sty-od .sty-live-card h4 small{font-size:11px;font-weight:700;color:var(--rose-600);background:var(--rose-100);border-radius:999px;padding:2px 9px;margin-inline-start:6px;vertical-align:middle}
+body.sty-od .sty-live-card h5{margin:20px 0 8px;font-size:12.5px;font-weight:700;color:var(--muted-600);text-transform:none;letter-spacing:.2px}
+body.sty-od .sty-live .muted{color:var(--muted-500);font-size:13px;margin:6px 0}
+body.sty-od .sty-live .sty-err{color:#b3261e;font-size:13px;margin:8px 0}
+
+/* live dot */
+body.sty-od .sty-live-dot{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--mint-700);background:var(--mint-100);border-radius:999px;padding:4px 11px}
+body.sty-od .sty-live-dot i{width:8px;height:8px;border-radius:50%;background:var(--mint-700);animation:styPulse 1.6s ease-out infinite}
+@keyframes styPulse{0%{box-shadow:0 0 0 0 rgba(63,113,96,.55)}70%{box-shadow:0 0 0 9px rgba(63,113,96,0)}100%{box-shadow:0 0 0 0 rgba(63,113,96,0)}}
+@media (prefers-reduced-motion:reduce){body.sty-od .sty-live-dot i{animation:none}}
+
+/* visitors */
+body.sty-od .sty-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+body.sty-od .sty-kpi{background:var(--inert);border-radius:var(--r-md);padding:14px 12px;text-align:center}
+body.sty-od .sty-kpi b{display:block;font-size:28px;font-weight:700;color:var(--rose-600);line-height:1.1}
+body.sty-od .sty-kpi span{display:block;font-size:12px;color:var(--muted-600);margin-top:6px}
+body.sty-od .sty-kpi em{display:block;font-style:normal;font-size:11px;margin-top:3px;font-weight:700}
+body.sty-od .sty-kpi em.up{color:var(--mint-700)}
+body.sty-od .sty-kpi em.down{color:#b3261e}
+body.sty-od .sty-bars-head{margin:20px 0 8px;font-size:12.5px;font-weight:700;color:var(--muted-600)}
+body.sty-od .sty-bars{display:flex;align-items:flex-end;gap:5px;height:92px}
+body.sty-od .sty-bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px;min-width:0}
+body.sty-od .sty-bar i{display:block;width:100%;background:var(--rose-300);border-radius:5px 5px 2px 2px;min-height:3px;transition:height .4s ease}
+body.sty-od .sty-bar.today i{background:var(--rose-600)}
+body.sty-od .sty-bar span{font-size:10px;color:var(--muted-500)}
+body.sty-od .sty-top{list-style:none;margin:0;padding:0}
+body.sty-od .sty-top li{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px;color:var(--ink-700)}
+body.sty-od .sty-top li:last-child{border-bottom:0}
+body.sty-od .sty-top li span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.sty-od .sty-top li b{color:var(--rose-600);flex-shrink:0}
+
+/* emails */
+body.sty-od .sty-tabs{display:inline-flex;background:var(--inert);border-radius:999px;padding:3px}
+body.sty-od .sty-tabs button{border:0;background:transparent;font:inherit;font-size:12.5px;font-weight:600;color:var(--muted-600);padding:5px 14px;border-radius:999px;cursor:pointer}
+body.sty-od .sty-tabs button.on{background:#fff;color:var(--rose-600);box-shadow:0 1px 4px rgba(47,16,20,.1)}
+body.sty-od .sty-sent{display:flex;align-items:baseline;gap:10px;margin-bottom:16px}
+body.sty-od .sty-sent b{font-size:38px;font-weight:700;color:var(--ink-900);line-height:1}
+body.sty-od .sty-sent span{font-size:14px;color:var(--muted-600)}
+body.sty-od .sty-meters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 18px}
+@media (max-width:600px){body.sty-od .sty-meters{grid-template-columns:repeat(2,minmax(0,1fr))}}
+body.sty-od .sty-meter>div:first-child{display:flex;justify-content:space-between;gap:6px;font-size:12px;color:var(--muted-600)}
+body.sty-od .sty-meter>div:first-child b{color:var(--ink-900);font-size:12.5px}
+body.sty-od .sty-meter-bar{height:6px;border-radius:999px;background:var(--inert);margin:7px 0 4px;overflow:hidden}
+body.sty-od .sty-meter-bar i{display:block;height:100%;border-radius:999px;transition:width .4s ease}
+body.sty-od .sty-meter small{font-size:11px;color:var(--muted-500)}
+body.sty-od .c-blue .sty-meter-bar i{background:#5aa0e6}
+body.sty-od .c-teal .sty-meter-bar i{background:#17a2a2}
+body.sty-od .c-green .sty-meter-bar i{background:var(--mint-700)}
+body.sty-od .c-red .sty-meter-bar i{background:#d8776e}
+body.sty-od .sty-feed{list-style:none;margin:0;padding:0;max-height:260px;overflow:auto}
+body.sty-od .sty-feed li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"ev to time" "ev sub sub";gap:2px 10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:12.5px;align-items:center}
+body.sty-od .sty-feed li:last-child{border-bottom:0}
+body.sty-od .sty-ev{grid-area:ev;font-size:11px;font-weight:700;color:var(--c);background:color-mix(in srgb,var(--c) 12%,#fff);border-radius:999px;padding:3px 10px;white-space:nowrap}
+body.sty-od .sty-ev-to{grid-area:to;color:var(--ink-700);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body.sty-od .sty-ev-sub{grid-area:sub;color:var(--muted-500);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+body.sty-od .sty-feed time{grid-area:time;color:var(--muted-500);font-size:11.5px}
+body.sty-od .sty-connect-row{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
+body.sty-od .sty-connect-row input{flex:1;min-width:220px}

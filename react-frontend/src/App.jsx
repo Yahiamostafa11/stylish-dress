@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Header from "./components/Header";
+import PageTracker from "./components/PageTracker";
 import Footer from "./components/Footer";
 import TipsWidget from "./components/TipsWidget";
 import DiscoveryPopup from "./components/DiscoveryPopup";
@@ -36,6 +37,7 @@ import Reviews from "./pages/Reviews";
 export default function App() {
   return (
     <>
+      <PageTracker />
       <Header />
       <Routes>
         <Route path="/" element={<Home />} />

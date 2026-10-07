@@ -89,6 +89,22 @@ export function fetchCategories() {
   return get("/categories").then((r) => r.data);
 }
 
+// ---- visit tracking (fire-and-forget; never blocks or breaks the page) ----
+
+export function trackPageview(path) {
+  try {
+    const url = `${API_BASE}/track`;
+    const body = JSON.stringify({ path });
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(url, new Blob([body], { type: "application/json" }));
+    } else {
+      fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body, keepalive: true }).catch(() => {});
+    }
+  } catch {
+    // tracking must never affect the shopper
+  }
+}
+
 // ---- auth ----
 
 export function registerAccount({ name, email, password, phone }) {

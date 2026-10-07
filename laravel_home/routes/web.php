@@ -5937,3 +5937,5 @@ Route::get('/api/products/{id}', function (Request $request, string $id) use ($a
 require __DIR__ . '/amnahi.php';
 require __DIR__ . '/checkout.php';
 require __DIR__ . '/reviews.php';
+
+require __DIR__ . '/track.php';
