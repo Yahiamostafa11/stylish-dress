@@ -309,7 +309,8 @@ Route::post('/api/amnahi/listings', function (Request $request) use ($amnahiCors
             mkdir($dir, 0755, true);
         }
 
-        $ext = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'jpg');
+        // Trust the detected type, not the client's filename (shared photos can arrive as ".tmp").
+        $ext = strtolower($file->guessExtension() ?: $file->getClientOriginalExtension() ?: 'jpg');
         $baseName = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) ?: 'amnahi';
         $filename = $baseName . '-' . Str::lower(Str::random(6)) . '.' . $ext;
         $mimeType = $file->getMimeType() ?: 'image/jpeg';
