@@ -18,7 +18,12 @@ const STYLIIISH_BREVO_KEY_OPTION = 'styliiiish_brevo_api_key';
 /* ------------------------------------------------------------------ helpers */
 
 function styliiiish_od_live_active() {
-	return function_exists('is_page') && (is_page('owner-dashboard') || is_page(1893));
+	if (function_exists('is_page') && (is_page('owner-dashboard') || is_page(1893))) {
+		return true;
+	}
+
+	// "My account → Moderate Your Site" renders the same dashboard on its own route.
+	return function_exists('wf_is_moderate_site_request') && wf_is_moderate_site_request();
 }
 
 /** Same audience as the dashboard itself: plugin admins, listed managers, or WooCommerce managers. */

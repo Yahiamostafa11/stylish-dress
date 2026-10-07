@@ -11,13 +11,26 @@ if (!defined('ABSPATH')) {
 }
 
 /** True on the owner dashboard page (works for the English and Arabic permalinks). */
-function styliiiish_od_skin_active() {
+function styliiiish_od_is_dashboard() {
 	return function_exists('is_page') && (is_page('owner-dashboard') || is_page(1893));
+}
+
+/** True on WooCommerce "My account" and all of its routes (orders, addresses, details, saved cards, moderate-site…). */
+function styliiiish_od_is_account() {
+	return function_exists('is_account_page') && is_account_page();
+}
+
+/** Both share the same chrome (header, footer, type, palette). */
+function styliiiish_od_skin_active() {
+	return styliiiish_od_is_dashboard() || styliiiish_od_is_account();
 }
 
 add_filter('body_class', function ($classes) {
 	if (styliiiish_od_skin_active()) {
 		$classes[] = 'sty-od';
+	}
+	if (styliiiish_od_is_account()) {
+		$classes[] = 'sty-acct';
 	}
 
 	return $classes;
@@ -103,8 +116,12 @@ add_action('wp_body_open', function () {
 				<?php endforeach; ?>
 			</nav>
 			<div class="sty-od-actions">
-				<a class="sty-od-chip" href="<?php echo esc_url($account); ?>"><?php echo esc_html($l['acct']); ?></a>
-				<a class="sty-od-chip" href="<?php echo esc_url(wp_logout_url(home_url('/'))); ?>"><?php echo esc_html($l['out']); ?></a>
+				<?php if (is_user_logged_in()) : ?>
+					<?php if (!styliiiish_od_is_account()) : ?>
+						<a class="sty-od-chip" href="<?php echo esc_url($account); ?>"><?php echo esc_html($l['acct']); ?></a>
+					<?php endif; ?>
+					<a class="sty-od-chip" href="<?php echo esc_url(wp_logout_url(home_url('/'))); ?>"><?php echo esc_html($l['out']); ?></a>
+				<?php endif; ?>
 				<a class="sty-od-chip solid" href="<?php echo esc_url(home_url('/')); ?>"><?php echo esc_html($l['store']); ?></a>
 			</div>
 		</div>

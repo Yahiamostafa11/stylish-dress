@@ -230,6 +230,171 @@ body.sty-od .site-content,body.sty-od #content{padding-top:0 !important;padding-
 body.sty-od .sty-od-actions{flex-wrap:wrap}
 
 /* =========================================================================
+   WooCommerce "My account" and its routes (body.sty-acct)
+   The old theme styles these pages from a handful of variables + hard-coded reds,
+   so: re-point the variables to the storefront palette, then fix what is hard-coded.
+   ========================================================================= */
+body.sty-acct{
+  --ekart-account-primary:var(--rose-600);
+  --ekart-account-secondary:var(--ink-900);
+  --ekart-account-bg:#fff;
+  --ekart-account-border:var(--line);
+  --ekart-account-soft:var(--rose-100);
+  --ekart-account-shadow:var(--shadow);
+}
+body.sty-acct.woocommerce-account{background:var(--page) !important;color:var(--ink-700)}
+body.sty-acct .woo-products{padding:28px 0 56px !important;background:transparent !important}
+body.sty-acct .woo-products > .container,body.sty-acct #wf-main{max-width:1320px;margin-inline:auto}
+
+/* page title the theme prints above the content, if any */
+body.sty-acct .entry-title,body.sty-acct .page-title{font-family:var(--font);font-weight:700;color:var(--ink-900)}
+
+/* ---- left menu ---- */
+body.sty-acct .woocommerce-account .woocommerce-MyAccount-navigation,
+body.sty-acct.woocommerce-account .woocommerce-MyAccount-navigation,
+body.sty-acct.woocommerce-account .woocommerce-MyAccount-content{border-radius:var(--r-lg);border-color:var(--line);box-shadow:var(--shadow)}
+body.sty-acct.woocommerce-account .woocommerce-MyAccount-navigation{padding:12px;top:96px}
+body.sty-acct.woocommerce-account .woocommerce-MyAccount-navigation ul{gap:4px}
+body.sty-acct.woocommerce-account .woocommerce-MyAccount-navigation ul li a{font-size:14.5px;font-weight:600;color:var(--ink-700) !important;border-radius:var(--r-md)}
+body.sty-acct.woocommerce-account .woocommerce-MyAccount-navigation ul li a::before{background:var(--line)}
+body.sty-acct.woocommerce-account .woocommerce-MyAccount-navigation ul li a:hover,
+body.sty-acct.woocommerce-account .woocommerce-MyAccount-navigation ul li a:focus{background:var(--rose-100) !important;border-color:var(--rose-300) !important;color:var(--rose-600) !important}
+body.sty-acct.woocommerce-account .woocommerce-MyAccount-navigation ul li.is-active a{background:var(--rose-100) !important;border-color:var(--rose-300) !important;color:var(--rose-600) !important;font-weight:700}
+body.sty-acct.woocommerce-account .woocommerce-MyAccount-navigation ul li.is-active a::before,
+body.sty-acct.woocommerce-account .woocommerce-MyAccount-navigation ul li a:hover::before{background:var(--rose-600)}
+body.sty-acct.woocommerce-account .woocommerce-MyAccount-navigation-link--customer-logout a{color:#b3261e !important}
+body.sty-acct.woocommerce-account .woocommerce-MyAccount-navigation-link--customer-logout a:hover{background:#fbeceb !important;border-color:#f0c9c5 !important;color:#b3261e !important}
+
+/* ---- content card ---- */
+body.sty-acct.woocommerce-account .woocommerce-MyAccount-content{padding:clamp(18px,2.4vw,30px);font-size:15px;color:var(--ink-700)}
+body.sty-acct.woocommerce-account .woocommerce-MyAccount-content h1,
+body.sty-acct.woocommerce-account .woocommerce-MyAccount-content h2,
+body.sty-acct.woocommerce-account .woocommerce-MyAccount-content h3,
+body.sty-acct.woocommerce-account .woocommerce-MyAccount-content h4{font-family:var(--font);font-weight:700;color:var(--ink-900);letter-spacing:0}
+body.sty-acct.woocommerce-account .woocommerce-MyAccount-content a:not(.button):not(.woocommerce-Button):not(.wc-forward):not([class*="btn"]){color:var(--rose-600);font-weight:600}
+body.sty-acct.woocommerce-account .woocommerce-MyAccount-content a:not(.button):not(.woocommerce-Button):not(.wc-forward):not([class*="btn"]):hover{color:var(--rose-500)}
+
+/* ---- buttons (white text is forced by the theme, so set the background to match) ---- */
+body.sty-acct .woocommerce a.button,
+body.sty-acct .woocommerce button.button,
+body.sty-acct .woocommerce input.button,
+body.sty-acct .woocommerce .woocommerce-Button,
+body.sty-acct .woocommerce-account .woocommerce-MyAccount-content .button,
+body.sty-acct .woocommerce-account .woocommerce-MyAccount-content .woocommerce-Button,
+body.sty-acct.woocommerce-account .woocommerce-MyAccount-content input[type="submit"],
+body.sty-acct .sty-btn-user-full,
+body.sty-acct .sty-btn-admin-full{
+  background:var(--rose-600) !important;color:#fff !important;border:1px solid var(--rose-600) !important;border-radius:var(--r-sm) !important;
+  font-family:var(--font);font-weight:700;font-size:14px;padding:11px 22px !important;line-height:1.4;box-shadow:none !important;
+  text-decoration:none;transition:background .15s,transform .15s}
+body.sty-acct .woocommerce a.button:hover,
+body.sty-acct .woocommerce button.button:hover,
+body.sty-acct .woocommerce input.button:hover,
+body.sty-acct .woocommerce .woocommerce-Button:hover,
+body.sty-acct .sty-btn-user-full:hover,
+body.sty-acct .sty-btn-admin-full:hover{background:var(--rose-500) !important;border-color:var(--rose-500) !important;transform:translateY(-1px)}
+/* the welcome-box buttons are pills in the plugin sheet */
+body.sty-acct .sty-btn-user-full,body.sty-acct .sty-btn-admin-full{border-radius:var(--r-md) !important;padding:13px 26px !important;font-size:15px;display:inline-block}
+body.sty-acct .woocommerce a.button.view,
+body.sty-acct .woocommerce a.button.cancel,
+body.sty-acct .woocommerce-orders-table__cell-order-actions a.button:not(.pay){background:#fff !important;color:var(--rose-600) !important;border-color:var(--rose-300) !important}
+body.sty-acct .woocommerce a.button.view:hover,
+body.sty-acct .woocommerce-orders-table__cell-order-actions a.button:not(.pay):hover{background:var(--rose-100) !important;color:var(--rose-600) !important}
+
+/* ---- welcome box from the Flexi plugin ---- */
+body.sty-acct .styliiiish-welcome-box{background:linear-gradient(135deg,var(--rose-100),#fff);border:1px solid var(--rose-300);border-radius:var(--r-lg);box-shadow:var(--shadow);padding:26px 28px}
+body.sty-acct .styliiiish-welcome-box:hover{box-shadow:0 10px 26px rgba(186,93,112,.14)}
+body.sty-acct .styliiiish-welcome-box .sty-title{font-size:22px;font-weight:700;color:var(--ink-900);margin:0 0 8px}
+body.sty-acct .styliiiish-welcome-box .sty-text{color:var(--muted-600);opacity:1}
+
+/* ---- forms ---- */
+body.sty-acct .woocommerce form .form-row label,
+body.sty-acct .woocommerce-MyAccount-content label{font-weight:600;font-size:13.5px;color:var(--ink-700)}
+body.sty-acct .woocommerce input.input-text,
+body.sty-acct .woocommerce .woocommerce-Input,
+body.sty-acct .woocommerce select,
+body.sty-acct .woocommerce textarea{
+  border:1px solid var(--line) !important;border-radius:var(--r-sm) !important;background:#fff;color:var(--ink-700);
+  padding:11px 14px;font-family:var(--font);font-size:14.5px;box-shadow:none;transition:border-color .15s,box-shadow .15s}
+body.sty-acct .woocommerce input.input-text:focus,
+body.sty-acct .woocommerce .woocommerce-Input:focus,
+body.sty-acct .woocommerce select:focus,
+body.sty-acct .woocommerce textarea:focus{border-color:var(--rose-400) !important;box-shadow:0 0 0 3px rgba(186,93,112,.14) !important;outline:none}
+body.sty-acct .woocommerce fieldset{background:var(--inert);border:1px dashed var(--rose-300);border-radius:var(--r-md);color:var(--muted-600)}
+body.sty-acct .woocommerce fieldset legend{font-weight:700;color:var(--ink-900);padding:0 8px}
+body.sty-acct input[type="checkbox"],body.sty-acct input[type="radio"]{accent-color:var(--rose-600)}
+body.sty-acct .woocommerce em,body.sty-acct .woocommerce .description{color:var(--muted-500);font-size:12.5px}
+body.sty-acct .woocommerce form .required,body.sty-acct .woocommerce abbr.required{color:var(--rose-600)}
+
+/* ---- logged-out: login / register / lost password ---- */
+body.sty-acct:not(.logged-in) .woocommerce{display:block !important;max-width:980px;margin:0 auto}
+body.sty-acct:not(.logged-in) .woocommerce > h2{font-size:26px;font-weight:700;color:var(--ink-900);margin:0 0 16px}
+body.sty-acct .woocommerce-form-login,
+body.sty-acct .woocommerce-form-register,
+body.sty-acct .woocommerce-ResetPassword,
+body.sty-acct form.lost_reset_password{background:#fff;border:1px solid var(--line) !important;border-radius:var(--r-lg) !important;box-shadow:var(--shadow);padding:26px 28px !important;margin:0 0 22px}
+body.sty-acct .u-columns.col2-set,body.sty-acct .col2-set.u-columns{display:grid !important;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+body.sty-acct .u-columns .u-column1,body.sty-acct .u-columns .u-column2{float:none !important;width:auto !important}
+body.sty-acct .u-columns h2{font-size:22px;font-weight:700;color:var(--ink-900);margin:0 0 14px}
+body.sty-acct .woocommerce-form-login__rememberme{font-weight:600}
+body.sty-acct .woocommerce-LostPassword a,body.sty-acct .lost_password a{color:var(--rose-600);font-weight:600}
+@media (max-width:760px){body.sty-acct .u-columns.col2-set,body.sty-acct .col2-set.u-columns{grid-template-columns:1fr}}
+
+/* ---- notices ---- */
+body.sty-acct .woocommerce-message,
+body.sty-acct .woocommerce-info,
+body.sty-acct .woocommerce-error,
+body.sty-acct .woocommerce-notice{background:#fff;border:1px solid var(--line);border-inline-start:4px solid var(--rose-600);border-top:1px solid var(--line);border-radius:var(--r-md);
+  color:var(--ink-700);padding:14px 18px 14px 48px;margin:0 0 18px;box-shadow:var(--shadow);list-style:none}
+body.sty-acct .woocommerce-message{border-inline-start-color:var(--mint-700)}
+body.sty-acct .woocommerce-error{border-inline-start-color:#b3261e}
+body.sty-acct .woocommerce-message::before{color:var(--mint-700)}
+body.sty-acct .woocommerce-info::before{color:var(--rose-600)}
+body.sty-acct .woocommerce-error::before{color:#b3261e}
+body.sty-acct .woocommerce-message a.button,body.sty-acct .woocommerce-info a.button{float:none;margin-inline-start:10px}
+
+/* ---- tables (orders, order details, saved cards, downloads) ---- */
+body.sty-acct .woocommerce table.shop_table,
+body.sty-acct .woocommerce-MyAccount-content table{width:100%;border:1px solid var(--line) !important;border-radius:var(--r-md) !important;border-collapse:separate !important;border-spacing:0;overflow:hidden;background:#fff}
+body.sty-acct .woocommerce table.shop_table th,
+body.sty-acct .woocommerce-MyAccount-content table th{background:var(--inert) !important;color:var(--muted-600);font-size:12.5px;font-weight:700;padding:13px 16px !important;border-bottom:1px solid var(--line) !important;text-transform:none}
+body.sty-acct .woocommerce table.shop_table td,
+body.sty-acct .woocommerce-MyAccount-content table td{padding:13px 16px !important;border-top:0 !important;border-bottom:1px solid var(--line) !important;color:var(--ink-700);font-size:14px}
+body.sty-acct .woocommerce table.shop_table tr:last-child td,
+body.sty-acct .woocommerce-MyAccount-content table tr:last-child td{border-bottom:0 !important}
+body.sty-acct .woocommerce table.shop_table tbody tr:hover td{background:var(--rose-100)}
+body.sty-acct .woocommerce-orders-table__cell-order-number a{font-weight:700}
+body.sty-acct mark{background:var(--rose-100);color:var(--rose-600);border-radius:6px;padding:2px 9px;font-weight:700}
+body.sty-acct .woocommerce .amount,body.sty-acct .woocommerce-Price-amount{color:var(--rose-600);font-weight:700}
+body.sty-acct .woocommerce-customer-details address{border:1px solid var(--line);border-radius:var(--r-md);padding:16px 18px;font-style:normal;background:var(--inert);color:var(--ink-700)}
+body.sty-acct .woocommerce-order-details h2,body.sty-acct .woocommerce-customer-details h2{font-size:19px}
+
+/* ---- addresses ---- */
+body.sty-acct .woocommerce-Addresses{gap:18px}
+body.sty-acct .woocommerce-account .woocommerce-MyAccount-content .woocommerce-Addresses .woocommerce-Address,
+body.sty-acct.woocommerce-account .woocommerce-MyAccount-content .woocommerce-Addresses .woocommerce-Address{background:#fff;border:1px solid var(--line);border-radius:var(--r-md);box-shadow:none;padding:18px 20px}
+body.sty-acct.woocommerce-account .woocommerce-MyAccount-content .woocommerce-Addresses .woocommerce-Address-title a.edit{background:var(--rose-100) !important;color:var(--rose-600) !important;border:1px solid var(--rose-300) !important;border-radius:999px !important;padding:5px 14px !important;font-size:12.5px;font-weight:700}
+
+/* ---- the plugin's other account screens (vendor/store, wallet…) ---- */
+body.sty-acct .taj-card{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow)}
+body.sty-acct .taj-page-title{font-family:var(--font);font-weight:700;color:var(--ink-900)}
+body.sty-acct .taj-page-subtitle{color:var(--muted-600)}
+
+/* ---- Moderate Your Site: same dashboard in its own route ---- */
+body.sty-acct .wf-moderate-site-shell{max-width:1320px;margin:0 auto;padding:0 28px}
+body.sty-acct .wf-moderate-site-standalone{padding:24px 0 48px}
+
+/* ---- phones: stack the menu above the content ---- */
+@media (max-width:900px){
+  body.sty-acct.woocommerce-account .woocommerce{flex-direction:column !important;gap:16px !important;padding:0 14px}
+  body.sty-acct.woocommerce-account .woocommerce > .woocommerce-MyAccount-navigation{flex:none !important;width:100% !important;max-width:none !important;position:static}
+  body.sty-acct.woocommerce-account .woocommerce-MyAccount-navigation ul{display:flex;overflow-x:auto;gap:6px;scrollbar-width:none}
+  body.sty-acct.woocommerce-account .woocommerce-MyAccount-navigation ul li{flex:0 0 auto}
+  body.sty-acct.woocommerce-account .woocommerce-MyAccount-navigation ul li a{white-space:nowrap;padding:10px 14px}
+  body.sty-acct .woocommerce-MyAccount-content table{display:block;overflow-x:auto}
+}
+
+/* =========================================================================
    Live panels in Statistics: Visitors + Emails (owner-dashboard-live.js)
    ========================================================================= */
 body.sty-od .sty-live{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:22px}
