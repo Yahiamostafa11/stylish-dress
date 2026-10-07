@@ -335,6 +335,10 @@ body.sty-acct .woocommerce-ResetPassword,
 body.sty-acct form.lost_reset_password{background:#fff;border:1px solid var(--line) !important;border-radius:var(--r-lg) !important;box-shadow:var(--shadow);padding:26px 28px !important;margin:0 0 22px}
 body.sty-acct .u-columns.col2-set,body.sty-acct .col2-set.u-columns{display:grid !important;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
 body.sty-acct .u-columns .u-column1,body.sty-acct .u-columns .u-column2{float:none !important;width:auto !important}
+/* WooCommerce's clearfix pseudo-elements would otherwise become (empty) grid cells */
+body.sty-acct .u-columns::before,body.sty-acct .u-columns::after,body.sty-acct .col2-set::before,body.sty-acct .col2-set::after{content:none !important;display:none !important}
+/* login only (registration off): one centred card */
+body.sty-acct .u-columns:not(:has(.u-column2)){grid-template-columns:minmax(0,520px);justify-content:center}
 body.sty-acct .u-columns h2{font-size:22px;font-weight:700;color:var(--ink-900);margin:0 0 14px}
 body.sty-acct .woocommerce-form-login__rememberme{font-weight:600}
 body.sty-acct .woocommerce-LostPassword a,body.sty-acct .lost_password a{color:var(--rose-600);font-weight:600}
