@@ -16,7 +16,6 @@ import Wishlist from "./pages/Wishlist";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
 import Account from "./pages/Account";
 import RequireAuth from "./components/RequireAuth";
 import ConfirmEmail from "./pages/ConfirmEmail";
@@ -55,7 +54,6 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/confirm-email" element={<ConfirmEmail />} />
         <Route path="/account" element={<RequireAuth><Account /></RequireAuth>} />
         <Route path="/messages" element={<Conversations />} />

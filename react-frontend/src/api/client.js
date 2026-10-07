@@ -103,8 +103,8 @@ export function forgotPassword(email) {
   return postJson("/auth/forgot-password", { email });
 }
 
-export function resetPassword({ token, password }) {
-  return postJson("/auth/reset-password", { token, password });
+export function resetPassword({ email, code, password }) {
+  return postJson("/auth/reset-password", { email, code, password });
 }
 
 export function changePassword({ currentPassword, newPassword }) {

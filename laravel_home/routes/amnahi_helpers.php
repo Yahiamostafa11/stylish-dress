@@ -57,46 +57,64 @@ if (!function_exists('amnahiHashPassword')) {
 
 /*
 |--------------------------------------------------------------------------
-| Password-reset tokens (stateless)
+| Password-reset OTP
 |--------------------------------------------------------------------------
 |
-| Signed + encrypted, valid for one hour, and bound to a fingerprint of the
-| user's current password hash — so a token stops working the moment the
-| password changes (single use) without needing a database table.
+| A 6-digit code emailed to the account, valid 10 minutes, 5 wrong guesses
+| burn it, single use. Only a keyed hash of the code is stored (in the cache),
+| never the code itself.
 */
 
-if (!function_exists('amnahiResetToken')) {
-    function amnahiResetToken(object $user): string
+if (!function_exists('amnahiOtpKey')) {
+    function amnahiOtpKey(string $email): string
     {
-        return Crypt::encryptString(json_encode([
-            'k' => 'pwreset',
-            'uid' => (int) $user->ID,
-            'fp' => substr(hash('sha256', (string) $user->user_pass), 0, 16),
-            'exp' => now()->addHour()->timestamp,
-        ]));
+        return 'amnahi_pw_otp:' . sha1(strtolower(trim($email)));
     }
 }
 
-if (!function_exists('amnahiResolveResetToken')) {
-    /** Returns the wp_users row the token belongs to, or null if invalid/expired/used. */
-    function amnahiResolveResetToken(string $token): ?object
+if (!function_exists('amnahiOtpHash')) {
+    function amnahiOtpHash(string $code): string
     {
-        try {
-            $payload = json_decode(Crypt::decryptString($token), true);
-        } catch (\Throwable $e) {
-            return null;
+        return hash_hmac('sha256', $code, (string) config('app.key'));
+    }
+}
+
+if (!function_exists('amnahiIssueOtp')) {
+    function amnahiIssueOtp(string $email): string
+    {
+        $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        Cache::put(amnahiOtpKey($email), ['h' => amnahiOtpHash($code), 'tries' => 0], now()->addMinutes(10));
+
+        return $code;
+    }
+}
+
+if (!function_exists('amnahiCheckOtp')) {
+    /** True only for a correct, unexpired, unused code. Consumes it on success. */
+    function amnahiCheckOtp(string $email, string $code): bool
+    {
+        $key = amnahiOtpKey($email);
+        $record = Cache::get($key);
+        if (!is_array($record)) {
+            return false;
         }
 
-        if (!is_array($payload) || ($payload['k'] ?? '') !== 'pwreset' || (int) ($payload['exp'] ?? 0) < time()) {
-            return null;
+        if ((int) ($record['tries'] ?? 0) >= 5) {
+            Cache::forget($key);
+
+            return false;
         }
 
-        $user = DB::table('wp_users')->where('ID', (int) ($payload['uid'] ?? 0))->first();
-        if (!$user || !hash_equals((string) ($payload['fp'] ?? ''), substr(hash('sha256', (string) $user->user_pass), 0, 16))) {
-            return null;
+        if (hash_equals((string) $record['h'], amnahiOtpHash(trim($code)))) {
+            Cache::forget($key);
+
+            return true;
         }
 
-        return $user;
+        $record['tries'] = (int) ($record['tries'] ?? 0) + 1;
+        Cache::put($key, $record, now()->addMinutes(10));
+
+        return false;
     }
 }
 
@@ -236,19 +254,21 @@ if (!function_exists('amnahiMailNewMessage')) {
     }
 }
 
-if (!function_exists('amnahiMailPasswordReset')) {
-    function amnahiMailPasswordReset(object $user, string $token): bool
+if (!function_exists('amnahiMailPasswordOtp')) {
+    function amnahiMailPasswordOtp(object $user, string $code): bool
     {
         return amnahiMailSend(
             (string) $user->user_email,
-            'إعادة تعيين كلمة المرور – Styliiiish',
+            'كود إعادة تعيين كلمة المرور: ' . $code,
             amnahiMailHtml(
-                'إعادة تعيين كلمة المرور 🔑',
+                'كود إعادة تعيين كلمة المرور 🔑',
                 '<p>أهلاً ' . e((string) $user->display_name ?: 'يا قمر') . '،</p>'
-                . '<p>وصلنا طلب لتغيير كلمة المرور بتاعة حسابك على Styliiiish. اضغطي على الزرار واختاري كلمة مرور جديدة. الرابط شغال لمدة <strong>ساعة</strong> ولمرة واحدة بس.</p>',
-                amnahiSiteUrl('/reset-password?token=' . rawurlencode($token)),
-                'اختاري كلمة مرور جديدة',
-                'لو إنتِ مطلبتيش تغيير كلمة المرور، تجاهلي الرسالة دي وحسابك في أمان.'
+                . '<p>اكتبي الكود ده في الموقع عشان تختاري كلمة مرور جديدة. الكود شغال لمدة <strong>10 دقايق</strong> ولمرة واحدة بس:</p>'
+                . '<p dir="ltr" style="font-size:34px;letter-spacing:10px;font-weight:700;color:#8E2F43;background:#FBF1F3;'
+                . 'border-radius:12px;padding:14px 10px;text-align:center;margin:18px 0">' . e($code) . '</p>',
+                null,
+                null,
+                'لو إنتِ مطلبتيش تغيير كلمة المرور، تجاهلي الرسالة دي وحسابك في أمان. متشاركيش الكود مع حد.'
             )
         );
     }

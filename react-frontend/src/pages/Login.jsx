@@ -50,15 +50,15 @@ export default function Login() {
           <PasswordField required value={form.password} onChange={(e) => setField("password", e.target.value)} />
         </div>
 
-        <p style={{ margin: "0 0 4px", fontSize: 12.5 }}>
-          <Link to="/forgot-password" style={{ color: "var(--rose-600)", fontWeight: 600 }}>{t("login.forgot")}</Link>
-        </p>
-
         {error && <p style={{ color: "var(--rose-600)", fontSize: 12.5, margin: "8px 0" }}>{error}</p>}
 
         <button className="btn btn-rose" style={{ width: "100%", marginTop: 12 }} type="submit" disabled={busy}>
           {busy ? t("login.submitting") : t("login.submit")}
         </button>
+
+        <p style={{ textAlign: "center", fontSize: 13, marginTop: 14 }}>
+          <Link to="/forgot-password" style={{ color: "var(--rose-600)", fontWeight: 600 }}>{t("login.forgot")}</Link>
+        </p>
 
         <p style={{ textAlign: "center", fontSize: 12.5, color: "var(--muted-600)", marginTop: 16 }}>
           {t("login.noAccount")} <Link to="/register" style={{ color: "var(--rose-600)", fontWeight: 600 }}>{t("login.registerLink")}</Link>

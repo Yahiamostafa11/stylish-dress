@@ -127,7 +127,10 @@ RateLimiter::for('amnahi-forgot', fn (Request $r) => [
     Limit::perHour(5)->by('forgot-mail|' . strtolower((string) $r->input('email'))),
 ]);
 RateLimiter::for('amnahi-account', fn (Request $r) => Limit::perMinute(10)->by('account|' . $r->ip()));
-RateLimiter::for('amnahi-reset', fn (Request $r) => Limit::perMinute(10)->by('reset-ip|' . $r->ip()));
+RateLimiter::for('amnahi-reset', fn (Request $r) => [
+    Limit::perMinute(10)->by('reset-ip|' . $r->ip()),
+    Limit::perHour(20)->by('reset-mail|' . strtolower((string) $r->input('email'))),
+]);
 RateLimiter::for('reviews', function (Request $r) use ($amnahiLimit) {
     [$max, $minutes] = $amnahiLimit('styliiiish.throttle.testimonial', '5,60');
 
@@ -216,7 +219,7 @@ Route::post('/api/auth/forgot-password', function (Request $request) use ($amnah
 
     $user = DB::table('wp_users')->where('user_email', $data['email'])->first();
     if ($user) {
-        amnahiMailPasswordReset($user, amnahiResetToken($user));
+        amnahiMailPasswordOtp($user, amnahiIssueOtp($data['email']));
     }
 
     return $amnahiCors(response()->json(['message' => 'ok']));
@@ -224,19 +227,21 @@ Route::post('/api/auth/forgot-password', function (Request $request) use ($amnah
 
 Route::post('/api/auth/reset-password', function (Request $request) use ($amnahiCors, $amnahiIssueToken) {
     $data = $request->validate([
-        'token' => 'required|string|max:2000',
+        'email' => 'required|email|max:100',
+        'code' => 'required|digits:6',
         'password' => 'required|string|min:6|max:100',
     ]);
 
-    $user = amnahiResolveResetToken($data['token']);
-    if (!$user) {
-        return $amnahiCors(response()->json(['message' => 'الرابط ده منتهي أو اتستخدم قبل كده، اطلبي رابط جديد'], 422));
+    $user = DB::table('wp_users')->where('user_email', $data['email'])->first();
+    if (!$user || !amnahiCheckOtp($data['email'], $data['code'])) {
+        return $amnahiCors(response()->json(['message' => 'الكود غلط أو منتهي، اطلبي كود جديد'], 422));
     }
 
     DB::table('wp_users')->where('ID', $user->ID)->update([
         'user_pass' => amnahiHashPassword($data['password']),
         'user_activation_key' => '',
     ]);
+    amnahiMailSecurityNotice((string) $user->user_email, 'كلمة المرور بتاعة حسابك على Styliiiish اتغيّرت دلوقتي.');
 
     return $amnahiCors(response()->json([
         'token' => $amnahiIssueToken((int) $user->ID),
