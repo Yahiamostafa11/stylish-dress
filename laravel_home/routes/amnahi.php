@@ -35,14 +35,16 @@ $amnahiCors = function ($response) {
 };
 
 $amnahiResolveImage = function (?string $guid, ?string $attachedFile, string $wpBaseUrl): ?string {
-    $guid = trim((string) $guid);
-    if ($guid !== '') {
-        return preg_replace('#^https?://[^/]+#i', $wpBaseUrl, $guid);
-    }
-
+    // Prefer the real file path: attachments added through wp-admin carry an
+    // attachment-page URL as their guid, which isn't an image.
     $file = ltrim(trim((string) $attachedFile), '/');
     if ($file !== '') {
         return $wpBaseUrl . '/wp-content/uploads/' . $file;
+    }
+
+    $guid = trim((string) $guid);
+    if ($guid !== '') {
+        return preg_replace('#^https?://[^/]+#i', $wpBaseUrl, $guid);
     }
 
     return null;
