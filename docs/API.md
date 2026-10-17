@@ -25,7 +25,7 @@ If `app.force_update` is true, block the app with an update screen. If `maintena
 | `GET /products/{id}` | Adds `description`, `gallery[]`, and **`offers`**: `[{slug, label, price, in_stock, variations[{variation_id, label, price, in_stock}]}]` (rent first). Products without offers have flat `sizes`. |
 | `GET /categories` | `[{slug, name, count}]` |
 | `GET /sizes` | Size filter values, in order XS→3XL |
-| `GET /price-range` | `{min, max}` for the price slider |
+| `GET /price-range` | `{data:{min, max, breakpoints[]}}` for the price slider |
 
 ## Auth & account
 
