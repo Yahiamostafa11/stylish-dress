@@ -5624,10 +5624,22 @@ if (!function_exists('apiProductParagraphs')) {
     {
         $parts = preg_split('/\R+|<\/(?:p|div|li|h[1-6])>|<br\s*\/?>/i', $html) ?: [];
 
-        return array_values(array_filter(array_map(
-            fn ($p) => trim(html_entity_decode(strip_tags($p), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')),
-            $parts
-        ), fn ($p) => $p !== ''));
+        return array_values(array_filter(array_map('apiCleanText', $parts), fn ($p) => $p !== ''));
+    }
+}
+
+// Plain text from WordPress HTML: strips tags, decodes entities (twice — the data holds some
+// double-encoded ones like "&amp;nbsp;"), turns non-breaking spaces into spaces.
+if (!function_exists('apiCleanText')) {
+    function apiCleanText(string $html): string
+    {
+        $text = strip_tags($html);
+        for ($i = 0; $i < 2; $i++) {
+            $text = html_entity_decode($text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        }
+        $text = str_replace("\xC2\xA0", ' ', $text);
+
+        return trim((string) preg_replace('/[ \t]+/u', ' ', $text));
     }
 }
 
@@ -5726,9 +5738,9 @@ Route::get('/api/products', function (Request $request) use ($apiCors, $apiWpBas
         ->map(function ($row) use ($apiResolveImage, $wpBaseUrl, $trList) {
             return [
                 'id' => (int) $row->id,
-                'name' => $trList((string) $row->name),
+                'name' => apiCleanText($trList((string) $row->name)),
                 'slug' => (string) $row->slug,
-                'short_description' => $trList(trim((string) $row->short_description)),
+                'short_description' => apiCleanText($trList(trim((string) $row->short_description))),
                 'price' => $row->price !== null ? (float) $row->price : null,
                 'regular_price' => $row->regular_price !== null ? (float) $row->regular_price : null,
                 'sale_price' => $row->sale_price !== null ? (float) $row->sale_price : null,
@@ -5883,13 +5895,15 @@ Route::get('/api/products/{id}', function (Request $request, string $id) use ($a
         ->unique()
         ->values();
 
-    // "Ready sizes" = real WooCommerce variations the admin set up for this
-    // product (pa_size attribute), as opposed to "Custom Measurements" which
-    // the client types in herself when her size isn't one of these.
+    // A product's variations can be a size (pa_size), a "condition"/offer such as Rent / New / Used
+    // (pa_product-condition), or both (offer × size). Offers carry their own prices — e.g. the same
+    // dress for 1,000 EGP to rent or 7,000 EGP to buy — so they are returned as first-class `offers`.
+    // Products without a condition attribute keep the original flat `sizes` list.
     $sizeOrder = ['xs' => 0, 's' => 1, 'm' => 2, 'l' => 3, 'xl' => 4, 'xxl' => 5, '2xl' => 5, '3xl' => 6, 'xxxl' => 6];
 
-    $sizes = DB::table('wp_posts as v')
+    $variationRows = DB::table('wp_posts as v')
         ->leftJoin('wp_postmeta as size_slug', fn ($j) => $j->on('v.ID', '=', 'size_slug.post_id')->where('size_slug.meta_key', 'attribute_pa_size'))
+        ->leftJoin('wp_postmeta as cond_slug', fn ($j) => $j->on('v.ID', '=', 'cond_slug.post_id')->where('cond_slug.meta_key', 'attribute_pa_product-condition'))
         ->leftJoin('wp_postmeta as v_price', fn ($j) => $j->on('v.ID', '=', 'v_price.post_id')->where('v_price.meta_key', '_price'))
         ->leftJoin('wp_postmeta as v_stock', fn ($j) => $j->on('v.ID', '=', 'v_stock.post_id')->where('v_stock.meta_key', '_stock_status'))
         ->where('v.post_parent', $row->id)
@@ -5898,31 +5912,90 @@ Route::get('/api/products/{id}', function (Request $request, string $id) use ($a
         ->select(
             'v.ID as variation_id',
             'size_slug.meta_value as size_slug',
+            'cond_slug.meta_value as cond_slug',
             'v_price.meta_value as price',
             'v_stock.meta_value as stock_status'
         )
-        ->get()
-        ->filter(fn ($v) => !empty($v->size_slug))
-        ->map(fn ($v) => [
-            'variation_id' => (int) $v->variation_id,
-            'label' => strtoupper($v->size_slug),
-            'price' => $v->price !== null ? (float) $v->price : null,
-            'in_stock' => $v->stock_status !== 'outofstock',
-        ])
-        ->sortBy(fn ($v) => $sizeOrder[strtolower($v['label'])] ?? 99)
-        ->values();
+        ->get();
+
+    $toVariation = fn ($v) => [
+        'variation_id' => (int) $v->variation_id,
+        'label' => !empty($v->size_slug) ? strtoupper($v->size_slug) : null,
+        'price' => $v->price !== null ? (float) $v->price : null,
+        'in_stock' => $v->stock_status !== 'outofstock',
+    ];
+
+    $sizes = collect();
+    $offers = collect();
+
+    if (!$variationRows->contains(fn ($v) => !empty($v->cond_slug))) {
+        $sizes = $variationRows
+            ->filter(fn ($v) => !empty($v->size_slug))
+            ->map($toVariation)
+            ->sortBy(fn ($v) => $sizeOrder[strtolower((string) $v['label'])] ?? 99)
+            ->values();
+    } else {
+        $condNames = DB::table('wp_terms as t')
+            ->join('wp_term_taxonomy as tt', 'tt.term_id', '=', 't.term_id')
+            ->where('tt.taxonomy', 'pa_product-condition')
+            ->whereIn('t.slug', $variationRows->pluck('cond_slug')->filter()->unique()->all())
+            ->pluck('t.name', 't.slug');
+
+        $offers = $variationRows
+            ->filter(fn ($v) => !empty($v->cond_slug))
+            ->groupBy('cond_slug')
+            ->map(function ($rows, $slug) use ($toVariation, $sizeOrder, $condNames) {
+                $vars = $rows->map($toVariation)
+                    ->sortBy(fn ($v) => $sizeOrder[strtolower((string) $v['label'])] ?? 99)
+                    ->values();
+                $pool = $vars->where('in_stock', true);
+                if ($pool->isEmpty()) {
+                    $pool = $vars;
+                }
+
+                return [
+                    'slug' => (string) $slug,
+                    'name' => html_entity_decode((string) $condNames->get($slug, $slug), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
+                    'price' => $pool->pluck('price')->filter(fn ($p) => $p !== null)->min(),
+                    'in_stock' => $vars->contains('in_stock', true),
+                    'variations' => $vars->all(),
+                ];
+            })
+            // Rent first, then the others from cheapest up.
+            ->sort(function ($a, $b) {
+                $ra = $a['slug'] === 'rent' ? 0 : 1;
+                $rb = $b['slug'] === 'rent' ? 0 : 1;
+
+                return [$ra, $a['price'] ?? PHP_INT_MAX] <=> [$rb, $b['price'] ?? PHP_INT_MAX];
+            })
+            ->values();
+    }
 
     $paragraphs = apiProductParagraphs((string) $row->description);
     $shortPlain = trim((string) strip_tags((string) $row->short_description));
-    $trDetail = apiProductTranslator($request, array_merge([$row->name, $shortPlain], $paragraphs));
+    $rawName = (string) $row->name;
+    $trDetail = apiProductTranslator($request, array_merge([$rawName, $shortPlain], $paragraphs, $offers->pluck('name')->all()));
+
+    $isAr = strtolower((string) $request->query('lang', '')) === 'ar';
+    $arOfferFallback = ['rent' => 'إيجار', 'new' => 'جديد'];
+    $offers = $offers->map(function ($o) use ($trDetail, $isAr, $arOfferFallback) {
+        $label = $trDetail($o['name']);
+        if ($isAr && $label === $o['name'] && isset($arOfferFallback[$o['slug']])) {
+            $label = $arOfferFallback[$o['slug']];
+        }
+        $o['label'] = $label;
+        unset($o['name']);
+
+        return $o;
+    })->values();
 
     return $apiCors(response()->json([
         'data' => [
             'id' => (int) $row->id,
-            'name' => $trDetail((string) $row->name),
+            'name' => apiCleanText($trDetail($rawName)),
             'slug' => (string) $row->slug,
             'description' => implode("\n\n", array_map($trDetail, $paragraphs)),
-            'short_description' => $trDetail($shortPlain),
+            'short_description' => apiCleanText($trDetail($shortPlain)),
             'price' => $row->price !== null ? (float) $row->price : null,
             'regular_price' => $row->regular_price !== null ? (float) $row->regular_price : null,
             'sale_price' => $row->sale_price !== null ? (float) $row->sale_price : null,
@@ -5930,6 +6003,7 @@ Route::get('/api/products/{id}', function (Request $request, string $id) use ($a
             'image' => $apiResolveImage($row->image_guid, $row->image_file, $wpBaseUrl),
             'gallery' => $gallery,
             'sizes' => $sizes,
+            'offers' => $offers,
         ],
     ]));
 });

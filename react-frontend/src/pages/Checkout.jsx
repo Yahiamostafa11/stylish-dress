@@ -49,6 +49,7 @@ export default function Checkout() {
           variation_id: item.variationId ?? undefined,
           quantity: item.quantity,
           measurements: item.measurements ?? undefined,
+          custom_size: item.sizeType === "custom" ? true : undefined,
           notes: item.notes ?? undefined,
         })),
       });

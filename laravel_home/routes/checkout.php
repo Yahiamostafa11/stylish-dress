@@ -44,6 +44,7 @@ Route::post('/api/checkout', function (Request $request) use ($checkoutCors) {
         'items.*.variation_id' => ['nullable', 'integer', 'min:1'],
         'items.*.quantity' => ['required', 'integer', 'min:1', 'max:20'],
         'items.*.measurements' => ['nullable', 'array'],
+        'items.*.custom_size' => ['nullable', 'boolean'],
         'items.*.notes' => ['nullable', 'string', 'max:500'],
     ]);
 

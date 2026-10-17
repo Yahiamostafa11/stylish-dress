@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { fetchProduct } from "../api/client";
 import { useLanguage } from "../context/LanguageContext";
 import { useCart } from "../context/CartContext";
@@ -25,6 +25,7 @@ export default function Measurements() {
   const navigate = useNavigate();
   const { addItem } = useCart();
   const { productId } = useParams();
+  const [params] = useSearchParams();
   const [product, setProduct] = useState(null);
   const [status, setStatus] = useState("loading");
 
@@ -46,7 +47,14 @@ export default function Measurements() {
     };
   }, [productId]);
 
-  const hasReadySizes = (product?.sizes?.length ?? 0) > 0;
+  // Products sold in several "offers" (e.g. Rent / New) carry the chosen offer from the product page.
+  const offers = product?.offers ?? [];
+  const offer = offers.length ? offers.find((o) => o.slug === params.get("offer")) ?? offers[0] : null;
+  // Ready sizes: the offer's own size variations when there are offers, else the product's flat list.
+  const sizeOptions = offer ? offer.variations.filter((v) => v.label) : product?.sizes ?? [];
+  const hasReadySizes = sizeOptions.length > 0;
+  // A custom-measurements line is still booked on a variation of the chosen offer so it is charged the right price.
+  const offerVariation = offer ? offer.variations.find((v) => v.in_stock) ?? offer.variations[0] : null;
   const [sizeType, setSizeType] = useState("custom");
   const [selectedVariationId, setSelectedVariationId] = useState(null);
   const [unit, setUnit] = useState("cm");
@@ -57,14 +65,18 @@ export default function Measurements() {
   const [confirmed, setConfirmed] = useState(false);
 
   useEffect(() => {
-    if (product?.sizes?.length) {
+    if (sizeOptions.length) {
       setSizeType("ready");
-      setSelectedVariationId(product.sizes.find((s) => s.in_stock)?.variation_id ?? product.sizes[0].variation_id);
+      setSelectedVariationId(sizeOptions.find((s) => s.in_stock)?.variation_id ?? sizeOptions[0].variation_id);
+    } else {
+      setSizeType("custom");
+      setSelectedVariationId(null);
     }
-  }, [product]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product, offer?.slug]);
 
   const setField = (key, val) => setValues((v) => ({ ...v, [key]: val }));
-  const selectedSize = product?.sizes?.find((s) => s.variation_id === selectedVariationId);
+  const selectedSize = sizeOptions.find((s) => s.variation_id === selectedVariationId);
   const canSubmit = confirmed && (sizeType === "custom" || !!selectedVariationId);
 
   const handleAddToCart = () => {
@@ -73,12 +85,16 @@ export default function Measurements() {
         ? Object.fromEntries(FIELD_KEYS.map((f) => [t(f.labelKey), `${values[f.key]} ${unit === "cm" ? t("measurements.unitCm") : t("measurements.unitIn")}`]))
         : { [t("measurements.sizeLabel")]: selectedSize?.label };
 
+    const customOnOffer = sizeType === "custom" && offerVariation;
     addItem({
       productId: product.id,
-      variationId: sizeType === "ready" ? selectedVariationId : null,
-      name: product.name,
+      variationId: sizeType === "ready" ? selectedVariationId : customOnOffer ? offerVariation.variation_id : null,
+      name: offer ? `${product.name} (${offer.label})` : product.name,
       image: product.image,
-      price: sizeType === "ready" && selectedSize?.price != null ? selectedSize.price : product.price,
+      price:
+        sizeType === "ready" && selectedSize?.price != null
+          ? selectedSize.price
+          : offer?.price ?? product.price,
       measurements,
       sizeType,
       unit,
@@ -119,6 +135,11 @@ export default function Measurements() {
           <div className="item-info">
             <h4>{product.name}</h4>
             <p>{product.short_description || product.description?.slice(0, 80)}</p>
+            {offer && (
+              <p className="offer-picked">
+                <b>{offer.price} {t("amnahi.currency")}</b> ({offer.label})
+              </p>
+            )}
             <span className="tag" style={{ position: "static", display: "inline-block" }}>{t("measurements.onSale")}</span>
           </div>
         </div>
@@ -132,7 +153,7 @@ export default function Measurements() {
 
         {sizeType === "ready" ? (
           <div className="size-picker">
-            {product.sizes.map((s) => (
+            {sizeOptions.map((s) => (
               <button
                 key={s.variation_id}
                 type="button"

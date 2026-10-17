@@ -512,3 +512,15 @@ nav.main a.on{color:var(--rose-600);font-weight:600;border-bottom:2px solid var(
 .footer-credit{opacity:.9}
 .footer-credit a{color:#fff;font-weight:600;border-bottom:1px solid rgba(255,255,255,.35);transition:border-color .2s ease}
 .footer-credit a:hover{border-bottom-color:#fff}
+
+/* ---- product offers (Rent / New / Used — each with its own price) ---- */
+.offer-list{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 20px}
+.offer-opt{display:inline-flex;align-items:baseline;gap:8px;padding:11px 18px;border-radius:14px;border:1.5px solid var(--line);background:#fff;cursor:pointer;font:inherit;color:var(--ink-700);transition:border-color .15s,background .15s,box-shadow .15s}
+.offer-opt:hover{border-color:var(--rose-300)}
+.offer-opt.on{border-color:var(--rose-600);background:var(--rose-100);box-shadow:0 4px 14px rgba(186,93,112,.14)}
+.offer-opt.out{opacity:.55}
+.offer-price{font-size:20px;font-weight:700;color:var(--rose-600)}
+.offer-label{font-size:13.5px;color:var(--muted-600)}
+.offer-opt i{font-style:normal;font-size:11px;color:var(--muted-500)}
+.offer-picked{margin:8px 0 0;font-size:14px;color:var(--muted-600)}
+.offer-picked b{color:var(--rose-600);font-size:16px}

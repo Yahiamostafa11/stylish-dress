@@ -130,7 +130,15 @@ try {
         // already records the size as a real product attribute, which the
         // order screen displays automatically ("Size: XL") — adding it again
         // here as custom meta would just show the same line twice.
-        if ($orderItem && !$variationId && !empty($line['measurements']) && is_array($line['measurements'])) {
+        // A custom-measurements line that is booked on an offer variation (Rent / New …,
+        // so it is charged that offer's price) is flagged custom_size and keeps its measurements.
+        $isCustomSize = !empty($line['custom_size']);
+        if ($orderItem && $isCustomSize && $variationId) {
+            // The variation was only chosen to carry the offer's price — don't show its (arbitrary) size.
+            $orderItem->delete_meta_data('pa_size');
+            $orderItem->save();
+        }
+        if ($orderItem && (!$variationId || $isCustomSize) && !empty($line['measurements']) && is_array($line['measurements'])) {
             foreach ($line['measurements'] as $label => $value) {
                 if ($value === '' || $value === null) {
                     continue;

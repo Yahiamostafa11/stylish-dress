@@ -14,6 +14,7 @@ export default function ProductDetail() {
   const [product, setProduct] = useState(null);
   const [status, setStatus] = useState("loading");
   const [activeImage, setActiveImage] = useState(0);
+  const [offerSlug, setOfferSlug] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -23,6 +24,7 @@ export default function ProductDetail() {
         if (!cancelled) {
           setProduct(data);
           setActiveImage(0);
+          setOfferSlug(data?.offers?.[0]?.slug ?? null);
           setStatus("ready");
         }
       })
@@ -43,6 +45,9 @@ export default function ProductDetail() {
 
   const images = [product.image, ...(product.gallery || [])].filter(Boolean);
   const favored = isFavorite(product.id);
+  const offers = product.offers ?? [];
+  const hasOffers = offers.length > 0;
+  const selectedOffer = offers.find((o) => o.slug === offerSlug) ?? offers[0];
 
   return (
     <div className="wrap page">
@@ -78,23 +83,42 @@ export default function ProductDetail() {
           {product.on_sale && <span className="story-eyebrow">{t("product.onSale")}</span>}
           <h1 style={{ fontSize: 26, color: "var(--ink-900)", margin: "6px 0 10px" }}>{product.name}</h1>
 
-          <p style={{ display: "flex", alignItems: "baseline", gap: 10, margin: "0 0 16px" }}>
-            <strong style={{ fontSize: 22, fontWeight: 700, color: "var(--rose-600)" }}>
-              {product.price} {t("amnahi.currency")}
-            </strong>
-            {product.on_sale && product.regular_price != null && (
-              <span style={{ fontSize: 14, color: "var(--muted-500)", textDecoration: "line-through" }}>
-                {product.regular_price} {t("amnahi.currency")}
-              </span>
-            )}
-          </p>
+          {hasOffers ? (
+            <div className="offer-list" role="radiogroup" aria-label={t("product.chooseOffer")}>
+              {offers.map((o) => (
+                <button
+                  key={o.slug}
+                  type="button"
+                  role="radio"
+                  aria-checked={selectedOffer?.slug === o.slug}
+                  className={`offer-opt${selectedOffer?.slug === o.slug ? " on" : ""}${o.in_stock ? "" : " out"}`}
+                  onClick={() => setOfferSlug(o.slug)}
+                >
+                  <span className="offer-price">{o.price} {t("amnahi.currency")}</span>
+                  <span className="offer-label">({o.label})</span>
+                  {!o.in_stock && <i>{t("measurements.outOfStock")}</i>}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <p style={{ display: "flex", alignItems: "baseline", gap: 10, margin: "0 0 16px" }}>
+              <strong style={{ fontSize: 22, fontWeight: 700, color: "var(--rose-600)" }}>
+                {product.price} {t("amnahi.currency")}
+              </strong>
+              {product.on_sale && product.regular_price != null && (
+                <span style={{ fontSize: 14, color: "var(--muted-500)", textDecoration: "line-through" }}>
+                  {product.regular_price} {t("amnahi.currency")}
+                </span>
+              )}
+            </p>
+          )}
 
           <p className="page-sub" style={{ textAlign: "start", marginBottom: 24 }}>
             {product.description || product.short_description}
           </p>
 
           <div style={{ display: "flex", gap: 10 }}>
-            <button className="btn btn-rose" style={{ flex: 1 }} onClick={() => navigate(`/order/${product.id}/measurements`)}>
+            <button className="btn btn-rose" style={{ flex: 1 }} onClick={() => navigate(`/order/${product.id}/measurements${selectedOffer ? `?offer=${encodeURIComponent(selectedOffer.slug)}` : ""}`)}>
               {t("product.startOrder")}
             </button>
             <button
