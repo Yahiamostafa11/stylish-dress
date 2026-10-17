@@ -91,3 +91,22 @@ Server side it is active as soon as `FIREBASE_SERVICE_ACCOUNT_JSON` (path to the
 
 - `POST /track` – page-view counter used by the website; the app does not need it.
 - Env knobs for the app: `MOBILE_MIN_VERSION`, `MOBILE_LATEST_VERSION`, `MOBILE_ANDROID_URL`, `MOBILE_IOS_URL`, `MOBILE_MAINTENANCE`, `MOBILE_WHATSAPP`, `MOBILE_INSTAGRAM`, `MOBILE_FACEBOOK`, `MOBILE_TIKTOK`.
+
+## WhatsApp messages
+
+The server sends WhatsApp messages automatically (the app only needs to keep the user's phone number and preference up to date):
+
+| Event | Trigger | Template |
+|---|---|---|
+| Welcome | `POST /auth/register` with a `phone` | `styliiiish_welcome` |
+| Order placed | `POST /checkout` (to `customer.phone`, includes the `pay_url`) | `styliiiish_order_placed` |
+| Listing received / live | `POST /amnahi/listings` (live right away only if auto-publish) · moderator publishes it | `styliiiish_listing_received`, `styliiiish_listing_live` |
+| Someone is interested | `POST /amnahi/listings/{id}/interest` (new conversation) → to the seller | `styliiiish_listing_interest` |
+
+Messages go out in the language of the request (`?lang=` / `Accept-Language`) – for the seller-side ones, in the language saved in the profile.
+
+- `GET /account/notifications` 🔒 → `{data:{phone, whatsapp_enabled, language}}`
+- `PUT|POST /account/notifications` 🔒 `{phone?, whatsapp_enabled?, language?}` – `422` if the phone is not a valid number. Egyptian local numbers (`01…`) and international (`+20…`, `0020…`) are accepted.
+- `GET /mobile/config` → `features.whatsapp_notifications` tells whether the server has WhatsApp switched on.
+
+Server setup (`laravel_home/.env`): `WHATSAPP_DRIVER=cloud` (Meta WhatsApp Business Cloud API; `log` = record only), `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, optional `WHATSAPP_MODE=template|text`, `WHATSAPP_API_VERSION`, `WHATSAPP_EN_CODE`. Business-initiated messages need Meta-approved templates: create the five template names above in the WhatsApp Manager (languages `ar` and `en`, body = the text in `routes/whatsapp_helpers.php`, `{{1}}…` placeholders). Every attempt is logged in the `whatsapp_messages` table.

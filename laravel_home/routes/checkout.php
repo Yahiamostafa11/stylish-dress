@@ -69,6 +69,14 @@ Route::post('/api/checkout', function (Request $request) use ($checkoutCors) {
 
     $order = $response->json();
 
+    try {
+        waSendLater($validated['customer']['phone'], 'styliiiish_order_placed', [
+            $validated['customer']['name'], $order['order_id'] ?? '', $order['total'] ?? '', $order['pay_url'] ?? '',
+        ], apiRequestLang($request));
+    } catch (Throwable $e) {
+        report($e);
+    }
+
     return $checkoutCors(response()->json([
         'order_id' => $order['order_id'] ?? null,
         'order_key' => $order['order_key'] ?? null,

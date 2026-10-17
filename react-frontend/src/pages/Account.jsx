@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { changePassword, requestEmailChange } from "../api/client";
+import { changePassword, fetchNotificationPrefs, requestEmailChange, saveNotificationPrefs } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import PasswordField from "../components/PasswordField";
@@ -105,6 +105,54 @@ function EmailCard() {
   );
 }
 
+function WhatsappCard() {
+  const { t, lang } = useLanguage();
+  const [form, setForm] = useState({ phone: "", enabled: true });
+  const [loaded, setLoaded] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState(null);
+
+  useEffect(() => {
+    fetchNotificationPrefs()
+      .then((p) => setForm({ phone: p.phone || "", enabled: p.whatsapp_enabled }))
+      .catch(() => {})
+      .finally(() => setLoaded(true));
+  }, []);
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    setMsg(null);
+    setBusy(true);
+    try {
+      await saveNotificationPrefs({ phone: form.phone, whatsapp_enabled: form.enabled, language: lang });
+      setMsg({ ok: true, text: t("account.waDone") });
+    } catch (err) {
+      setMsg({ ok: false, text: err.message || t("account.error") });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <form className="order-card" onSubmit={onSubmit}>
+      <h2 style={{ fontSize: 16, margin: "0 0 6px" }}>{t("account.waTitle")}</h2>
+      <p style={{ fontSize: 12.5, color: "var(--muted-500)", margin: "0 0 16px" }}>{t("account.waHint")}</p>
+      <div className="field" style={{ marginBottom: 14 }}>
+        <label>{t("register.phone")}</label>
+        <input type="tel" dir="ltr" disabled={!loaded} value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} />
+      </div>
+      <label style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 13.5 }}>
+        <input type="checkbox" checked={form.enabled} onChange={(e) => setForm((f) => ({ ...f, enabled: e.target.checked }))} />
+        {t("account.waEnable")}
+      </label>
+      {msg && <p style={msgStyle(msg.ok)}>{msg.text}</p>}
+      <button className="btn btn-rose" style={{ width: "100%", marginTop: 8 }} type="submit" disabled={busy || !loaded}>
+        {busy ? t("reset.saving") : t("account.waSave")}
+      </button>
+    </form>
+  );
+}
+
 export default function Account() {
   const { user, logout } = useAuth();
   const { t } = useLanguage();
@@ -126,6 +174,7 @@ export default function Account() {
       <div style={{ display: "grid", gap: 20, maxWidth: 440, margin: "0 auto 28px" }}>
         <PasswordCard />
         <EmailCard />
+        <WhatsappCard />
         <div style={{ display: "flex", gap: 10 }}>
           <Link to="/messages" className="btn btn-outline" style={{ flex: 1, textAlign: "center" }}>{t("header.messages")}</Link>
           <button type="button" className="btn btn-outline" style={{ flex: 1 }} onClick={onLogout}>{t("header.logout")}</button>

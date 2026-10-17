@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
 require_once __DIR__ . '/mobile_helpers.php';
+require_once __DIR__ . '/whatsapp_helpers.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -51,6 +52,7 @@ Route::get('/api/mobile/config', function (Request $request) {
             'reviews' => true,
             'push' => (bool) mobilePushCredentials(),
             'google_login' => false,
+            'whatsapp_notifications' => (bool) config('styliiiish.whatsapp.driver'),
         ],
         'contact' => [
             'email' => (string) config('styliiiish.reviews.notify_email'),
@@ -209,7 +211,70 @@ Route::post('/api/internal/listing-live', function (Request $request) {
             'ar' => ['فستانك اتنشر 🎉', '«' . $post->post_title . '» بقى متاح على امنحي'],
             'en' => ['Your dress is live 🎉', '“' . $post->post_title . '” is now on Amnahi'],
         ], ['type' => 'listing_live', 'listing_id' => $post->ID]);
+        waNotifyUser((int) $post->post_author, 'styliiiish_listing_live', [
+            DB::table('wp_users')->where('ID', $post->post_author)->value('display_name'),
+            $post->post_title,
+            amnahiSiteUrl('/amnahi/' . $post->ID),
+        ]);
     }
 
     return response()->json(['message' => 'ok']);
+});
+
+// Contact number + notification preferences (WhatsApp messages, language used in them).
+$mobileNotificationPrefs = function (Request $request) use ($amnahiAuthUser) {
+    $user = $amnahiAuthUser($request);
+    if (!$user) {
+        return response()->json(['message' => 'Unauthorized'], 401);
+    }
+
+    if ($request->isMethod('get')) {
+        $meta = DB::table('wp_usermeta')->where('user_id', $user->ID)->whereIn('meta_key', ['styliiiish_phone', 'styliiiish_wa_optout', 'styliiiish_lang'])->pluck('meta_value', 'meta_key');
+
+        return response()->json(['data' => [
+            'phone' => (string) ($meta['styliiiish_phone'] ?? ''),
+            'whatsapp_enabled' => ($meta['styliiiish_wa_optout'] ?? '') !== '1',
+            'language' => ($meta['styliiiish_lang'] ?? '') === 'en' ? 'en' : 'ar',
+        ]]);
+    }
+
+    $data = $request->validate([
+        'phone' => 'nullable|string|max:30',
+        'whatsapp_enabled' => 'nullable|boolean',
+        'language' => 'nullable|in:ar,en',
+    ]);
+    $set = fn (string $key, string $value) => DB::table('wp_usermeta')->updateOrInsert(['user_id' => $user->ID, 'meta_key' => $key], ['meta_value' => $value]);
+
+    if (array_key_exists('phone', $data)) {
+        $phone = trim((string) $data['phone']);
+        if ($phone !== '' && !waNormalizePhone($phone)) {
+            return response()->json(['message' => 'رقم الموبايل مش صحيح', 'errors' => ['phone' => ['invalid']]], 422);
+        }
+        $set('styliiiish_phone', $phone);
+    }
+    if (array_key_exists('whatsapp_enabled', $data) && $data['whatsapp_enabled'] !== null) {
+        $set('styliiiish_wa_optout', $data['whatsapp_enabled'] ? '0' : '1');
+    }
+    if (!empty($data['language'])) {
+        $set('styliiiish_lang', $data['language']);
+    }
+
+    return response()->json(['message' => 'ok']);
+};
+Route::get('/api/account/notifications', $mobileNotificationPrefs);
+Route::put('/api/account/notifications', $mobileNotificationPrefs)->middleware('throttle:amnahi-account');
+Route::post('/api/account/notifications', $mobileNotificationPrefs)->middleware('throttle:amnahi-account');
+
+// Owner/dev only (shared secret): sends one template to a number right now and returns the result,
+// to check the WhatsApp credentials once they are in .env.
+Route::post('/api/internal/whatsapp-test', function (Request $request) {
+    $secret = (string) config('styliiiish.commerce.order_bridge_secret');
+    if ($secret === '' || !hash_equals($secret, (string) $request->header('X-Bridge-Secret', ''))) {
+        return response()->json(['message' => 'Forbidden'], 403);
+    }
+    $template = (string) $request->input('template', 'styliiiish_welcome');
+    $ok = waSend((string) $request->input('phone'), $template, (array) $request->input('params', ['Test']), (string) $request->input('lang', 'ar'));
+    $last = DB::table('whatsapp_messages')->orderByDesc('id')->first();
+
+    return response()->json(['sent' => $ok, 'last' => $last]);
 });

@@ -43,7 +43,8 @@ function get(path, { auth = false } = {}) {
 function postJson(path, data, { auth = false } = {}) {
   const headers = { "Content-Type": "application/json" };
   if (auth) headers.Authorization = `Bearer ${getToken() ?? ""}`;
-  return fetch(`${API_BASE}${path}`, {
+  const sep = path.includes("?") ? "&" : "?";
+  return fetch(`${API_BASE}${path}${sep}lang=${getLang()}`, {
     method: "POST",
     headers,
     body: JSON.stringify(data),
@@ -133,6 +134,14 @@ export function requestEmailChange({ newEmail, currentPassword }) {
 
 export function confirmEmailChange(token) {
   return postJson("/account/email/confirm", { token });
+}
+
+export function fetchNotificationPrefs() {
+  return get("/account/notifications", { auth: true }).then((r) => r.data);
+}
+
+export function saveNotificationPrefs(prefs) {
+  return postJson("/account/notifications", prefs, { auth: true });
 }
 
 export function fetchMe() {

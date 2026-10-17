@@ -177,7 +177,10 @@ Route::post('/api/auth/register', function (Request $request) use ($amnahiCors, 
         ['user_id' => $userId, 'meta_key' => 'wp_capabilities', 'meta_value' => serialize(['subscriber' => true])],
         ['user_id' => $userId, 'meta_key' => 'wp_user_level', 'meta_value' => '0'],
         ['user_id' => $userId, 'meta_key' => 'styliiiish_phone', 'meta_value' => (string) ($data['phone'] ?? '')],
+        ['user_id' => $userId, 'meta_key' => 'styliiiish_lang', 'meta_value' => apiRequestLang($request)],
     ]);
+
+    waSendLater($data['phone'] ?? null, 'styliiiish_welcome', [$data['name']], apiRequestLang($request), $userId);
 
     return $amnahiCors(response()->json([
         'token' => $amnahiIssueToken($userId),
@@ -502,8 +505,10 @@ Route::post('/api/amnahi/listings', function (Request $request) use ($amnahiCors
     if ($autoPublish) {
         DB::table('wp_postmeta')->insert(['post_id' => $productId, 'meta_key' => '_styliiiish_amnahi_live_mailed', 'meta_value' => '1']);
         amnahiMailListingLive((int) $user->ID, (int) $productId, (string) $data['title']);
+        waNotifyUser((int) $user->ID, 'styliiiish_listing_live', [$user->display_name, $data['title'], amnahiSiteUrl('/amnahi/' . $productId)]);
     } else {
         amnahiMailListingReceived((int) $user->ID, (int) $productId, (string) $data['title']);
+        waNotifyUser((int) $user->ID, 'styliiiish_listing_received', [$user->display_name, $data['title']]);
     }
 
     return $amnahiCors(response()->json([
@@ -702,6 +707,12 @@ Route::post('/api/amnahi/listings/{id}/interest', function (Request $request, st
             'ar' => ['حد مهتم بفستانك', ($buyer->display_name ?: 'حد') . ' بعتلك رسالة'],
             'en' => ['Someone is interested', ($buyer->display_name ?: 'Someone') . ' sent you a message'],
         ], ['type' => 'chat', 'conversation_id' => $conversationId]);
+        waNotifyUser((int) $sellerId, 'styliiiish_listing_interest', [
+            DB::table('wp_users')->where('ID', $sellerId)->value('display_name'),
+            $buyer->display_name ?: 'حد',
+            DB::table('wp_posts')->where('ID', $id)->value('post_title'),
+            amnahiSiteUrl('/messages/' . $conversationId),
+        ]);
     } catch (\Throwable $e) {
         report($e);
     }

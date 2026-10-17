@@ -121,6 +121,20 @@ return [
     ],
 
     /*
+     | WhatsApp customer messages (routes/whatsapp_helpers.php).
+     | driver: '' = off (default) | 'cloud' = Meta WhatsApp Business Cloud API | 'log' = record only.
+     | mode: 'template' (approved templates – required to message customers first) | 'text'.
+     */
+    'whatsapp' => [
+        'driver' => (string) env('WHATSAPP_DRIVER', ''),
+        'mode' => (string) env('WHATSAPP_MODE', 'template'),
+        'token' => (string) env('WHATSAPP_TOKEN', ''),
+        'phone_number_id' => (string) env('WHATSAPP_PHONE_NUMBER_ID', ''),
+        'api_version' => (string) env('WHATSAPP_API_VERSION', 'v21.0'),
+        'en_code' => (string) env('WHATSAPP_EN_CODE', 'en'),
+    ],
+
+    /*
      | Checkout → WooCommerce order creation.
      |
      | The React storefront builds its own cart client-side, then hands the
