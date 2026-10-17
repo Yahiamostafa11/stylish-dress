@@ -524,3 +524,14 @@ nav.main a.on{color:var(--rose-600);font-weight:600;border-bottom:2px solid var(
 .offer-opt i{font-style:normal;font-size:11px;color:var(--muted-500)}
 .offer-picked{margin:8px 0 0;font-size:14px;color:var(--muted-600)}
 .offer-picked b{color:var(--rose-600);font-size:16px}
+
+/* ---- price chips on product cards (rent / new / used) ---- */
+.p-prices{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 2px}
+.p-price{display:inline-flex;align-items:baseline;gap:5px;padding:6px 13px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--ink-700);line-height:1.2;white-space:nowrap}
+.p-price b{font-size:15.5px;font-weight:700;letter-spacing:.2px}
+.p-price small{font-size:11px;opacity:.8}
+.p-price em{font-style:normal;font-size:11px;font-weight:700;padding-inline-start:7px;margin-inline-start:2px;border-inline-start:1px solid currentColor;opacity:.75}
+.p-rent{background:var(--mint-050);border-color:var(--mint-100);color:var(--mint-700)}
+.p-new{background:var(--rose-100);border-color:var(--rose-300);color:var(--rose-600)}
+.p-used{background:var(--inert);border-color:var(--line);color:var(--ink-700)}
+.p-plain b{color:var(--rose-600)}

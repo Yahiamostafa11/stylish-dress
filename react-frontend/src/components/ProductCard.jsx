@@ -5,12 +5,29 @@ import { useLanguage } from "../context/LanguageContext";
 
 const FALLBACK_GRADIENT = "linear-gradient(200deg,#EFE2E6,#DCCCD4)";
 
+const kindOf = (slug = "") => (slug.startsWith("rent") ? "rent" : slug.startsWith("new") ? "new" : "used");
+const fmt = (n) => Number(n).toLocaleString("en-US", { maximumFractionDigits: 2 });
+
+// One price per kind of offer (rent / new / used): the list API sends {kind, price}, the detail API
+// (used by the wishlist) sends {slug, price, ...} — accept both. Rent first, then cheapest up.
+function priceChips(product) {
+  const best = {};
+  (product.offers ?? []).forEach((o) => {
+    const price = Number(o.price);
+    const kind = o.kind ?? kindOf(o.slug);
+    if (!Number.isFinite(price)) return;
+    if (!best[kind] || price < best[kind].price) best[kind] = { kind, price };
+  });
+  return Object.values(best).sort((a, b) => (a.kind === "rent" ? 0 : 1) - (b.kind === "rent" ? 0 : 1) || a.price - b.price);
+}
+
 export default function ProductCard({ product }) {
   const navigate = useNavigate();
   const { t } = useLanguage();
   const { isFavorite, toggleFavorite } = useFavorites();
   const favored = isFavorite(product.id);
   const goToProduct = () => navigate(`/product/${product.id}`);
+  const chips = priceChips(product);
 
   return (
     <article className="p">
@@ -47,6 +64,24 @@ export default function ProductCard({ product }) {
       <div className="p-body">
         <h4>{product.name}</h4>
         <p>{product.short_description || " "}</p>
+        {(chips.length > 0 || product.price != null) && (
+          <div className="p-prices">
+            {chips.length > 0 ? (
+              chips.map((o) => (
+                <span key={o.kind} className={`p-price p-${o.kind}`}>
+                  <b>{fmt(o.price)}</b>
+                  <small>{t("amnahi.currency")}</small>
+                  <em>{t(`offer.${o.kind}`)}</em>
+                </span>
+              ))
+            ) : (
+              <span className="p-price p-plain">
+                <b>{fmt(product.price)}</b>
+                <small>{t("amnahi.currency")}</small>
+              </span>
+            )}
+          </div>
+        )}
         <div className="p-row">
           <Link className="link-btn" to={`/product/${product.id}`}>{t("product.viewDetails")}</Link>
         </div>

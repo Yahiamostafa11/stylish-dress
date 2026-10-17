@@ -5734,8 +5734,43 @@ Route::get('/api/products', function (Request $request) use ($apiCors, $apiWpBas
 
     $trList = apiProductTranslator($request, $rows->flatMap(fn ($r) => [$r->name, $r->short_description])->all());
 
+    // Every price a card should show: one per kind of offer (rent / new / used), cheapest variation of each.
+    // "Kind" is derived from the condition slug (rent*, new*, everything else = used).
+    $offersByProduct = [];
+    $productIds = $rows->pluck('id')->map(fn ($i) => (int) $i)->all();
+    if ($productIds) {
+        $offerRows = DB::table('wp_posts as v')
+            ->join('wp_postmeta as cond', fn ($j) => $j->on('v.ID', '=', 'cond.post_id')->where('cond.meta_key', 'attribute_pa_product-condition'))
+            ->leftJoin('wp_postmeta as v_price', fn ($j) => $j->on('v.ID', '=', 'v_price.post_id')->where('v_price.meta_key', '_price'))
+            ->leftJoin('wp_postmeta as v_stock', fn ($j) => $j->on('v.ID', '=', 'v_stock.post_id')->where('v_stock.meta_key', '_stock_status'))
+            ->whereIn('v.post_parent', $productIds)
+            ->where('v.post_type', 'product_variation')
+            ->where('v.post_status', 'publish')
+            ->where('cond.meta_value', '!=', '')
+            ->get(['v.post_parent as pid', 'cond.meta_value as cond', 'v_price.meta_value as price', 'v_stock.meta_value as stock']);
+
+        foreach ($offerRows->groupBy('pid') as $pid => $group) {
+            $kinds = [];
+            foreach ($group as $r) {
+                if ($r->price === null || $r->price === '') {
+                    continue;
+                }
+                $kind = str_starts_with($r->cond, 'rent') ? 'rent' : (str_starts_with($r->cond, 'new') ? 'new' : 'used');
+                $inStock = $r->stock !== 'outofstock';
+                $price = (float) $r->price;
+                // prefer in-stock variations; among equals the cheapest
+                if (!isset($kinds[$kind]) || ($inStock && !$kinds[$kind]['in_stock']) || ($inStock === $kinds[$kind]['in_stock'] && $price < $kinds[$kind]['price'])) {
+                    $kinds[$kind] = ['kind' => $kind, 'price' => $price, 'in_stock' => $inStock];
+                }
+            }
+            // Rent first, then cheapest up.
+            uasort($kinds, fn ($x, $y) => [$x['kind'] === 'rent' ? 0 : 1, $x['price']] <=> [$y['kind'] === 'rent' ? 0 : 1, $y['price']]);
+            $offersByProduct[(int) $pid] = array_values($kinds);
+        }
+    }
+
     $rows = $rows
-        ->map(function ($row) use ($apiResolveImage, $wpBaseUrl, $trList) {
+        ->map(function ($row) use ($apiResolveImage, $wpBaseUrl, $trList, $offersByProduct) {
             return [
                 'id' => (int) $row->id,
                 'name' => apiCleanText($trList((string) $row->name)),
@@ -5746,6 +5781,7 @@ Route::get('/api/products', function (Request $request) use ($apiCors, $apiWpBas
                 'sale_price' => $row->sale_price !== null ? (float) $row->sale_price : null,
                 'on_sale' => $row->sale_price !== null && $row->sale_price !== '' && $row->sale_price !== $row->regular_price,
                 'image' => $apiResolveImage($row->image_guid, $row->image_file, $wpBaseUrl),
+                'offers' => $offersByProduct[(int) $row->id] ?? [],
             ];
         })
         ->unique('id')
