@@ -79,8 +79,22 @@ add_action('shutdown', function () {
 
 	foreach (array_unique($queue) as $post_id) {
 		styliiiish_amnahi_send_live_mail($post_id);
+		styliiiish_amnahi_push_live($post_id);
 	}
 }, 0);
+
+/** Tells the Laravel API to push "your dress is live" to the seller's phone (no-op without push set up). */
+function styliiiish_amnahi_push_live($post_id) {
+	if (!defined('STYLIIISH_ORDER_BRIDGE_SECRET') || '' === STYLIIISH_ORDER_BRIDGE_SECRET) {
+		return;
+	}
+	wp_remote_post(home_url('/api/internal/listing-live'), array(
+		'timeout'  => 5,
+		'blocking' => false,
+		'headers'  => array('X-Bridge-Secret' => STYLIIISH_ORDER_BRIDGE_SECRET, 'Accept' => 'application/json'),
+		'body'     => array('post_id' => (int) $post_id),
+	));
+}
 
 function styliiiish_amnahi_send_live_mail($post_id) {
 	$post   = get_post($post_id);

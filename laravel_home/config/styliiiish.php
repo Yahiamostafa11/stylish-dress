@@ -101,6 +101,26 @@ return [
     ],
 
     /*
+     | Mobile app (routes/mobile.php).
+     |
+     | min_version: apps older than this are told to update (hard gate).
+     | push: FCM HTTP v1 — set FIREBASE_SERVICE_ACCOUNT_JSON to the service-account JSON file
+     | path (or the raw JSON). Without it push sending is a silent no-op.
+     */
+    'mobile' => [
+        'min_version' => (string) env('MOBILE_MIN_VERSION', '1.0.0'),
+        'latest_version' => (string) env('MOBILE_LATEST_VERSION', '1.0.0'),
+        'android_url' => (string) env('MOBILE_ANDROID_URL', ''),
+        'ios_url' => (string) env('MOBILE_IOS_URL', ''),
+        'maintenance' => filter_var(env('MOBILE_MAINTENANCE', false), FILTER_VALIDATE_BOOL),
+        'whatsapp' => (string) env('MOBILE_WHATSAPP', ''),
+        'instagram' => (string) env('MOBILE_INSTAGRAM', ''),
+        'facebook' => (string) env('MOBILE_FACEBOOK', ''),
+        'tiktok' => (string) env('MOBILE_TIKTOK', ''),
+        'push_service_account' => (string) env('FIREBASE_SERVICE_ACCOUNT_JSON', ''),
+    ],
+
+    /*
      | Checkout → WooCommerce order creation.
      |
      | The React storefront builds its own cart client-side, then hands the

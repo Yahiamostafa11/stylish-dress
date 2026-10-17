@@ -5598,7 +5598,7 @@ if (!function_exists('apiProductTranslator')) {
     function apiProductTranslator(Request $request, array $texts): callable
     {
         $map = [];
-        if (strtolower((string) $request->query('lang', '')) === 'ar' && Schema::hasTable('wp_trp_dictionary_en_us_ar')) {
+        if (apiRequestLang($request) === 'ar' && Schema::hasTable('wp_trp_dictionary_en_us_ar')) {
             $lookup = collect($texts)->map(fn ($t) => trim((string) $t))->filter()->unique()->values()->all();
             foreach (array_chunk($lookup, 200) as $chunk) {
                 DB::table('wp_trp_dictionary_en_us_ar')
@@ -5650,7 +5650,7 @@ Route::get('/api/products', function (Request $request) use ($apiCors, $apiWpBas
     $size = trim((string) $request->query('size', ''));
     $minPrice = $request->query('min_price');
     $maxPrice = $request->query('max_price');
-    $limit = max(1, min(100, (int) $request->query('limit', 40)));
+    [$page, $perPage, $offset] = apiPageParams($request, 40, 100);
 
     $query = DB::table('wp_posts as p')
         ->leftJoin('wp_postmeta as price', fn ($j) => $j->on('p.ID', '=', 'price.post_id')->where('price.meta_key', '_price'))
@@ -5659,6 +5659,7 @@ Route::get('/api/products', function (Request $request) use ($apiCors, $apiWpBas
         ->leftJoin('wp_postmeta as thumb', fn ($j) => $j->on('p.ID', '=', 'thumb.post_id')->where('thumb.meta_key', '_thumbnail_id'))
         ->leftJoin('wp_posts as img', 'thumb.meta_value', '=', 'img.ID')
         ->leftJoin('wp_postmeta as img_file', fn ($j) => $j->on('img.ID', '=', 'img_file.post_id')->where('img_file.meta_key', '_wp_attached_file'))
+        ->leftJoin('wp_postmeta as img_meta', fn ($j) => $j->on('img.ID', '=', 'img_meta.post_id')->where('img_meta.meta_key', '_wp_attachment_metadata'))
         ->where('p.post_type', 'product')
         ->where('p.post_status', 'publish')
         ->whereNotExists(function ($sub) {
@@ -5716,9 +5717,13 @@ Route::get('/api/products', function (Request $request) use ($apiCors, $apiWpBas
         }
     }
 
+    $total = (clone $query)->distinct()->count('p.ID');
+
     $rows = $query
         ->orderBy('p.post_date', 'desc')
-        ->limit($limit)
+        ->orderBy('p.ID', 'desc')
+        ->offset($offset)
+        ->limit($perPage)
         ->select(
             'p.ID as id',
             'p.post_title as name',
@@ -5728,7 +5733,8 @@ Route::get('/api/products', function (Request $request) use ($apiCors, $apiWpBas
             'regular.meta_value as regular_price',
             'sale.meta_value as sale_price',
             'img.guid as image_guid',
-            'img_file.meta_value as image_file'
+            'img_file.meta_value as image_file',
+            'img_meta.meta_value as image_meta'
         )
         ->get();
 
@@ -5781,13 +5787,14 @@ Route::get('/api/products', function (Request $request) use ($apiCors, $apiWpBas
                 'sale_price' => $row->sale_price !== null ? (float) $row->sale_price : null,
                 'on_sale' => $row->sale_price !== null && $row->sale_price !== '' && $row->sale_price !== $row->regular_price,
                 'image' => $apiResolveImage($row->image_guid, $row->image_file, $wpBaseUrl),
+                'image_thumb' => apiThumbUrl($row->image_meta, $row->image_file, $wpBaseUrl),
                 'offers' => $offersByProduct[(int) $row->id] ?? [],
             ];
         })
         ->unique('id')
         ->values();
 
-    return $apiCors(response()->json(['data' => $rows]));
+    return $apiCors(response()->json(['data' => $rows, 'meta' => apiPageMeta($page, $perPage, $total)]));
 });
 
 // Dress-type categories for the Shop page's filter pills (e.g. "Bridesmaids'
@@ -6045,6 +6052,7 @@ Route::get('/api/products/{id}', function (Request $request, string $id) use ($a
 });
 
 require __DIR__ . '/amnahi.php';
+require __DIR__ . '/mobile.php';
 require __DIR__ . '/checkout.php';
 require __DIR__ . '/reviews.php';
 

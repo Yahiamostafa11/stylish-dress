@@ -513,19 +513,26 @@ Route::post('/api/amnahi/listings', function (Request $request) use ($amnahiCors
 
 Route::get('/api/amnahi/listings', function (Request $request) use ($amnahiScope, $amnahiCors, $amnahiResolveImage, $amnahiWpBaseUrl) {
     $wpBaseUrl = $amnahiWpBaseUrl($request);
-    $limit = max(1, min(60, (int) $request->query('limit', 30)));
+    [$page, $perPage, $offset] = apiPageParams($request, 30, 60);
 
-    $rows = DB::table('wp_posts as p')
+    $base = DB::table('wp_posts as p')
         ->where($amnahiScope)
         ->leftJoin('wp_postmeta as price', fn ($j) => $j->on('p.ID', '=', 'price.post_id')->where('price.meta_key', '_price'))
         ->leftJoin('wp_postmeta as thumb', fn ($j) => $j->on('p.ID', '=', 'thumb.post_id')->where('thumb.meta_key', '_thumbnail_id'))
         ->leftJoin('wp_posts as img', 'thumb.meta_value', '=', 'img.ID')
         ->leftJoin('wp_postmeta as img_file', fn ($j) => $j->on('img.ID', '=', 'img_file.post_id')->where('img_file.meta_key', '_wp_attached_file'))
+        ->leftJoin('wp_postmeta as img_meta', fn ($j) => $j->on('img.ID', '=', 'img_meta.post_id')->where('img_meta.meta_key', '_wp_attachment_metadata'))
         ->leftJoin('wp_users as u', 'u.ID', '=', 'p.post_author')
         ->where('p.post_type', 'product')
-        ->where('p.post_status', 'publish')
+        ->where('p.post_status', 'publish');
+
+    $total = (clone $base)->distinct()->count('p.ID');
+
+    $rows = $base
         ->orderBy('p.post_date', 'desc')
-        ->limit($limit)
+        ->orderBy('p.ID', 'desc')
+        ->offset($offset)
+        ->limit($perPage)
         ->select(
             'p.ID as id',
             'p.post_title as name',
@@ -533,6 +540,7 @@ Route::get('/api/amnahi/listings', function (Request $request) use ($amnahiScope
             'price.meta_value as price',
             'img.guid as image_guid',
             'img_file.meta_value as image_file',
+            'img_meta.meta_value as image_meta',
             'u.display_name as seller_name'
         )
         ->get()
@@ -542,12 +550,13 @@ Route::get('/api/amnahi/listings', function (Request $request) use ($amnahiScope
             'short_description' => trim((string) $row->short_description),
             'price' => $row->price !== null ? (float) $row->price : null,
             'image' => $amnahiResolveImage($row->image_guid, $row->image_file, $wpBaseUrl),
+            'image_thumb' => apiThumbUrl($row->image_meta, $row->image_file, $wpBaseUrl),
             'seller_name' => (string) $row->seller_name,
         ])
         ->unique('id')
         ->values();
 
-    return $amnahiCors(response()->json(['data' => $rows]));
+    return $amnahiCors(response()->json(['data' => $rows, 'meta' => apiPageMeta($page, $perPage, $total)]));
 });
 
 Route::get('/api/amnahi/mine', function (Request $request) use ($amnahiScope, $amnahiCors, $amnahiAuthUser, $amnahiResolveImage, $amnahiWpBaseUrl) {
@@ -689,6 +698,10 @@ Route::post('/api/amnahi/listings/{id}/interest', function (Request $request, st
 
     try {
         amnahiMailNewMessage((int) $sellerId, (int) $buyer->ID, (int) $id, (int) $conversationId, true);
+        mobilePushLater((int) $sellerId, [
+            'ar' => ['حد مهتم بفستانك', ($buyer->display_name ?: 'حد') . ' بعتلك رسالة'],
+            'en' => ['Someone is interested', ($buyer->display_name ?: 'Someone') . ' sent you a message'],
+        ], ['type' => 'chat', 'conversation_id' => $conversationId]);
     } catch (\Throwable $e) {
         report($e);
     }
@@ -702,10 +715,14 @@ Route::get('/api/conversations', function (Request $request) use ($amnahiCors, $
         return $amnahiCors(response()->json(['message' => 'Unauthorized'], 401));
     }
 
+    [$page, $perPage, $offset] = apiPageParams($request, 30, 100);
+    $mine = fn ($q) => $q->where('c.buyer_user_id', $user->ID)->orWhere('c.seller_user_id', $user->ID);
+    $total = DB::table('chat_conversations as c')->where($mine)->count();
     $rows = DB::table('chat_conversations as c')
-        ->where('c.buyer_user_id', $user->ID)
-        ->orWhere('c.seller_user_id', $user->ID)
+        ->where($mine)
         ->orderBy('c.updated_at', 'desc')
+        ->offset($offset)
+        ->limit($perPage)
         ->get();
 
     $data = $rows->map(function ($c) use ($user) {
@@ -721,7 +738,7 @@ Route::get('/api/conversations', function (Request $request) use ($amnahiCors, $
         ];
     });
 
-    return $amnahiCors(response()->json(['data' => $data]));
+    return $amnahiCors(response()->json(['data' => $data, 'meta' => apiPageMeta($page, $perPage, $total)]));
 });
 
 Route::get('/api/conversations/{id}/messages', function (Request $request, string $id) use ($amnahiCors, $amnahiAuthUser) {
@@ -772,6 +789,11 @@ Route::post('/api/conversations/{id}/messages', function (Request $request, stri
             ? (int) $conversation->seller_user_id
             : (int) $conversation->buyer_user_id;
         amnahiMailNewMessage($recipientId, (int) $user->ID, (int) $conversation->listing_id, (int) $id);
+        $preview = Str::limit(trim($data['body']), 100);
+        mobilePushLater($recipientId, [
+            'ar' => [$user->display_name ?: 'رسالة جديدة', $preview],
+            'en' => [$user->display_name ?: 'New message', $preview],
+        ], ['type' => 'chat', 'conversation_id' => $id]);
     } catch (\Throwable $e) {
         report($e);
     }

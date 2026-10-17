@@ -24,7 +24,19 @@ function detectFromBrowser() {
 }
 
 export function LanguageProvider({ children }) {
-  const [lang, setLangState] = useState(() => readStoredLang() || "ar");
+  // ?lang=ar|en (used by the mobile app's WebViews) wins over everything and is remembered.
+  const [lang, setLangState] = useState(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get("lang");
+    if (fromUrl === "ar" || fromUrl === "en") {
+      try {
+        localStorage.setItem(LANG_KEY, fromUrl);
+      } catch {
+        /* storage unavailable */
+      }
+      return fromUrl;
+    }
+    return readStoredLang() || "ar";
+  });
 
   useEffect(() => {
     if (readStoredLang()) return; // manual/previous choice always wins
