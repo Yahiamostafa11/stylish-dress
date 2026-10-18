@@ -55,6 +55,8 @@
 
 ## اللي محتاج منك / من العميلة
 
+0. **GitHub (ريبو الموقع):** التوكن (PAT) اللي في إعدادات الـ remote بتاع `Yahiamostafa11/stylish-dress` بقى مرفوض (`401`)، فآخر 3 commits عندي **محلية ومش مرفوعة ولا متنشرة على السيرفر**: إصلاح نص الخطأ "المنفذ 8000" + هذا التقرير. جدّد التوكن (أو سجّل دخول GitHub) وبعدها `git push` وأعمل pull على السيرفر. (ريبو التطبيق اترفع عادي.)
+
 1. **Firebase للإشعارات:** تعمل مشروع Firebase، تدّيني `google-services.json` (أندرويد) و`GoogleService-Info.plist` (iOS) وملف الـ service account، وأنا أوصّلهم (الباك اند جاهز).
 2. **واتساب:** رقم Business + توكن Meta + الموافقة على 5 templates (نصوصها في `whatsapp_helpers.php`).
 3. **روابط السوشيال والواتساب** لصفحة التواصل (`MOBILE_WHATSAPP`, `MOBILE_INSTAGRAM`… في `.env`).
