@@ -62,7 +62,7 @@ export const translations = {
     "home.latestTitle": "أحدث الفساتين",
     "home.viewAll": "عرض كل الفساتين ←",
     "home.loading": "جاري تحميل الفساتين...",
-    "home.error": "تعذر تحميل الفساتين الآن — تأكدي أن السيرفر شغال على المنفذ 8000",
+    "home.error": "تعذر تحميل الفساتين الآن، جربي تاني بعد شوية",
 
     // brand story
     "story.eyebrow": "من إحنا",
@@ -107,7 +107,7 @@ export const translations = {
     "category.customMadeDresses": "فساتين مصممة حسب الطلب",
     "catalog.search": "بحث",
     "catalog.loading": "جاري تحميل الفساتين...",
-    "catalog.error": "تعذر تحميل الفساتين الآن — تأكدي أن السيرفر شغال على المنفذ 8000",
+    "catalog.error": "تعذر تحميل الفساتين الآن، جربي تاني بعد شوية",
     "catalog.empty": "مفيش فساتين مطابقة للبحث — جربي كلمة تانية.",
 
     // discovery popup
@@ -360,7 +360,7 @@ export const translations = {
     "checkout.emptyCart": "سلتك فاضية — ضيفي فستان الأول",
     "checkout.redirecting": "بنحولك لصفحة الدفع الآمنة...",
     "measurements.loading": "جاري تحميل الفستان...",
-    "measurements.error": "تعذر تحميل بيانات الفستان — تأكدي أن السيرفر شغال على المنفذ 8000",
+    "measurements.error": "تعذر تحميل بيانات الفستان، جربي تاني بعد شوية",
     "measurements.field.chest": "محيط الصدر",
     "measurements.field.waist": "محيط الوسط",
     "measurements.field.hips": "محيط الأرداف",
@@ -797,7 +797,7 @@ export const translations = {
     "home.latestTitle": "Latest Dresses",
     "home.viewAll": "View All Dresses →",
     "home.loading": "Loading dresses...",
-    "home.error": "Couldn't load dresses right now — make sure the server is running on port 8000",
+    "home.error": "Couldn't load dresses right now, please try again in a moment",
 
     // brand story
     "story.eyebrow": "",
@@ -842,7 +842,7 @@ export const translations = {
     "category.customMadeDresses": "Custom-Made Dresses",
     "catalog.search": "Search",
     "catalog.loading": "Loading dresses...",
-    "catalog.error": "Couldn't load dresses right now — make sure the server is running on port 8000",
+    "catalog.error": "Couldn't load dresses right now, please try again in a moment",
     "catalog.empty": "No dresses match your search — try another word.",
 
     // discovery popup
@@ -1095,7 +1095,7 @@ export const translations = {
     "checkout.emptyCart": "Your cart is empty — add a dress first",
     "checkout.redirecting": "Redirecting you to secure payment...",
     "measurements.loading": "Loading dress...",
-    "measurements.error": "Couldn't load dress data — make sure the server is running on port 8000",
+    "measurements.error": "Couldn't load dress data, please try again in a moment",
     "measurements.field.chest": "Chest",
     "measurements.field.waist": "Waist",
     "measurements.field.hips": "Hips",
