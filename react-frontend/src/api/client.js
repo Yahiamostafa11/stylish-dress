@@ -192,6 +192,11 @@ export function expressInterest(listingId) {
 
 // ---- reviews ----
 
+// Contact-us form → emailed to the team (Reply-To = visitor email when given).
+export function submitContact({ name, contact, message }) {
+  return postJson("/contact", { name, contact, message });
+}
+
 export function submitReview({ name, message }) {
   return postJson("/reviews", { name, message });
 }

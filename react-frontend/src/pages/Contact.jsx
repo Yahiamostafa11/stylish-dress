@@ -1,5 +1,6 @@
 import { CONTACT_EMAIL } from "../config/site";
 import { useState } from "react";
+import { submitContact } from "../api/client";
 import { useLanguage } from "../context/LanguageContext";
 
 const CONTACT_KEYS = [
@@ -35,14 +36,25 @@ const CONTACT_KEYS = [
 
 export default function Contact() {
   const { t } = useLanguage();
-  const [form, setForm] = useState({ name: "", message: "" });
+  const [form, setForm] = useState({ name: "", contact: "", message: "" });
   const [sent, setSent] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
 
   const setField = (key, value) => setForm((f) => ({ ...f, [key]: value }));
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-    setSent(true);
+    setBusy(true);
+    setError("");
+    try {
+      await submitContact(form);
+      setSent(true);
+    } catch (err) {
+      setError(err.message || t("reviews.errorMsg"));
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -76,10 +88,15 @@ export default function Contact() {
                 <input required value={form.name} onChange={(e) => setField("name", e.target.value)} />
               </div>
               <div className="field" style={{ marginBottom: 16 }}>
+                <label><i>*</i>{t("contact.contactLabel")}</label>
+                <input required value={form.contact} onChange={(e) => setField("contact", e.target.value)} />
+              </div>
+              <div className="field" style={{ marginBottom: 16 }}>
                 <label><i>*</i>{t("contact.messageLabel")}</label>
                 <textarea required value={form.message} onChange={(e) => setField("message", e.target.value)} />
               </div>
-              <button className="btn btn-rose" style={{ width: "100%" }} type="submit">{t("contact.submit")}</button>
+              {error && <p style={{ color: "var(--rose-600)", fontSize: 12.5, margin: "0 0 12px" }}>{error}</p>}
+              <button className="btn btn-rose" style={{ width: "100%" }} type="submit" disabled={busy}>{t("contact.submit")}</button>
             </form>
           )}
         </div>
