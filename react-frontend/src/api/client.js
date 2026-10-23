@@ -64,8 +64,9 @@ function postForm(path, formData, { auth = false } = {}) {
 // ---- catalog ----
 
 // With `page` it returns { items, meta } (meta.has_more tells whether another page exists); without it, just the list.
-export function fetchProducts({ search = "", category = "", size = "", minPrice = "", maxPrice = "", limit = 40, page = 0 } = {}) {
+export function fetchProducts({ search = "", category = "", size = "", minPrice = "", maxPrice = "", limit = 40, page = 0, offer = "" } = {}) {
   const params = new URLSearchParams();
+  if (offer) params.set("offer", offer);
   if (search) params.set("search", search);
   if (category) params.set("category", category);
   if (size) params.set("size", size);

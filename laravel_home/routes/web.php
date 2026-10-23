@@ -5698,6 +5698,26 @@ Route::get('/api/products', function (Request $request) use ($apiCors, $apiWpBas
         });
     }
 
+    // ?offer=rent|new|used – only dresses that can be got that way (Rent page, Marketplace page).
+    $offer = strtolower(trim((string) $request->query('offer', '')));
+    if (in_array($offer, ['rent', 'new', 'used'], true)) {
+        $query->whereExists(function ($sub) use ($offer) {
+            $sub->select(DB::raw(1))
+                ->from('wp_posts as ov')
+                ->join('wp_postmeta as oc', fn ($j) => $j->on('ov.ID', '=', 'oc.post_id')->where('oc.meta_key', 'attribute_pa_product-condition'))
+                ->whereColumn('ov.post_parent', 'p.ID')
+                ->where('ov.post_type', 'product_variation')
+                ->where('ov.post_status', 'publish');
+            if ($offer === 'rent') {
+                $sub->where('oc.meta_value', 'like', 'rent%');
+            } elseif ($offer === 'new') {
+                $sub->where('oc.meta_value', 'like', 'new%');
+            } else {
+                $sub->where('oc.meta_value', '!=', '')->where('oc.meta_value', 'not like', 'rent%')->where('oc.meta_value', 'not like', 'new%');
+            }
+        });
+    }
+
     // pa_size is a global WooCommerce attribute, so WordPress attaches its
     // terms to the parent product (not just the variation) the same way
     // product_cat is — the storefront's native attribute-filter widget

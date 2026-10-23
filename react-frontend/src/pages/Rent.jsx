@@ -6,6 +6,7 @@ export default function Rent() {
       eyebrowKey="rent.eyebrow"
       titleKey="rent.title"
       subtitleKey="rent.subtitle"
+      offer="rent"
     />
   );
 }

@@ -6,6 +6,7 @@ export default function Marketplace() {
       eyebrowKey="marketplace.eyebrow"
       titleKey="marketplace.title"
       subtitleKey="marketplace.subtitle"
+      offer="used"
     />
   );
 }

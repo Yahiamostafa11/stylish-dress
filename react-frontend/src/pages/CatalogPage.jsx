@@ -6,7 +6,7 @@ import CategoryPills from "../components/CategoryPills";
 import Reveal from "../components/Reveal";
 import { useLanguage } from "../context/LanguageContext";
 
-export default function CatalogPage({ eyebrowKey, titleKey, subtitleKey, limit = 60, showCategories = false }) {
+export default function CatalogPage({ eyebrowKey, titleKey, subtitleKey, limit = 60, showCategories = false, offer = "" }) {
   const { t, lang } = useLanguage();
   const [params, setParams] = useSearchParams();
   const urlSearch = params.get("search") || "";
@@ -30,7 +30,7 @@ export default function CatalogPage({ eyebrowKey, titleKey, subtitleKey, limit =
     let cancelled = false;
     setStatus("loading");
     setPage(1);
-    fetchProducts({ search: urlSearch, category: urlCategory, size: urlSize, minPrice: urlMinPrice, maxPrice: urlMaxPrice, limit, page: 1 })
+    fetchProducts({ search: urlSearch, category: urlCategory, size: urlSize, minPrice: urlMinPrice, maxPrice: urlMaxPrice, limit, page: 1, offer })
       .then(({ items, meta }) => {
         if (!cancelled) {
           setProducts(items);
@@ -44,12 +44,12 @@ export default function CatalogPage({ eyebrowKey, titleKey, subtitleKey, limit =
     return () => {
       cancelled = true;
     };
-  }, [urlSearch, urlCategory, urlSize, urlMinPrice, urlMaxPrice, limit, lang]);
+  }, [urlSearch, urlCategory, urlSize, urlMinPrice, urlMaxPrice, limit, lang, offer]);
 
   const loadMore = () => {
     const next = page + 1;
     setLoadingMore(true);
-    fetchProducts({ search: urlSearch, category: urlCategory, size: urlSize, minPrice: urlMinPrice, maxPrice: urlMaxPrice, limit, page: next })
+    fetchProducts({ search: urlSearch, category: urlCategory, size: urlSize, minPrice: urlMinPrice, maxPrice: urlMaxPrice, limit, page: next, offer })
       .then(({ items, meta }) => {
         setProducts((prev) => {
           const seen = new Set(prev.map((p) => p.id));
