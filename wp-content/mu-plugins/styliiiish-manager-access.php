@@ -75,6 +75,21 @@ add_filter('do_shortcode_tag', function ($output, $tag) {
 		$target = get_permalink($queried);
 	}
 
+	// Jetpack's brute-force protection asks for a small sum on every login. If the form comes without the answer it
+	// shows an in-between page and the person has to log in all over again (and loses the "return to the dashboard"
+	// part), so the question is part of this form.
+	$math = '';
+	$jp   = '\\Automattic\\Jetpack\\Waf\\Brute_Force_Protection\\Brute_Force_Protection_Math_Authenticate';
+	if (class_exists($jp) && is_callable(array($jp, 'math_form'))) {
+		ob_start();
+		call_user_func(array($jp, 'math_form'));
+		$math = (string) ob_get_clean();
+	}
+	$add_math = static function ($html) use ($math) {
+		return $html . $math;
+	};
+	add_filter('login_form_middle', $add_math);
+
 	$form = wp_login_form(array(
 		'echo'           => false,
 		'redirect'       => $target,
@@ -85,6 +100,7 @@ add_filter('do_shortcode_tag', function ($output, $tag) {
 		'label_log_in'   => $ar ? 'دخول' : 'Log in',
 		'remember'       => true,
 	));
+	remove_filter('login_form_middle', $add_math);
 
 	return '<div class="sty-od-login"><h2>' . ($ar ? 'دخول لوحة التحكم' : 'Sign in to the dashboard') . '</h2>' . $form . '</div>';
 }, 10, 2);
