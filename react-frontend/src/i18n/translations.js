@@ -108,6 +108,7 @@ export const translations = {
     "category.customMadeDresses": "فساتين مصممة حسب الطلب",
     "catalog.search": "بحث",
     "catalog.loading": "جاري تحميل الفساتين...",
+    "catalog.loadMore": "عرض المزيد",
     "catalog.error": "تعذر تحميل الفساتين الآن، جربي تاني بعد شوية",
     "catalog.empty": "مفيش فساتين مطابقة للبحث — جربي كلمة تانية.",
 
@@ -844,6 +845,7 @@ export const translations = {
     "category.customMadeDresses": "Custom-Made Dresses",
     "catalog.search": "Search",
     "catalog.loading": "Loading dresses...",
+    "catalog.loadMore": "Load more",
     "catalog.error": "Couldn't load dresses right now, please try again in a moment",
     "catalog.empty": "No dresses match your search — try another word.",
 

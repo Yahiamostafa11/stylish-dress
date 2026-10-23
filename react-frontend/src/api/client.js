@@ -63,7 +63,8 @@ function postForm(path, formData, { auth = false } = {}) {
 
 // ---- catalog ----
 
-export function fetchProducts({ search = "", category = "", size = "", minPrice = "", maxPrice = "", limit = 40 } = {}) {
+// With `page` it returns { items, meta } (meta.has_more tells whether another page exists); without it, just the list.
+export function fetchProducts({ search = "", category = "", size = "", minPrice = "", maxPrice = "", limit = 40, page = 0 } = {}) {
   const params = new URLSearchParams();
   if (search) params.set("search", search);
   if (category) params.set("category", category);
@@ -71,7 +72,8 @@ export function fetchProducts({ search = "", category = "", size = "", minPrice 
   if (minPrice) params.set("min_price", String(minPrice));
   if (maxPrice) params.set("max_price", String(maxPrice));
   if (limit) params.set("limit", String(limit));
-  return get(`/products?${params.toString()}`).then((r) => r.data);
+  if (page) params.set("page", String(page));
+  return get(`/products?${params.toString()}`).then((r) => (page ? { items: r.data, meta: r.meta } : r.data));
 }
 
 export function fetchSizes() {
@@ -158,10 +160,11 @@ export function fetchMe() {
 
 // ---- amnahi ----
 
-export function fetchAmnahiListings({ limit = 30 } = {}) {
+export function fetchAmnahiListings({ limit = 30, page = 0 } = {}) {
   const params = new URLSearchParams();
   if (limit) params.set("limit", String(limit));
-  return get(`/amnahi/listings?${params.toString()}`).then((r) => r.data);
+  if (page) params.set("page", String(page));
+  return get(`/amnahi/listings?${params.toString()}`).then((r) => (page ? { items: r.data, meta: r.meta } : r.data));
 }
 
 export function fetchAmnahiListing(id) {

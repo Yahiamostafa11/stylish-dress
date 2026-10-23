@@ -18,6 +18,9 @@ export default function CatalogPage({ eyebrowKey, titleKey, subtitleKey, limit =
   const [search, setSearch] = useState(urlSearch);
   const [products, setProducts] = useState([]);
   const [status, setStatus] = useState("loading");
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
     setSearch(urlSearch);
@@ -26,10 +29,12 @@ export default function CatalogPage({ eyebrowKey, titleKey, subtitleKey, limit =
   useEffect(() => {
     let cancelled = false;
     setStatus("loading");
-    fetchProducts({ search: urlSearch, category: urlCategory, size: urlSize, minPrice: urlMinPrice, maxPrice: urlMaxPrice, limit })
-      .then((data) => {
+    setPage(1);
+    fetchProducts({ search: urlSearch, category: urlCategory, size: urlSize, minPrice: urlMinPrice, maxPrice: urlMaxPrice, limit, page: 1 })
+      .then(({ items, meta }) => {
         if (!cancelled) {
-          setProducts(data);
+          setProducts(items);
+          setHasMore(Boolean(meta?.has_more));
           setStatus("ready");
         }
       })
@@ -40,6 +45,22 @@ export default function CatalogPage({ eyebrowKey, titleKey, subtitleKey, limit =
       cancelled = true;
     };
   }, [urlSearch, urlCategory, urlSize, urlMinPrice, urlMaxPrice, limit, lang]);
+
+  const loadMore = () => {
+    const next = page + 1;
+    setLoadingMore(true);
+    fetchProducts({ search: urlSearch, category: urlCategory, size: urlSize, minPrice: urlMinPrice, maxPrice: urlMaxPrice, limit, page: next })
+      .then(({ items, meta }) => {
+        setProducts((prev) => {
+          const seen = new Set(prev.map((p) => p.id));
+          return [...prev, ...items.filter((p) => !seen.has(p.id))];
+        });
+        setPage(next);
+        setHasMore(Boolean(meta?.has_more));
+      })
+      .catch(() => {})
+      .finally(() => setLoadingMore(false));
+  };
 
   const discoveryParams = () => {
     const next = {};
@@ -112,6 +133,14 @@ export default function CatalogPage({ eyebrowKey, titleKey, subtitleKey, limit =
             </Reveal>
           ))}
         </section>
+      )}
+
+      {status === "ready" && hasMore && (
+        <div style={{ textAlign: "center", margin: "8px 0 40px" }}>
+          <button className="btn btn-rose" type="button" onClick={loadMore} disabled={loadingMore}>
+            {loadingMore ? t("catalog.loading") : t("catalog.loadMore")}
+          </button>
+        </div>
       )}
     </div>
   );

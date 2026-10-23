@@ -13,13 +13,17 @@ function AmnahiGrid() {
   const { t } = useLanguage();
   const [listings, setListings] = useState([]);
   const [status, setStatus] = useState("loading");
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
-    fetchAmnahiListings({ limit: 40 })
-      .then((data) => {
+    fetchAmnahiListings({ limit: 40, page: 1 })
+      .then(({ items, meta }) => {
         if (!cancelled) {
-          setListings(data);
+          setListings(items);
+          setHasMore(Boolean(meta?.has_more));
           setStatus("ready");
         }
       })
@@ -30,6 +34,22 @@ function AmnahiGrid() {
       cancelled = true;
     };
   }, []);
+
+  const loadMore = () => {
+    const next = page + 1;
+    setLoadingMore(true);
+    fetchAmnahiListings({ limit: 40, page: next })
+      .then(({ items, meta }) => {
+        setListings((prev) => {
+          const seen = new Set(prev.map((l) => l.id));
+          return [...prev, ...items.filter((l) => !seen.has(l.id))];
+        });
+        setPage(next);
+        setHasMore(Boolean(meta?.has_more));
+      })
+      .catch(() => {})
+      .finally(() => setLoadingMore(false));
+  };
 
   return (
     <>
@@ -47,6 +67,14 @@ function AmnahiGrid() {
             </Reveal>
           ))}
         </section>
+      )}
+
+      {status === "ready" && hasMore && (
+        <div style={{ textAlign: "center", margin: "8px 0 24px" }}>
+          <button className="btn btn-rose" type="button" onClick={loadMore} disabled={loadingMore}>
+            {loadingMore ? t("amnahi.loading") : t("catalog.loadMore")}
+          </button>
+        </div>
       )}
     </>
   );
