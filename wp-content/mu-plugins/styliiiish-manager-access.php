@@ -30,20 +30,54 @@ function styliiiish_is_dashboard_user($user_id) {
 	return user_can($user_id, 'manage_options');
 }
 
-// Sign-in from My Account (WooCommerce form) → the storefront home.
+// Sign-in from My Account (WooCommerce form) → the storefront home. A form that asked for a specific page
+// (anything other than the default My Account address) keeps that page.
 add_filter('woocommerce_login_redirect', function ($redirect, $user) {
-	if ($user instanceof WP_User && styliiiish_is_dashboard_user($user->ID)) {
-		return home_url('/');
+	if (!($user instanceof WP_User) || !styliiiish_is_dashboard_user($user->ID)) {
+		return $redirect;
+	}
+	$account = function_exists('wc_get_page_permalink') ? wc_get_page_permalink('myaccount') : '';
+	if ($account !== '' && untrailingslashit((string) $redirect) !== untrailingslashit($account)) {
+		return $redirect;
 	}
 
-	return $redirect;
+	return home_url('/');
 }, 20, 2);
 
-// Sign-in through the plain WordPress login screen behaves the same for them.
+// Sign-in through the plain WordPress login screen: same, unless a return page was requested
+// (the owner-dashboard login form below always asks to come back to the dashboard).
 add_filter('login_redirect', function ($redirect_to, $requested, $user) {
-	if ($user instanceof WP_User && styliiiish_is_dashboard_user($user->ID)) {
+	if ($user instanceof WP_User && styliiiish_is_dashboard_user($user->ID) && empty($requested)) {
 		return home_url('/');
 	}
 
 	return $redirect_to;
 }, 20, 3);
+
+// /owner-dashboard/ for someone who is signed out: a login form that brings them straight back to the dashboard
+// (instead of the plain "Please log in" line).
+add_filter('do_shortcode_tag', function ($output, $tag) {
+	if ($tag !== 'owner_dashboard' || is_user_logged_in()) {
+		return $output;
+	}
+
+	$ar     = is_rtl();
+	$target = home_url('/owner-dashboard/');
+	$queried = get_queried_object_id();
+	if ($queried && get_permalink($queried)) {
+		$target = get_permalink($queried);
+	}
+
+	$form = wp_login_form(array(
+		'echo'           => false,
+		'redirect'       => $target,
+		'form_id'        => 'sty-od-loginform',
+		'label_username' => $ar ? 'الإيميل أو اسم المستخدم' : 'Email or username',
+		'label_password' => $ar ? 'كلمة المرور' : 'Password',
+		'label_remember' => $ar ? 'فكّرني' : 'Remember me',
+		'label_log_in'   => $ar ? 'دخول' : 'Log in',
+		'remember'       => true,
+	));
+
+	return '<div class="sty-od-login"><h2>' . ($ar ? 'دخول لوحة التحكم' : 'Sign in to the dashboard') . '</h2>' . $form . '</div>';
+}, 10, 2);
