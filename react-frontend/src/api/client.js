@@ -144,6 +144,14 @@ export function saveNotificationPrefs(prefs) {
   return postJson("/account/notifications", prefs, { auth: true });
 }
 
+// True when the visitor is signed in to WordPress as the owner / a manager (same-domain cookie; never throws).
+export function fetchManagerSession() {
+  return fetch("/sty-session.php", { credentials: "same-origin", cache: "no-store" })
+    .then((res) => (res.ok ? res.json() : { manager: false }))
+    .then((data) => data?.manager === true)
+    .catch(() => false);
+}
+
 export function fetchMe() {
   return get("/auth/me", { auth: true }).then((r) => r.user);
 }

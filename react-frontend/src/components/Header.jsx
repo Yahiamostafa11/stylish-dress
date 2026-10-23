@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useFavorites } from "../context/FavoritesContext";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
+import { fetchManagerSession } from "../api/client";
 
 const NAV = [
   { href: "/", key: "nav.home" },
@@ -24,6 +25,18 @@ export default function Header() {
   const { isAuthed, user } = useAuth();
   const { t, lang, toggleLang } = useLanguage();
   const [search, setSearch] = useState("");
+  // The owner / managers sign in through WordPress (My Account); when that session exists show a shortcut to their dashboard.
+  const [isManager, setIsManager] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchManagerSession().then((ok) => {
+      if (!cancelled) setIsManager(ok);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const submitSearch = (e) => {
     e.preventDefault();
@@ -64,6 +77,12 @@ export default function Header() {
         </nav>
 
         <div className="icons">
+          {isManager && (
+            <a href="/owner-dashboard/" className="dash-chip">
+              {t("header.dashboard")}
+            </a>
+          )}
+
           <button type="button" onClick={toggleLang} className="lang-toggle" aria-label={t("header.langToggle")}>
             {t("header.langToggle")}
           </button>

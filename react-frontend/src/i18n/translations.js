@@ -15,6 +15,7 @@ export const translations = {
     "header.logout": "تسجيل خروج",
     "header.login": "تسجيل الدخول",
     "header.langToggle": "English",
+    "header.dashboard": "لوحة التحكم",
 
     // footer
     "footer.blurb": "فساتين تحكي قصتك — تسوقي، أجّري، أو بيعي فستانك في مكان واحد.",
@@ -750,6 +751,7 @@ export const translations = {
     "header.logout": "Log out",
     "header.login": "Log in",
     "header.langToggle": "العربية",
+    "header.dashboard": "My Dashboard",
 
     // footer
     "footer.blurb": "Dresses that tell your story — shop, rent, or sell in one place.",

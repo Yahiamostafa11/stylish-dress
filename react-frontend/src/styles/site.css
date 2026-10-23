@@ -57,6 +57,9 @@ nav.main a.on{color:var(--rose-600);font-weight:600;border-bottom:2px solid var(
   color:var(--rose-600);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;
   transition:background .15s ease,color .15s ease}
 .lang-toggle:hover{background:var(--rose-600);color:#fff;border-color:var(--rose-600)}
+.dash-chip{height:32px;padding:0 14px;border-radius:999px;background:var(--rose-600);color:#fff;font-size:12px;font-weight:700;
+  display:inline-flex;align-items:center;white-space:nowrap;text-decoration:none;transition:background .15s ease}
+.dash-chip:hover{background:var(--rose-500)}
 .badge i{position:absolute;top:-6px;inset-inline-end:-7px;width:16px;height:16px;border-radius:50%;
   background:var(--rose-600);color:#fff;font-size:9.5px;font-style:normal;font-weight:700;
   display:flex;align-items:center;justify-content:center}
