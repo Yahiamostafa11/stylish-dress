@@ -5653,15 +5653,25 @@ Route::get('/api/products', function (Request $request) use ($apiCors, $apiWpBas
     [$page, $perPage, $offset] = apiPageParams($request, 40, 100);
 
     $query = DB::table('wp_posts as p')
-        ->leftJoin('wp_postmeta as price', fn ($j) => $j->on('p.ID', '=', 'price.post_id')->where('price.meta_key', '_price'))
-        ->leftJoin('wp_postmeta as regular', fn ($j) => $j->on('p.ID', '=', 'regular.post_id')->where('regular.meta_key', '_regular_price'))
-        ->leftJoin('wp_postmeta as sale', fn ($j) => $j->on('p.ID', '=', 'sale.post_id')->where('sale.meta_key', '_sale_price'))
+        ->leftJoin('wp_postmeta as price', fn ($j) => $j->on('p.ID', '=', 'price.post_id')->where('price.meta_key', '_price')->whereRaw('price.meta_id = (select min(m_price.meta_id) from wp_postmeta m_price where m_price.post_id = p.ID and m_price.meta_key = "_price")'))
+        ->leftJoin('wp_postmeta as regular', fn ($j) => $j->on('p.ID', '=', 'regular.post_id')->where('regular.meta_key', '_regular_price')->whereRaw('regular.meta_id = (select min(m_regular.meta_id) from wp_postmeta m_regular where m_regular.post_id = p.ID and m_regular.meta_key = "_regular_price")'))
+        ->leftJoin('wp_postmeta as sale', fn ($j) => $j->on('p.ID', '=', 'sale.post_id')->where('sale.meta_key', '_sale_price')->whereRaw('sale.meta_id = (select min(m_sale.meta_id) from wp_postmeta m_sale where m_sale.post_id = p.ID and m_sale.meta_key = "_sale_price")'))
         ->leftJoin('wp_postmeta as thumb', fn ($j) => $j->on('p.ID', '=', 'thumb.post_id')->where('thumb.meta_key', '_thumbnail_id'))
         ->leftJoin('wp_posts as img', 'thumb.meta_value', '=', 'img.ID')
         ->leftJoin('wp_postmeta as img_file', fn ($j) => $j->on('img.ID', '=', 'img_file.post_id')->where('img_file.meta_key', '_wp_attached_file'))
         ->leftJoin('wp_postmeta as img_meta', fn ($j) => $j->on('img.ID', '=', 'img_meta.post_id')->where('img_meta.meta_key', '_wp_attachment_metadata'))
         ->where('p.post_type', 'product')
         ->where('p.post_status', 'publish')
+        ->whereNotExists(function ($sub) {
+            // "Catalog visibility: hidden" in WooCommerce
+            $sub->select(DB::raw(1))
+                ->from('wp_term_relationships as tr_hid')
+                ->join('wp_term_taxonomy as tt_hid', 'tr_hid.term_taxonomy_id', '=', 'tt_hid.term_taxonomy_id')
+                ->join('wp_terms as t_hid', 'tt_hid.term_id', '=', 't_hid.term_id')
+                ->where('tt_hid.taxonomy', 'product_visibility')
+                ->where('t_hid.slug', 'exclude-from-catalog')
+                ->whereColumn('tr_hid.object_id', 'p.ID');
+        })
         ->whereNotExists(function ($sub) {
             $sub->select(DB::raw(1))
                 ->from('wp_term_relationships as tr_amnahi')

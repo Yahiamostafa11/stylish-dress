@@ -522,7 +522,7 @@ Route::get('/api/amnahi/listings', function (Request $request) use ($amnahiScope
 
     $base = DB::table('wp_posts as p')
         ->where($amnahiScope)
-        ->leftJoin('wp_postmeta as price', fn ($j) => $j->on('p.ID', '=', 'price.post_id')->where('price.meta_key', '_price'))
+        ->leftJoin('wp_postmeta as price', fn ($j) => $j->on('p.ID', '=', 'price.post_id')->where('price.meta_key', '_price')->whereRaw('price.meta_id = (select min(m_price.meta_id) from wp_postmeta m_price where m_price.post_id = p.ID and m_price.meta_key = "_price")'))
         ->leftJoin('wp_postmeta as thumb', fn ($j) => $j->on('p.ID', '=', 'thumb.post_id')->where('thumb.meta_key', '_thumbnail_id'))
         ->leftJoin('wp_posts as img', 'thumb.meta_value', '=', 'img.ID')
         ->leftJoin('wp_postmeta as img_file', fn ($j) => $j->on('img.ID', '=', 'img_file.post_id')->where('img_file.meta_key', '_wp_attached_file'))
@@ -574,7 +574,7 @@ Route::get('/api/amnahi/mine', function (Request $request) use ($amnahiScope, $a
 
     $rows = DB::table('wp_posts as p')
         ->where($amnahiScope)
-        ->leftJoin('wp_postmeta as price', fn ($j) => $j->on('p.ID', '=', 'price.post_id')->where('price.meta_key', '_price'))
+        ->leftJoin('wp_postmeta as price', fn ($j) => $j->on('p.ID', '=', 'price.post_id')->where('price.meta_key', '_price')->whereRaw('price.meta_id = (select min(m_price.meta_id) from wp_postmeta m_price where m_price.post_id = p.ID and m_price.meta_key = "_price")'))
         ->leftJoin('wp_postmeta as thumb', fn ($j) => $j->on('p.ID', '=', 'thumb.post_id')->where('thumb.meta_key', '_thumbnail_id'))
         ->leftJoin('wp_posts as img', 'thumb.meta_value', '=', 'img.ID')
         ->leftJoin('wp_postmeta as img_file', fn ($j) => $j->on('img.ID', '=', 'img_file.post_id')->where('img_file.meta_key', '_wp_attached_file'))
@@ -601,7 +601,7 @@ Route::get('/api/amnahi/listings/{id}', function (Request $request, string $id) 
 
     $row = DB::table('wp_posts as p')
         ->where($amnahiScope)
-        ->leftJoin('wp_postmeta as price', fn ($j) => $j->on('p.ID', '=', 'price.post_id')->where('price.meta_key', '_price'))
+        ->leftJoin('wp_postmeta as price', fn ($j) => $j->on('p.ID', '=', 'price.post_id')->where('price.meta_key', '_price')->whereRaw('price.meta_id = (select min(m_price.meta_id) from wp_postmeta m_price where m_price.post_id = p.ID and m_price.meta_key = "_price")'))
         ->leftJoin('wp_postmeta as dtype', fn ($j) => $j->on('p.ID', '=', 'dtype.post_id')->where('dtype.meta_key', '_styliiiish_amnahi_dress_type'))
         ->leftJoin('wp_postmeta as thumb', fn ($j) => $j->on('p.ID', '=', 'thumb.post_id')->where('thumb.meta_key', '_thumbnail_id'))
         ->leftJoin('wp_posts as img', 'thumb.meta_value', '=', 'img.ID')
