@@ -44,11 +44,18 @@ add_filter('woocommerce_login_redirect', function ($redirect, $user) {
 	return home_url('/');
 }, 20, 2);
 
-// Sign-in through the plain WordPress login screen: same, unless a return page was requested
-// (the owner-dashboard login form below always asks to come back to the dashboard).
+// Sign-in through the plain WordPress login screen (the hidden /secure-admin/ page): owner and managers land on
+// the Owner Dashboard instead of the WordPress admin, unless they asked for a specific page.
+// WordPress itself fills "redirect_to" with the wp-admin address when nothing was requested, so that
+// value counts as "no request" too.
 add_filter('login_redirect', function ($redirect_to, $requested, $user) {
-	if ($user instanceof WP_User && styliiiish_is_dashboard_user($user->ID) && empty($requested)) {
-		return home_url('/');
+	if (!($user instanceof WP_User) || !styliiiish_is_dashboard_user($user->ID)) {
+		return $redirect_to;
+	}
+
+	$requested = trim((string) $requested);
+	if ($requested === '' || untrailingslashit($requested) === untrailingslashit(admin_url())) {
+		return home_url('/owner-dashboard/');
 	}
 
 	return $redirect_to;
