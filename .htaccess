@@ -89,6 +89,18 @@ RewriteRule ^ %{REQUEST_URI}? [R=301,L]
 </IfModule>
 
 # =====================================
+# ONE HOST: www -> styliiiish.com
+# WordPress login cookies belong to a single host name, so someone who signs in on
+# www.styliiiish.com is sent to styliiiish.com (home_url) logged out. One canonical host fixes that
+# (and avoids every page existing twice for Google).
+# =====================================
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{HTTP_HOST} ^www\.styliiiish\.com$ [NC]
+RewriteRule ^(.*)$ https://styliiiish.com/$1 [R=301,L]
+</IfModule>
+
+# =====================================
 # HYBRID ROUTER (WordPress + Laravel)
 # =====================================
 <IfModule mod_rewrite.c>
